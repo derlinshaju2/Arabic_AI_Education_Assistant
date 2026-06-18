@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Answer Evaluation - Arabic AI Education Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- TOP NAVIGATION -->
+    <header class="topbar">
+        <div class="brand-row">
+            <a href="/dashboard" class="brand-mark" title="Back to Dashboard">
+                <svg viewBox="0 0 24 24" role="img">
+                    <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M8 10.2h8M8 13.8h5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+            </a>
+            <span class="brand-text">Answer Evaluation</span>
+        </div>
+        <nav class="top-actions" aria-label="Account">
+            <a href="/dashboard" class="button secondary small">Back to Dashboard</a>
+            <div class="profile-dropdown-wrapper">
+                <button class="profile-trigger" id="profileTrigger" aria-label="User menu" aria-expanded="false">
+                    {% if user.profileImage %}
+                    <img class="user-avatar" src="{{ user.profileImage }}" alt="{{ user.name }}" width="36" height="36">
+                    {% else %}
+                    <div class="user-avatar initial">{{ user.name[:1].upper() if user.name else 'U' }}</div>
+                    {% endif %}
+                    <div class="user-info">
+                        <span class="user-name">{{ user.name }}</span>
+                        <span class="user-email">{{ user.email }}</span>
+                    </div>
+                    <svg class="dropdown-chevron" viewBox="0 0 24 24" width="16" height="16">
+                        <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-header">
+                        <span class="dropdown-user-name">{{ user.name }}</span>
+                        <span class="dropdown-user-email">{{ user.email }}</span>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="/logout" class="dropdown-item danger">
+                        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="page-shell">
+        <!-- MODULE HEADER -->
+        <section class="module-page-header">
+            <a href="/dashboard" class="back-link">
+                <svg viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Back to Dashboard
+            </a>
+            <div class="module-page-title">
+                <div class="module-icon">
+                    <svg viewBox="0 0 24 24" role="img">
+                        <path d="M7 3h7l4 4v14H7a2 2 0 01-2-2V5a2 2 0 012-2z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M14 3v5h5M8.5 12h7M8.5 15h7M8.5 18h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="eyebrow">Module 02</p>
+                    <h1>Answer Evaluation</h1>
+                    <p class="subtitle">Compare reference and student answers with AI-powered evaluation</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-single-grid">
+            <article class="module-card module-card-full">
+                <!-- Form with AJAX and standard POST fallback -->
+                <form class="stack" id="evaluateForm" action="/evaluate" method="post">
+                    <label class="field">
+                        <span>Subject</span>
+                        <select name="subject" id="evalSubject" class="select-input">
+                            <option value="Arabic">Arabic</option>
+                            <option value="Science">Science</option>
+                            <option value="History">History</option>
+                            <option value="Math">Math</option>
+                        </select>
+                    </label>
+
+                    <label class="field">
+                        <span>Reference Answer</span>
+                        <div class="textarea-wrapper">
+                            <textarea name="reference" id="evalReference" rows="4" placeholder="Enter the expected/correct answer" required maxlength="2000">{{ reference_answer or "" }}</textarea>
+                            <span class="char-counter"><span id="refCharCount">0</span>/2000</span>
+                        </div>
+                    </label>
+
+                    <label class="field">
+                        <span>Student Answer</span>
+                        <div class="textarea-wrapper">
+                            <textarea name="student" id="evalStudent" rows="4" placeholder="Enter the student's response" required maxlength="2000">{{ student_answer or "" }}</textarea>
+                            <span class="char-counter"><span id="stuCharCount">0</span>/2000</span>
+                        </div>
+                    </label>
+
+                    <div id="evalError" class="alert error-msg" style="display:none;"></div>
+
+                    <button class="button primary full" type="submit" id="evalSubmit">
+                        <span class="btn-text">Evaluate Answer</span>
+                        <span class="btn-loader" style="display:none;"><span class="spinner"></span> Evaluating...</span>
+                    </button>
+                </form>
+
+                <!-- Evaluation Results -->
+                {% if evaluation_result %}
+                <div class="eval-results" id="evalResults">
+                    <div class="result-header">
+                        <h3>Evaluation Results</h3>
+                    </div>
+
+                    <div class="score-section">
+                        <div class="score-circle" id="scoreCircle">
+                            <svg viewBox="0 0 120 120" class="score-svg">
+                                <circle cx="60" cy="60" r="52" fill="none" stroke="#e2e8f0" stroke-width="8"/>
+                                <circle cx="60" cy="60" r="52" fill="none" stroke="#0d9488" stroke-width="8" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="{{ 326.73 - (evaluation_result.score_percentage or (evaluation_result.score * 10)) / 100 * 326.73 }}" class="score-progress" id="scoreProgress" style="{% if evaluation_result.score >= 7 %}stroke:#16a34a;{% elif evaluation_result.score >= 4 %}stroke:#f59e0b;{% else %}stroke:#dc2626;{% endif %}"/>
+                            </svg>
+                            <div class="score-text">
+                                <span class="score-number" id="scoreNumber">{{ evaluation_result.score_percentage or (evaluation_result.score * 10) }}</span>
+                                <span class="score-unit">%</span>
+                            </div>
+                        </div>
+                        <div class="score-details">
+                            <span class="score-grade" id="scoreGrade">
+                                {% if evaluation_result.score >= 9 %}Excellent{% elif evaluation_result.score >= 7 %}Good{% elif evaluation_result.score >= 5 %}Fair{% elif evaluation_result.score >= 3 %}Needs Work{% else %}Poor{% endif %}
+                            </span>
+                            <span class="score-out-of" id="scoreOutOf">Score: {{ evaluation_result.score }} / 10</span>
+                        </div>
+                    </div>
+
+                    {% if evaluation_result.feedback %}
+                    <div class="feedback-section" id="feedbackCorrect">
+                        <h4 class="feedback-title correct">
+                            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M22 4L12 14.01l-3-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Correct Concepts
+                        </h4>
+                        <ul class="feedback-list" id="correctList">
+                            {% for item in evaluation_result.feedback.correct_concepts %}
+                            <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="feedback-section" id="feedbackMissing">
+                        <h4 class="feedback-title missing">
+                            <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 9l-6 6M9 9l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                            Missing Concepts
+                        </h4>
+                        <ul class="feedback-list" id="missingList">
+                            {% for item in evaluation_result.feedback.missing_concepts %}
+                            <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="feedback-section" id="feedbackSuggestions">
+                        <h4 class="feedback-title suggestions">
+                            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 21h6M10 17v4M14 17v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                            Improvement Suggestions
+                        </h4>
+                        <ul class="feedback-list" id="suggestionsList">
+                            {% for item in evaluation_result.feedback.suggestions %}
+                            <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="eval-results" id="evalResults" style="display:none;">
+                    <div class="result-header">
+                        <h3>Evaluation Results</h3>
+                    </div>
+
+                    <div class="score-section">
+                        <div class="score-circle" id="scoreCircle">
+                            <svg viewBox="0 0 120 120" class="score-svg">
+                                <circle cx="60" cy="60" r="52" fill="none" stroke="#e2e8f0" stroke-width="8"/>
+                                <circle cx="60" cy="60" r="52" fill="none" stroke="#0d9488" stroke-width="8" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73" class="score-progress" id="scoreProgress"/>
+                            </svg>
+                            <div class="score-text">
+                                <span class="score-number" id="scoreNumber">0</span>
+                                <span class="score-unit">%</span>
+                            </div>
+                        </div>
+                        <div class="score-details">
+                            <span class="score-grade" id="scoreGrade">--</span>
+                            <span class="score-out-of" id="scoreOutOf">Score: 0 / 10</span>
+                        </div>
+                    </div>
+
+                    <div class="feedback-section" id="feedbackCorrect">
+                        <h4 class="feedback-title correct">
+                            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M22 4L12 14.01l-3-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Correct Concepts
+                        </h4>
+                        <ul class="feedback-list" id="correctList"></ul>
+                    </div>
+
+                    <div class="feedback-section" id="feedbackMissing">
+                        <h4 class="feedback-title missing">
+                            <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 9l-6 6M9 9l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                            Missing Concepts
+                        </h4>
+                        <ul class="feedback-list" id="missingList"></ul>
+                    </div>
+
+                    <div class="feedback-section" id="feedbackSuggestions">
+                        <h4 class="feedback-title suggestions">
+                            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 21h6M10 17v4M14 17v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                            Improvement Suggestions
+                        </h4>
+                        <ul class="feedback-list" id="suggestionsList"></ul>
+                    </div>
+                </div>
+                {% endif %}
+            </article>
+        </div>
+    </main>
+
+    <script>
+        window.USER_DATA = {{ user | tojson }};
+        {% if evaluation_result %}
+        window._lastEval = {{ evaluation_result | tojson }};
+        {% endif %}
+    </script>
+    <script src="/static/script.js"></script>
+</body>
+</html>

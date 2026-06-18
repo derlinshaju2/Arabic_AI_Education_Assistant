@@ -1,0 +1,88 @@
+<!-- Image Captioning Module Content -->
+<div class="module-content-wrapper">
+    <!-- MODULE HEADER -->
+    <section class="module-page-header">
+        <div class="module-page-title">
+            <div class="module-icon">
+                <svg viewBox="0 0 24 24" role="img">
+                    <path d="M4 7.5A2.5 2.5 0 016.5 5h11A2.5 2.5 0 0120 7.5v9A2.5 2.5 0 0117.5 19h-11A2.5 2.5 0 014 16.5v-9z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M8 5l1.2-2h5.6L16 5M8.5 15l2.2-2.4 1.9 1.8 2.2-3 2.7 3.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div>
+                <p class="eyebrow">Module 01</p>
+                <h2>Image Captioning</h2>
+                <p class="subtitle">Upload an image to generate an Arabic caption with English translation</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="module-single-grid">
+        <article class="module-card module-card-full">
+            <!-- Form with both AJAX and standard POST fallback -->
+            <form class="stack" id="captionForm" action="/upload" method="post" enctype="multipart/form-data">
+                <div class="file-drop" id="captionDropZone">
+                    <input type="file" name="image" id="captionFileInput" accept="image/jpeg,image/png,image/webp,image/gif" required>
+                    <div class="drop-content" id="captionDropContent">
+                        <div class="drop-icon">
+                            <svg viewBox="0 0 24 24" role="img">
+                                <path d="M12 15V4m0 0L8 8m4-4l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M5 15v2.5A2.5 2.5 0 007.5 20h9a2.5 2.5 0 002.5-2.5V15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <span class="file-title" id="captionFileTitle">Drag & drop or click to upload</span>
+                        <span class="file-formats">Supports JPG, PNG, WebP, GIF</span>
+                    </div>
+                    <img class="upload-preview" id="captionPreview" alt="Preview" style="display:none;">
+                </div>
+
+                <div id="captionError" class="alert error-msg" style="display:none;"></div>
+
+                <button class="button primary full" type="submit" id="captionSubmit">
+                    <span class="btn-text">Generate Caption</span>
+                    <span class="btn-loader" style="display:none;"><span class="spinner"></span> Analyzing image...</span>
+                </button>
+            </form>
+
+            <!-- Caption Results -->
+            <div class="result-panel" id="captionResults" style="display:none;">
+                <div class="result-header">
+                    <h3>Generated Caption</h3>
+                    <div class="result-actions">
+                        <button class="icon-btn" onclick="copyCaption()" title="Copy to clipboard">
+                            <svg viewBox="0 0 24 24" width="16" height="16"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                            Copy
+                        </button>
+                        <button class="icon-btn" onclick="downloadCaption()" title="Download result">
+                            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Download
+                        </button>
+                    </div>
+                </div>
+                <img class="preview-image" id="resultImage" src="" alt="Uploaded image">
+                <div class="result-list">
+                    <div class="result-item">
+                        <span class="result-tag arabic-tag">Arabic Caption</span>
+                        <p class="arabic-text" id="resultArabic" dir="rtl"></p>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-tag english-tag">English Translation</span>
+                        <p id="resultEnglish"></p>
+                    </div>
+                </div>
+                <div class="confidence-bar">
+                    <span class="confidence-label">Confidence</span>
+                    <div class="confidence-track">
+                        <div class="confidence-fill" id="confidenceFill" style="width: 75%;"></div>
+                    </div>
+                    <span class="confidence-value" id="confidenceValue">75%</span>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+<script>
+    // Re-initialize caption form handlers after content is loaded
+    initializeCaptioningModule();
+</script>

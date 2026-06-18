@@ -1,0 +1,111 @@
+<!-- Answer Evaluation Module Content -->
+<div class="module-content-wrapper">
+    <!-- MODULE HEADER -->
+    <section class="module-page-header">
+        <div class="module-page-title">
+            <div class="module-icon">
+                <svg viewBox="0 0 24 24" role="img">
+                    <path d="M7 3h7l4 4v14H7a2 2 0 01-2-2V5a2 2 0 012-2z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M14 3v5h5M8.5 12h7M8.5 15h7M8.5 18h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div>
+                <p class="eyebrow">Module 02</p>
+                <h2>Answer Evaluation</h2>
+                <p class="subtitle">Compare and evaluate student answers with AI-powered analysis and detailed feedback</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="module-single-grid">
+        <article class="module-card module-card-full">
+            <!-- Evaluation Form -->
+            <form class="stack" id="evaluationForm" action="/evaluate" method="post" enctype="multipart/form-data">
+                <div class="form-row">
+                    <div class="field">
+                        <label for="subject">Subject/Topic</label>
+                        <input type="text" id="subject" name="subject" placeholder="e.g., Islamic History, Math, Biology" required>
+                    </div>
+                </div>
+
+                <div class="form-row two-cols">
+                    <div class="field">
+                        <label for="reference">Reference Answer</label>
+                        <textarea id="reference" name="reference" placeholder="Enter the correct/reference answer..." required></textarea>
+                        <div class="char-counter"><span id="refCounter">0</span>/500</div>
+                    </div>
+                    <div class="field">
+                        <label for="student">Student Answer</label>
+                        <textarea id="student" name="student" placeholder="Enter the student's answer..." required></textarea>
+                        <div class="char-counter"><span id="stuCounter">0</span>/500</div>
+                    </div>
+                </div>
+
+                <div id="evaluationError" class="alert error-msg" style="display:none;"></div>
+
+                <button class="button primary full" type="submit" id="evaluationSubmit">
+                    <span class="btn-text">Evaluate Answer</span>
+                    <span class="btn-loader" style="display:none;"><span class="spinner"></span> Analyzing answers...</span>
+                </button>
+            </form>
+
+            <!-- Evaluation Results -->
+            <div class="evaluation-results" id="evaluationResults" style="display:none;">
+                <div class="result-header">
+                    <h3>Evaluation Results</h3>
+                </div>
+
+                <!-- Score Display -->
+                <div class="score-display">
+                    <div class="score-circle" id="scoreCircle">
+                        <span class="score-value" id="scoreValue">0</span>
+                        <span class="score-label">/10</span>
+                    </div>
+                    <div class="score-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Similarity</span>
+                            <span class="detail-value" id="similarityValue">0%</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Coverage</span>
+                            <span class="detail-value" id="coverageValue">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Sections -->
+                <div class="feedback-sections">
+                    <div class="feedback-section correct">
+                        <h4>✓ Correct Concepts</h4>
+                        <ul id="correctList"></ul>
+                    </div>
+                    <div class="feedback-section missing">
+                        <h4>✗ Missing Concepts</h4>
+                        <ul id="missingList"></ul>
+                    </div>
+                    <div class="feedback-section suggestions">
+                        <h4>💡 Suggestions</h4>
+                        <ul id="suggestionsList"></ul>
+                    </div>
+                </div>
+
+                <!-- Answer Comparison -->
+                <div class="answer-comparison">
+                    <div class="answer-box reference">
+                        <h4>Reference Answer</h4>
+                        <p id="comparisonReference"></p>
+                    </div>
+                    <div class="answer-box student">
+                        <h4>Student Answer</h4>
+                        <p id="comparisonStudent"></p>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+<script>
+    // Re-initialize evaluation form handlers after content is loaded
+    initializeEvaluationModule();
+</script>

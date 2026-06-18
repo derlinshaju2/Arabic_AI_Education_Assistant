@@ -1,0 +1,42 @@
+# Dataset
+dataset/
+
+# Features
+features/
+
+# Models
+models/
+*.h5
+*.pt
+*.bin
+*.onnx
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# VS Code
+.vscode/
+
+# Uploads (runtime files)
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Environment variables
+.env
+users.db
+
+# API keys
+api key.txt
+OPEN AI.txt
+
+# Logs & system files
+*.log
+*.out
+.DS_Store
+Thumbs.db
