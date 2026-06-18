@@ -1,6 +1,7 @@
 Flask
 gunicorn
 flask-cors
+python-dotenv
 
 bcrypt
 pyjwt
