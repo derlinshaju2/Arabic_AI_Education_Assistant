@@ -3,284 +3,267 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IntelliArabic — AI-Powered Arabic Learning & Evaluation</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>IntelliArabic - AI-Powered Arabic Learning & Evaluation</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='hero.css') }}">
 </head>
-<body class="bg-white text-slate-900 antialiased">
-  <div class="min-h-screen flex flex-col">
-    <header class="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-slate-200/60">
-      <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <a href="#top" class="flex items-center gap-3">
-          <img src="/static/arabic.png" alt="IntelliArabic" class="h-10 w-auto" />
-          <span class="hidden sm:inline text-base font-semibold text-slate-900">IntelliArabic</span>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <div class="nav-inner">
+        <a class="brand" href="#home" aria-label="IntelliArabic home">
+          <img src="{{ url_for('static', filename='arabic.png') }}" alt="IntelliArabic logo">
+          <span>IntelliArabic</span>
         </a>
-        <nav class="hidden items-center justify-center gap-8 text-sm font-medium text-slate-700 md:flex">
-          <a href="#home" class="transition hover:text-indigo-600">Home</a>
-          <a href="#features" class="transition hover:text-indigo-600">Features</a>
-          <a href="#how-it-works" class="transition hover:text-indigo-600">How It Works</a>
-          <a href="#testimonials" class="transition hover:text-indigo-600">About</a>
-          <a href="#faq" class="transition hover:text-indigo-600">FAQ</a>
-          <button type="button" onclick="window.location.href='/login'" class="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-50">Login</button>
+
+        <nav class="desktop-nav" aria-label="Primary navigation">
+          <a href="#home">Home</a>
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#about">About</a>
+          <a href="#faq">FAQ</a>
+          <button type="button" class="nav-login" onclick="window.location.href='/login'">Login</button>
         </nav>
-        <button id="mobileMenuButton" class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white p-2 text-slate-700 transition hover:bg-slate-50 md:hidden">
-          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+
+        <button id="mobileMenuButton" class="menu-button" type="button" aria-label="Open menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
         </button>
       </div>
-      <div id="mobileMenu" class="hidden border-t border-slate-200 bg-white/95 px-4 py-4 md:hidden">
-        <div class="flex flex-col gap-3 text-sm font-medium text-slate-700">
-          <a href="#home" class="block rounded-2xl px-4 py-3 transition hover:bg-slate-100">Home</a>
-          <a href="#features" class="block rounded-2xl px-4 py-3 transition hover:bg-slate-100">Features</a>
-          <a href="#how-it-works" class="block rounded-2xl px-4 py-3 transition hover:bg-slate-100">How It Works</a>
-          <a href="#testimonials" class="block rounded-2xl px-4 py-3 transition hover:bg-slate-100">About</a>
-          <a href="#faq" class="block rounded-2xl px-4 py-3 transition hover:bg-slate-100">FAQ</a>
-          <button type="button" onclick="window.location.href='/login'" class="block text-left rounded-2xl px-4 py-3 transition hover:bg-slate-100">Login</button>
-        </div>
-      </div>
+
+      <nav id="mobileMenu" class="mobile-nav" aria-label="Mobile navigation">
+        <a href="#home">Home</a>
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#about">About</a>
+        <a href="#faq">FAQ</a>
+        <button type="button" onclick="window.location.href='/login'">Login</button>
+      </nav>
     </header>
 
-    <main id="home" class="flex-1">
-      <section class="relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 pt-16 pb-24">
-        <div class="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.12),_transparent_30%)]"></div>
-        <div class="mx-auto grid max-w-7xl gap-16 px-4 pb-16 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
-          <div class="relative flex flex-col justify-center gap-6 pt-8">
-            <div class="inline-flex rounded-full bg-gradient-to-r from-indigo-600 to-sky-500 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white shadow-lg shadow-indigo-500/10">AI-Powered Arabic Learning &amp; Evaluation</div>
-            <div class="space-y-6">
-              <h1 class="text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">IntelliArabic brings image captioning and answer evaluation into one premium AI learning platform.</h1>
-              <p class="max-w-xl text-base leading-7 text-slate-600 sm:text-lg">Generate Arabic captions from images, score student responses with semantic similarity, and accelerate Arabic learning with university-grade AI tools.</p>
-            </div>
-            <div class="grid gap-4 sm:max-w-max sm:grid-cols-2">
-              <a href="/captioning" class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-600 to-sky-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:brightness-110">Try Image Captioning</a>
-              <a href="/evaluation" class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50">Evaluate Answers</a>
+    <main id="home">
+      <section class="hero-section">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">AI-Powered Arabic Learning & Evaluation</p>
+            <h1>IntelliArabic brings image captioning and answer evaluation into one premium AI learning platform.</h1>
+            <p class="hero-text">Generate Arabic captions from images, score student responses with semantic similarity, and accelerate Arabic learning with university-grade AI tools.</p>
+            <div class="hero-actions">
+              <a class="primary-action" href="/captioning">Try Image Captioning</a>
+              <a class="secondary-action" href="/evaluation">Evaluate Answers</a>
             </div>
           </div>
 
-          <div class="relative flex items-center justify-center">
-            <div class="relative w-full max-w-2xl overflow-hidden rounded-[28px] border border-slate-800/60 bg-[#0b1220] shadow-2xl shadow-black/40">
-              <div class="flex items-center justify-between border-b border-slate-800/60 bg-[#07101a]/80 px-6 py-4">
-                <div class="flex items-center gap-3">
-                  <span class="h-3 w-3 rounded-full bg-rose-500"></span>
-                  <span class="h-3 w-3 rounded-full bg-amber-400"></span>
-                  <span class="h-3 w-3 rounded-full bg-emerald-400"></span>
-                </div>
-                <div class="rounded-full border border-slate-700/50 bg-[#071623] px-3 py-1 text-xs uppercase tracking-[0.3em] text-slate-400">Live preview</div>
+          <div class="preview-panel" aria-label="IntelliArabic platform preview">
+            <div class="preview-topbar">
+              <div class="window-dots" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
               </div>
-              <div class="grid gap-6 p-6 md:grid-cols-[1.05fr_0.95fr]">
-                <div class="space-y-5 rounded-[24px] bg-[#07121a]/60 p-6 text-slate-200 ring-1 ring-black/20 backdrop-blur-sm">
-                  <div class="rounded-[20px] bg-[#06121b]/80 p-5 ring-1 ring-black/20">
-                    <div class="flex items-center justify-between gap-3">
-                      <div>
-                        <p class="text-sm uppercase tracking-[0.28em] text-sky-300/80">Upload Image</p>
-                        <p class="mt-3 text-base font-semibold text-slate-200">al-rabea.jpeg</p>
-                      </div>
-                      <span class="rounded-full bg-[#0e1722] px-3 py-1 text-xs text-slate-400">2.1 MB</span>
-                    </div>
+              <span class="preview-label">Live Preview</span>
+            </div>
+
+            <div class="preview-content">
+              <section class="preview-column">
+                <div class="preview-card compact">
+                  <div>
+                    <span class="mini-label">Upload Image</span>
+                    <strong>al-rabea.jpeg</strong>
                   </div>
-                  <div class="rounded-[20px] bg-[#07121a]/80 p-6 ring-1 ring-black/20">
-                    <div class="flex items-start justify-between gap-4">
-                      <div>
-                        <p class="text-sm uppercase tracking-[0.28em] text-slate-400">Generated Caption</p>
-                        <p class="mt-3 text-base leading-7 text-slate-200">"صورة لطالب يقرأ كتابًا في فصل دراسي حديث" — Accurate Arabic caption with contextual explanation.</p>
-                      </div>
-                      <div class="hidden h-12 w-12 rounded-3xl bg-gradient-to-br from-indigo-500 to-sky-400 text-white md:grid place-items-center text-sm font-semibold">A+</div>
-                    </div>
+                  <span class="file-chip">2.1 MB</span>
+                </div>
+
+                <div class="preview-card">
+                  <span class="mini-label">Generated Caption</span>
+                  <p>Arabic caption generated with context-aware learning feedback and classroom-ready vocabulary support.</p>
+                </div>
+
+                <div class="metric-grid">
+                  <div class="metric-card">
+                    <span>Caption Confidence</span>
+                    <strong>92%</strong>
                   </div>
-                  <div class="grid gap-4 md:grid-cols-2">
-                    <div class="rounded-[16px] bg-[#06121b]/70 p-5 ring-1 ring-black/20">
-                      <p class="text-sm uppercase tracking-[0.28em] text-slate-400">Caption confidence</p>
-                      <p class="mt-3 text-2xl font-semibold text-slate-200">92%</p>
-                    </div>
-                    <div class="rounded-[16px] bg-[#06121b]/70 p-5 ring-1 ring-black/20">
-                      <p class="text-sm uppercase tracking-[0.28em] text-slate-400">Response time</p>
-                      <p class="mt-3 text-2xl font-semibold text-slate-200">1.4s</p>
-                    </div>
+                  <div class="metric-card">
+                    <span>Response Time</span>
+                    <strong>1.4s</strong>
                   </div>
                 </div>
-                <div class="space-y-5 rounded-[24px] bg-[#07121a]/60 p-6 ring-1 ring-black/20 backdrop-blur-sm">
-                  <div class="rounded-[20px] bg-[#06121b]/80 p-5 ring-1 ring-black/20">
-                    <div class="flex flex-col gap-4">
-                      <div class="flex items-center justify-between gap-4">
-                        <div>
-                          <p class="text-sm uppercase tracking-[0.28em] text-slate-400">Evaluation score</p>
-                          <p class="mt-2 text-3xl font-semibold text-slate-200">87%</p>
-                        </div>
-                        <div class="rounded-full bg-gradient-to-r from-indigo-500 to-sky-400 px-3 py-2 text-xs font-semibold text-white">High</div>
-                      </div>
-                      <div class="h-2 overflow-hidden rounded-full bg-[#0b1822]">
-                        <div class="h-2 w-[87%] rounded-full bg-gradient-to-r from-sky-500 to-indigo-500"></div>
-                      </div>
+              </section>
+
+              <section class="preview-column">
+                <div class="score-card">
+                  <div class="score-row">
+                    <div>
+                      <span class="mini-label">Evaluation Score</span>
+                      <strong>87%</strong>
                     </div>
+                    <span class="score-chip">High</span>
                   </div>
-                  <div class="rounded-[24px] bg-slate-900/90 p-5 ring-1 ring-slate-700/70">
-                    <p class="text-sm uppercase tracking-[0.28em] text-slate-400">Student answer</p>
-                    <p class="mt-3 text-base leading-7 text-white">"الطالب يدرس اللغة العربية باستخدام الذكاء الاصطناعي لتحسين مهاراته الكتابية."</p>
-                  </div>
-                  <div class="rounded-[24px] bg-slate-900/90 p-5 ring-1 ring-slate-700/70">
-                    <p class="text-sm uppercase tracking-[0.28em] text-slate-400">Suggested correction</p>
-                    <p class="mt-3 text-base leading-7 text-white">مقترح تحسين: التركيز على المفردات والتراكيب النحوية لرفع جودة الإجابة.</p>
-                  </div>
+                  <div class="score-track"><span></span></div>
                 </div>
-              </div>
+
+                <div class="dark-note">
+                  <span class="mini-label">Student Answer</span>
+                  <p>The student answer shows strong understanding with room for richer vocabulary.</p>
+                </div>
+
+                <div class="dark-note">
+                  <span class="mini-label">Suggested Correction</span>
+                  <p>Focus on precise word choice and stronger grammar patterns to improve fluency.</p>
+                </div>
+              </section>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="features" class="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
-        <div class="grid gap-6 text-center">
-          <p class="inline-flex self-start rounded-full bg-indigo-50 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-indigo-700">Features</p>
-          <h2 class="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">Everything educators need to teach Arabic with AI confidence.</h2>
-          <p class="mx-auto max-w-2xl text-base leading-7 text-slate-600">From image captioning to semantic grading, IntelliArabic brings an intelligent workflow for classrooms, tutors, and research programs.</p>
+      <section id="features" class="content-section">
+        <div class="section-heading">
+          <p class="section-kicker">Features</p>
+          <h2>Everything educators need to teach Arabic with AI confidence.</h2>
+          <p>From image captioning to semantic grading, IntelliArabic brings an intelligent workflow for classrooms, tutors, and research programs.</p>
         </div>
-        <div class="mt-12 grid gap-6 lg:grid-cols-4">
-          <article class="rounded-[20px] border border-slate-200/80 bg-white/90 p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-            <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-gradient-to-br from-sky-500 to-indigo-500 text-white shadow-lg shadow-sky-500/20">
-              <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12a7 7 0 0114 0" /><path d="M12 7v6" /><path d="M8 12h8" /></svg>
+
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12a7 7 0 0 1 14 0"/><path d="M12 7v6"/><path d="M8 12h8"/></svg>
             </div>
-            <h3 class="text-lg font-semibold text-slate-950">Arabic Image Caption Generation</h3>
-            <p class="mt-3 text-sm leading-6 text-slate-600">Upload images and instantly receive high-quality Arabic captions for education and assessment.</p>
+            <h3>Arabic Image Caption Generation</h3>
+            <p>Upload images and instantly receive high-quality Arabic captions for education and assessment.</p>
           </article>
-          <article class="rounded-[20px] border border-slate-200/80 bg-white/90 p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-            <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-lg shadow-violet-500/20">
-              <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4" /><path d="M4 19h16" /><path d="M6 4h12" /></svg>
+
+          <article class="feature-card">
+            <div class="feature-icon violet">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 12 2 2 4-4"/><path d="M4 19h16"/><path d="M6 4h12"/></svg>
             </div>
-            <h3 class="text-lg font-semibold text-slate-950">Arabic Answer Evaluation</h3>
-            <p class="mt-3 text-sm leading-6 text-slate-600">Score written answers using semantic similarity and adaptive feedback for learners.</p>
+            <h3>Arabic Answer Evaluation</h3>
+            <p>Score written answers using semantic similarity and adaptive feedback for learners.</p>
           </article>
-          <article class="rounded-[20px] border border-slate-200/80 bg-white/90 p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-            <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-500 to-cyan-500 text-white shadow-lg shadow-emerald-500/20">
-              <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v4" /><path d="M12 20v-4" /><path d="M4 12h4" /><path d="M16 12h4" /><path d="M7.5 7.5l2.5 2.5" /><path d="M14 14l2.5 2.5" /><path d="M7.5 16.5l2.5-2.5" /></svg>
+
+          <article class="feature-card">
+            <div class="feature-icon green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v4"/><path d="M12 20v-4"/><path d="M4 12h4"/><path d="M16 12h4"/><path d="m7.5 7.5 2.5 2.5"/><path d="m14 14 2.5 2.5"/><path d="m7.5 16.5 2.5-2.5"/></svg>
             </div>
-            <h3 class="text-lg font-semibold text-slate-950">Similarity Score Calculation</h3>
-            <p class="mt-3 text-sm leading-6 text-slate-600">Understand student performance with confidence scores and semantic grading metrics.</p>
+            <h3>Similarity Score Calculation</h3>
+            <p>Understand student performance with confidence scores and semantic grading metrics.</p>
           </article>
-          <article class="rounded-[20px] border border-slate-200/80 bg-white/90 p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-            <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-gradient-to-br from-rose-500 to-orange-500 text-white shadow-lg shadow-rose-500/20">
-              <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14" /><path d="M5 7h14" /><path d="M5 17h14" /></svg>
+
+          <article class="feature-card">
+            <div class="feature-icon rose">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 7h14"/><path d="M5 17h14"/></svg>
             </div>
-            <h3 class="text-lg font-semibold text-slate-950">AI-Powered Learning Assistance</h3>
-            <p class="mt-3 text-sm leading-6 text-slate-600">A complete assistant for teachers, tutors, and educational researchers in Arabic language learning.</p>
+            <h3>AI-Powered Learning Assistance</h3>
+            <p>A complete assistant for teachers, tutors, and educational researchers in Arabic language learning.</p>
           </article>
         </div>
       </section>
 
-      <section id="how-it-works" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-        <div class="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-          <div>
-            <p class="text-sm uppercase tracking-[0.35em] text-indigo-600">How it works</p>
-            <h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">A simple three-step workflow for educators and students.</h2>
-            <p class="mt-4 max-w-xl text-base leading-7 text-slate-600">From image upload to semantic grading, IntelliArabic delivers transparent AI-powered Arabic learning support with results you can trust.</p>
-          </div>
-          <div class="space-y-6">
-            <div class="rounded-[24px] border border-slate-200/80 bg-white/95 p-6 shadow-sm">
-              <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-gradient-to-br from-indigo-600 to-sky-500 text-white shadow-lg shadow-sky-500/20">
-                <span class="text-base font-semibold">1</span>
-              </div>
-              <h3 class="text-lg font-semibold text-slate-950">Upload your learning material</h3>
-              <p class="mt-3 text-sm leading-6 text-slate-600">Teachers or students upload images and sample answers to the platform.</p>
-            </div>
-            <div class="rounded-[24px] border border-slate-200/80 bg-white/95 p-6 shadow-sm">
-              <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-500 to-cyan-500 text-white shadow-lg shadow-emerald-500/20">
-                <span class="text-base font-semibold">2</span>
-              </div>
-              <h3 class="text-lg font-semibold text-slate-950">Generate captions and scores</h3>
-              <p class="mt-3 text-sm leading-6 text-slate-600">IntelliArabic creates Arabic captions, evaluates responses, and produces similarity-based scoring.</p>
-            </div>
-            <div class="rounded-[24px] border border-slate-200/80 bg-white/95 p-6 shadow-sm">
-              <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-gradient-to-br from-rose-500 to-orange-500 text-white shadow-lg shadow-rose-500/20">
-                <span class="text-base font-semibold">3</span>
-              </div>
-              <h3 class="text-lg font-semibold text-slate-950">Review insights and improve learning</h3>
-              <p class="mt-3 text-sm leading-6 text-slate-600">Use AI insights to refine lessons, personalize feedback, and improve Arabic fluency.</p>
-            </div>
-          </div>
+      <section id="how-it-works" class="workflow-section">
+        <div class="workflow-copy">
+          <p class="section-kicker">How It Works</p>
+          <h2>A simple three-step workflow for educators and students.</h2>
+          <p>From image upload to semantic grading, IntelliArabic delivers transparent AI-powered Arabic learning support with results you can trust.</p>
+        </div>
+
+        <div class="step-list">
+          <article class="step-card">
+            <span>1</span>
+            <h3>Upload your learning material</h3>
+            <p>Teachers or students upload images and sample answers to the platform.</p>
+          </article>
+          <article class="step-card">
+            <span>2</span>
+            <h3>Generate captions and scores</h3>
+            <p>IntelliArabic creates Arabic captions, evaluates responses, and produces similarity-based scoring.</p>
+          </article>
+          <article class="step-card">
+            <span>3</span>
+            <h3>Review insights and improve learning</h3>
+            <p>Use AI insights to refine lessons, personalize feedback, and improve Arabic fluency.</p>
+          </article>
         </div>
       </section>
 
-      <section id="testimonials" class="bg-slate-50 px-4 py-20 sm:px-6 lg:px-8">
-        <div class="mx-auto max-w-7xl text-center">
-          <p class="text-sm uppercase tracking-[0.35em] text-indigo-600">Testimonials</p>
-          <h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">Trusted by educators and institutions worldwide.</h2>
-          <div class="mt-12 grid gap-6 lg:grid-cols-3">
-            <article class="rounded-[24px] bg-white p-6 shadow-sm ring-1 ring-slate-200/80">
-              <p class="text-lg font-semibold text-slate-900">"IntelliArabic transformed our Arabic curriculum with fast, reliable grading support."</p>
-              <p class="mt-4 text-sm leading-6 text-slate-600">— Dr. Amina Farouk, Curriculum Lead</p>
-            </article>
-            <article class="rounded-[24px] bg-white p-6 shadow-sm ring-1 ring-slate-200/80">
-              <p class="text-lg font-semibold text-slate-900">"The captioning features save time and help students connect visual learning to Arabic vocabulary."</p>
-              <p class="mt-4 text-sm leading-6 text-slate-600">— Prof. Omar Salem, Arabic Language Department</p>
-            </article>
-            <article class="rounded-[24px] bg-white p-6 shadow-sm ring-1 ring-slate-200/80">
-              <p class="text-lg font-semibold text-slate-900">"A polished platform that feels built for modern academic institutions."</p>
-              <p class="mt-4 text-sm leading-6 text-slate-600">— Leila Mansour, EdTech Coordinator</p>
-            </article>
-          </div>
+      <section id="about" class="testimonial-section">
+        <div class="section-heading">
+          <p class="section-kicker">Testimonials</p>
+          <h2>Trusted by educators and institutions worldwide.</h2>
+        </div>
+
+        <div class="testimonial-grid">
+          <article>
+            <p>"IntelliArabic transformed our Arabic curriculum with fast, reliable grading support."</p>
+            <span>Dr. Amina Farouk, Curriculum Lead</span>
+          </article>
+          <article>
+            <p>"The captioning features save time and help students connect visual learning to Arabic vocabulary."</p>
+            <span>Prof. Omar Salem, Arabic Language Department</span>
+          </article>
+          <article>
+            <p>"A polished platform that feels built for modern academic institutions."</p>
+            <span>Leila Mansour, EdTech Coordinator</span>
+          </article>
         </div>
       </section>
 
-      <section id="faq" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-        <div class="grid gap-10 lg:grid-cols-[0.9fr_0.7fr] lg:items-start">
-          <div>
-            <p class="text-sm uppercase tracking-[0.35em] text-indigo-600">FAQ</p>
-            <h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">Frequently asked questions</h2>
-          </div>
-          <div class="space-y-4">
-            <div class="rounded-[24px] border border-slate-200/80 bg-white p-6 shadow-sm">
-              <h3 class="font-semibold text-slate-950">How accurate are the Arabic captions?</h3>
-              <p class="mt-3 text-sm leading-6 text-slate-600">Our AI models provide high-quality captions with context-aware translations curated for educational use.</p>
-            </div>
-            <div class="rounded-[24px] border border-slate-200/80 bg-white p-6 shadow-sm">
-              <h3 class="font-semibold text-slate-950">Can I use IntelliArabic for classroom grading?</h3>
-              <p class="mt-3 text-sm leading-6 text-slate-600">Yes — it is designed to support educators with scalable grading and insightful feedback dashboards.</p>
-            </div>
-            <div class="rounded-[24px] border border-slate-200/80 bg-white p-6 shadow-sm">
-              <h3 class="font-semibold text-slate-950">Does this work for all dialects of Arabic?</h3>
-              <p class="mt-3 text-sm leading-6 text-slate-600">The platform is optimized for Modern Standard Arabic and educational contexts, while remaining flexible across varieties.</p>
-            </div>
-          </div>
+      <section id="faq" class="faq-section">
+        <div class="faq-heading">
+          <p class="section-kicker">FAQ</p>
+          <h2>Frequently asked questions</h2>
+        </div>
+        <div class="faq-list">
+          <article>
+            <h3>How accurate are the Arabic captions?</h3>
+            <p>Our AI models provide high-quality captions with context-aware translations curated for educational use.</p>
+          </article>
+          <article>
+            <h3>Can I use IntelliArabic for classroom grading?</h3>
+            <p>Yes. It is designed to support educators with scalable grading and insightful feedback dashboards.</p>
+          </article>
+          <article>
+            <h3>Does this work for all dialects of Arabic?</h3>
+            <p>The platform is optimized for Modern Standard Arabic and educational contexts, while remaining flexible across varieties.</p>
+          </article>
         </div>
       </section>
     </main>
 
-    <footer class="border-t border-slate-200 bg-white py-14">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <div class="flex items-center gap-3">
-              <img src="/static/arabic.png" alt="IntelliArabic" class="h-10 w-auto" />
-              <span class="text-base font-semibold text-slate-900">IntelliArabic</span>
-            </div>
-            <p class="mt-4 max-w-md text-sm leading-6 text-slate-600">AI-driven Arabic education for modern classrooms, research teams, and language programs.</p>
-          </div>
-          <div class="grid gap-4 sm:grid-cols-3">
-            <a href="#features" class="text-sm font-medium text-slate-700 transition hover:text-indigo-600">Features</a>
-            <a href="#how-it-works" class="text-sm font-medium text-slate-700 transition hover:text-indigo-600">How It Works</a>
-            <a href="#faq" class="text-sm font-medium text-slate-700 transition hover:text-indigo-600">FAQ</a>
-          </div>
-        </div>
+    <footer class="site-footer">
+      <div>
+        <a class="brand footer-brand" href="#home">
+          <img src="{{ url_for('static', filename='arabic.png') }}" alt="IntelliArabic logo">
+          <span>IntelliArabic</span>
+        </a>
+        <p>AI-driven Arabic education for modern classrooms, research teams, and language programs.</p>
       </div>
+      <nav aria-label="Footer navigation">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#faq">FAQ</a>
+      </nav>
     </footer>
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const mobileButton = document.getElementById('mobileMenuButton');
-      const mobileMenu = document.getElementById('mobileMenu');
+    document.addEventListener('DOMContentLoaded', function () {
+      var mobileButton = document.getElementById('mobileMenuButton');
+      var mobileMenu = document.getElementById('mobileMenu');
 
-      if (mobileButton) {
-        mobileButton.addEventListener('click', () => {
-          mobileMenu?.classList.toggle('hidden');
-        });
-      }
+      if (!mobileButton || !mobileMenu) return;
 
-      // Close mobile menu when clicking on a link
-      const mobileLinks = mobileMenu?.querySelectorAll('a, button');
-      if (mobileLinks) {
-        mobileLinks.forEach(link => {
-          link.addEventListener('click', () => {
-            mobileMenu?.classList.add('hidden');
-          });
+      mobileButton.addEventListener('click', function () {
+        var isOpen = mobileMenu.classList.toggle('is-open');
+        mobileButton.setAttribute('aria-expanded', String(isOpen));
+      });
+
+      mobileMenu.querySelectorAll('a, button').forEach(function (item) {
+        item.addEventListener('click', function () {
+          mobileMenu.classList.remove('is-open');
+          mobileButton.setAttribute('aria-expanded', 'false');
         });
-      }
+      });
     });
   </script>
 </body>
