@@ -39,7 +39,7 @@ AUTH_ERROR_MESSAGES = {
 
 @app.after_request
 def prevent_auth_page_cache(response):
-    if request.path in {"/login", "/signup", "/register", "/google-login", "/google-callback"}:
+    if request.path in {"/login", "/signup", "/register", "/google-login", "/google-callback", "/static/google-auth.js"}:
         response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
         response.headers["Pragma"] = "no-cache"
         response.headers["Expires"] = "0"
