@@ -44,10 +44,23 @@
         button.addEventListener("click", function () {
             button.disabled = true;
             button.classList.add("is-loading");
-            window.location.href = config.loginUrl || "/google-login";
+            navigateToGoogle(config.loginUrl || "/google-login");
         });
 
         return button;
+    }
+
+    function navigateToGoogle(url) {
+        try {
+            if (window.top && window.top !== window.self) {
+                window.top.location.href = url;
+                return;
+            }
+        } catch (error) {
+            // Cross-origin frames can block top navigation; fall back to this frame.
+        }
+
+        window.location.href = url;
     }
 
     function render(config) {
