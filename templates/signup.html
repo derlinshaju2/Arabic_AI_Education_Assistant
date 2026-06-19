@@ -4,25 +4,52 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IntelliArabic - Create Account</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    :root {
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #dbe4f0;
+      --purple: #6366f1;
+      --purple-dark: #4f46e5;
+      --danger: #b91c1c;
+      --danger-bg: #fef2f2;
+      --shadow: 0 26px 80px rgba(15, 23, 42, 0.18);
+    }
+
     * {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      box-sizing: border-box;
     }
-    
-    .glass-blur {
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+
+    html,
+    body {
+      min-height: 100%;
     }
-    
+
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--ink);
+      background: #eef3fb;
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
     .hero-bg {
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      position: relative;
+      position: fixed;
+      inset: 0;
+      z-index: 0;
       overflow: hidden;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     }
-    
+
     .hero-bg::before {
-      content: '';
+      content: "";
       position: absolute;
       top: -50%;
       right: -50%;
@@ -32,17 +59,97 @@
       filter: blur(100px);
       animation: float 20s ease-in-out infinite;
     }
-    
+
     @keyframes float {
       0%, 100% { transform: translate(0, 0); }
       50% { transform: translate(30px, -30px); }
     }
-    
-    .modal-card {
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-      animation: slideUp 0.4s ease-out;
+
+    .preview-nav {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px clamp(18px, 4vw, 72px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.38);
+      background: rgba(255, 255, 255, 0.42);
+      backdrop-filter: blur(16px);
     }
-    
+
+    .preview-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: #0f172a;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .preview-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    }
+
+    .preview-links {
+      display: flex;
+      gap: 24px;
+      color: #334155;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .preview-hero {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      text-align: center;
+    }
+
+    .preview-hero h1 {
+      margin: 0 0 16px;
+      color: rgba(15, 23, 42, 0.3);
+      font-size: clamp(38px, 7vw, 72px);
+      line-height: 1;
+      font-weight: 850;
+    }
+
+    .preview-hero p {
+      margin: 0;
+      color: rgba(51, 65, 85, 0.28);
+      font-size: clamp(16px, 2vw, 22px);
+      font-weight: 600;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(15, 23, 42, 0.12);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .signup-card {
+      position: relative;
+      width: min(550px, 100%);
+      padding: clamp(24px, 4vw, 34px);
+      border: 1px solid rgba(255, 255, 255, 0.88);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: var(--shadow);
+      animation: slideUp 0.35s ease-out;
+    }
+
     @keyframes slideUp {
       from {
         opacity: 0;
@@ -53,82 +160,166 @@
         transform: translateY(0);
       }
     }
-    
+
+    .close-btn {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: #1f2937;
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1;
+      cursor: pointer;
+      transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+    }
+
+    .close-btn:hover {
+      background: #f1f5f9;
+      color: var(--purple);
+      transform: scale(1.04);
+    }
+
+    .signup-header {
+      margin-bottom: 24px;
+      padding-right: 40px;
+    }
+
+    .signup-header h2 {
+      margin: 0;
+      color: #0f172a;
+      font-size: 26px;
+      line-height: 1.2;
+      font-weight: 850;
+    }
+
+    .signup-header p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .signup-form {
+      display: grid;
+      gap: 16px;
+    }
+
+    .field {
+      display: grid;
+      gap: 9px;
+    }
+
+    .field label {
+      color: #0f172a;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .required {
+      color: #ef4444;
+    }
+
     .input-field {
-      background: #f8f9fa;
+      width: 100%;
+      min-width: 0;
+      min-height: 48px;
+      padding: 0 16px;
       border: 1.5px solid #e0e3e8;
-      transition: all 0.3s ease;
+      border-radius: 16px;
+      outline: 0;
+      background: #f8f9fa;
+      color: #111827;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
     }
-    
+
+    .input-field::placeholder {
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
     .input-field:focus {
+      border-color: var(--purple);
       background: #ffffff;
-      border-color: #6366f1;
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-      outline: none;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
     }
-    
+
+    .field-hint {
+      margin: 0;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .alert {
+      padding: 12px 14px;
+      border: 1px solid rgba(220, 38, 38, 0.18);
+      border-radius: 12px;
+      background: var(--danger-bg);
+      color: var(--danger);
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
     .gradient-button {
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .gradient-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 24px rgba(99, 102, 241, 0.4);
-    }
-    
-    .gradient-button:active {
-      transform: translateY(0);
-    }
-    
-    .google-button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.75rem;
       width: 100%;
       min-height: 50px;
-      border: 1.5px solid #dbe4f0;
+      margin-top: 8px;
+      border: 0;
       border-radius: 16px;
-      background: #ffffff;
-      color: #111827;
-      font-size: 0.875rem;
-      font-weight: 700;
-      text-decoration: none;
-      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
-      transition: all 0.3s ease;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 850;
+      cursor: pointer;
+      box-shadow: 0 14px 26px rgba(99, 102, 241, 0.26);
+      transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
     }
-    
-    .google-button:hover {
-      background: #f8fafc;
-      border-color: #bfcce0;
-      box-shadow: 0 14px 28px rgba(99, 102, 241, 0.12);
+
+    .gradient-button:hover {
       transform: translateY(-1px);
+      box-shadow: 0 18px 34px rgba(99, 102, 241, 0.34);
+      filter: brightness(1.03);
     }
 
-    .google-button:active {
-      transform: translateY(0);
-      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
-    }
-
-    .google-button:disabled,
-    .google-button[aria-disabled="true"] {
+    .gradient-button:disabled {
       cursor: not-allowed;
-      opacity: 0.62;
-      pointer-events: none;
+      opacity: 0.7;
       transform: none;
     }
 
-    .google-button.is-loading {
-      pointer-events: none;
+    .divider {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      padding-top: 2px;
+      color: #8b92a5;
+      font-size: 13px;
+      font-weight: 650;
     }
 
-    .google-button svg {
-      width: 1.25rem;
-      height: 1.25rem;
-      flex: 0 0 auto;
+    .divider::before,
+    .divider::after {
+      content: "";
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #d9e2ef);
+    }
+
+    .divider::after {
+      background: linear-gradient(90deg, #d9e2ef, transparent);
     }
 
     .google-auth-host {
@@ -138,175 +329,181 @@
       place-items: center;
     }
 
-    .divider-text {
-      color: #8b92a5;
-      font-size: 13px;
-      font-weight: 500;
-    }
-    
-    .login-link {
-      color: #6366f1;
+    .google-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      min-height: 50px;
+      border: 1.5px solid var(--line);
+      border-radius: 16px;
+      background: #ffffff;
+      color: #111827;
+      font-size: 14px;
+      font-weight: 800;
       text-decoration: none;
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+      transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+    }
+
+    .google-button:hover {
+      border-color: #bfcce0;
+      background: #f8fafc;
+      box-shadow: 0 14px 28px rgba(99, 102, 241, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .google-button svg {
+      width: 20px;
+      height: 20px;
+      flex: 0 0 auto;
+    }
+
+    .google-button[aria-disabled="true"] {
+      cursor: not-allowed;
+      opacity: 0.62;
+      pointer-events: none;
+      transform: none;
+    }
+
+    .login-note {
+      margin: 20px 0 0;
+      padding-top: 18px;
+      border-top: 1px solid rgba(226, 232, 240, 0.8);
+      color: #64748b;
+      font-size: 14px;
       font-weight: 600;
-      transition: color 0.2s ease;
+      text-align: center;
     }
-    
+
+    .login-link {
+      color: var(--purple);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
     .login-link:hover {
-      color: #4f46e5;
+      color: var(--purple-dark);
     }
-    
-    .close-btn {
-      color: #1f2937;
-      font-size: 28px;
-      font-weight: 300;
-      cursor: pointer;
-      line-height: 1;
-      transition: color 0.2s ease;
-    }
-    
-    .close-btn:hover {
-      color: #6366f1;
-    }
-    
+
     @media (max-width: 640px) {
-      .modal-card {
-        width: calc(100% - 32px);
-        margin: 16px;
+      .preview-links {
+        display: none;
+      }
+
+      .preview-hero h1 {
+        padding: 0 18px;
+      }
+
+      .modal-overlay {
+        padding: 14px;
+      }
+
+      .signup-card {
+        padding: 24px 18px;
       }
     }
   </style>
 </head>
-<body class="bg-gray-50">
-  <!-- Blurred Background -->
-  <div class="hero-bg fixed inset-0 z-0">
-    <!-- Navigation Bar Simulation -->
-    <div class="absolute top-0 left-0 right-0 backdrop-blur-lg bg-white/40 border-b border-white/20">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg"></div>
-          <div class="text-sm font-semibold text-slate-900">IntelliArabic</div>
-        </div>
-        <div class="hidden md:flex gap-6 text-sm text-slate-700">
-          <span class="hover:text-indigo-600 cursor-pointer">Home</span>
-          <span class="hover:text-indigo-600 cursor-pointer">Features</span>
-          <span class="hover:text-indigo-600 cursor-pointer">About</span>
-        </div>
+<body>
+  <main class="hero-bg" aria-hidden="true">
+    <nav class="preview-nav">
+      <div class="preview-brand">
+        <span class="preview-mark"></span>
+        <span>IntelliArabic</span>
       </div>
-    </div>
-    
-    <!-- Hero Text -->
-    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-      <div class="text-center">
-        <h1 class="text-6xl font-bold text-slate-900/30 mb-4">AI-Powered Arabic Learning</h1>
-        <p class="text-xl text-slate-700/25">Premium education platform</p>
+      <div class="preview-links">
+        <span>Home</span>
+        <span>Features</span>
+        <span>About</span>
       </div>
-    </div>
-  </div>
+    </nav>
 
-  <!-- Glass Modal Overlay -->
-  <div class="glass-blur fixed inset-0 z-10 bg-black/10 flex items-center justify-center p-4">
-    <!-- Modal Card -->
-    <div class="modal-card bg-white rounded-[20px] w-full max-w-[550px] p-8 relative">
-      <!-- Close Button -->
-      <button onclick="window.location.href='/'" class="close-btn absolute top-6 right-6" title="Close">
-        ×
+    <section class="preview-hero">
+      <div>
+        <h1>AI-Powered Arabic Learning</h1>
+        <p>Premium education platform</p>
+      </div>
+    </section>
+  </main>
+
+  <section class="modal-overlay" aria-label="Create account dialog">
+    <div class="signup-card" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
+      <button onclick="window.location.href='/'" class="close-btn" type="button" title="Close" aria-label="Close signup">
+        &times;
       </button>
 
-      <!-- Header -->
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold text-slate-900">Create your account</h2>
-        <p class="text-sm text-slate-600 mt-1">Join IntelliArabic today</p>
-      </div>
+      <header class="signup-header">
+        <h2 id="signupTitle">Create your account</h2>
+        <p>Join IntelliArabic today</p>
+      </header>
 
-      <!-- Form -->
-      <form id="signupForm" method="POST" class="space-y-4">
-        <!-- Name Input -->
-        <div class="space-y-2.5">
-          <label for="name" class="block text-sm font-bold text-slate-900">
-            Full Name <span class="text-red-500">*</span>
-          </label>
-          <input 
-            type="text" 
-            id="name" 
-            name="name" 
+      <form id="signupForm" method="POST" class="signup-form">
+        <div class="field">
+          <label for="name">Full Name <span class="required">*</span></label>
+          <input
+            type="text"
+            id="name"
+            name="name"
             placeholder="John Doe"
             value="{{ form.name if form is defined and form.name is defined else '' }}"
-            class="input-field w-full px-4 py-3 rounded-[16px] text-sm text-slate-900 placeholder:text-slate-400"
+            class="input-field"
+            autocomplete="name"
             required
-          />
+          >
         </div>
 
-        <!-- Email Input -->
-        <div class="space-y-2.5">
-          <label for="email" class="block text-sm font-bold text-slate-900">
-            Email address <span class="text-red-500">*</span>
-          </label>
-          <input 
-            type="email" 
-            id="email" 
-            name="email" 
+        <div class="field">
+          <label for="email">Email address <span class="required">*</span></label>
+          <input
+            type="email"
+            id="email"
+            name="email"
             placeholder="you@example.com"
             value="{{ form.email if form is defined and form.email is defined else '' }}"
-            class="input-field w-full px-4 py-3 rounded-[16px] text-sm text-slate-900 placeholder:text-slate-400"
+            class="input-field"
+            autocomplete="email"
             required
-          />
+          >
         </div>
 
-        <!-- Password Input -->
-        <div class="space-y-2.5">
-          <label for="password" class="block text-sm font-bold text-slate-900">
-            Password <span class="text-red-500">*</span>
-          </label>
-          <input 
-            type="password" 
-            id="password" 
-            name="password" 
-            placeholder="••••••••"
-            class="input-field w-full px-4 py-3 rounded-[16px] text-sm text-slate-900 placeholder:text-slate-400"
+        <div class="field">
+          <label for="password">Password <span class="required">*</span></label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="********"
+            class="input-field"
+            autocomplete="new-password"
             required
-          />
-          <p class="text-xs text-slate-500">At least 8 characters</p>
+          >
+          <p class="field-hint">At least 8 characters</p>
         </div>
 
-        <!-- Error Message (if any) -->
-        <div id="signupError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-[12px] text-sm font-medium" {% if not error %}style="display: none;"{% endif %}>
+        <div id="signupError" class="alert" role="alert" {% if not error %}hidden style="display: none;"{% endif %}>
           {{ error or '' }}
         </div>
 
-        <!-- Sign Up Button -->
-        <button 
-          type="submit"
-          class="gradient-button w-full py-3 rounded-[16px] text-white font-bold text-sm transition-all duration-300 mt-6"
-        >
-          Create Account
-        </button>
+        <button type="submit" class="gradient-button">Create Account</button>
 
-        <!-- Divider -->
-        <div class="flex items-center gap-3 pt-2">
-          <div class="flex-1 h-px bg-gradient-to-r from-slate-200 to-slate-100"></div>
-          <span class="divider-text">Or continue with</span>
-          <div class="flex-1 h-px bg-gradient-to-l from-slate-200 to-slate-100"></div>
-        </div>
+        <div class="divider">Or continue with</div>
 
-        <!-- Google Signup Button -->
         <div id="googleSignupButton" class="google-auth-host"></div>
       </form>
 
-      <!-- Login Link -->
-      <div class="text-center pt-4 mt-6 border-t border-slate-200/50">
-        <p class="text-sm text-slate-600">
-          Already have an account? 
-          <a href="/login" class="login-link">Sign in</a>
-        </p>
-      </div>
+      <p class="login-note">
+        Already have an account?
+        <a href="/login" class="login-link">Sign in</a>
+      </p>
     </div>
-  </div>
+  </section>
 
   <script>
-    // Handle form submission
     document.getElementById('signupForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      
+
       const formData = new FormData(this);
       const data = {
         name: formData.get('name'),
@@ -317,13 +514,15 @@
       const errorBox = document.getElementById('signupError');
       const submitButton = this.querySelector('button[type="submit"]');
       errorBox.style.display = 'none';
+      errorBox.hidden = true;
       errorBox.textContent = '';
       submitButton.disabled = true;
 
       fetch('/signup', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(data),
         credentials: 'same-origin'
@@ -337,8 +536,8 @@
         throw new Error(result.data.message || 'Could not create your account. Please try again.');
       })
       .catch(error => {
-        console.error('Error:', error);
         errorBox.textContent = error.message || 'An error occurred. Please try again.';
+        errorBox.hidden = false;
         errorBox.style.display = 'block';
       })
       .finally(() => {
