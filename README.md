@@ -40,3 +40,25 @@ This is a Flask-based AI backend system for Arabic education tasks including ima
 - NLP + Computer Vision models
 
 ---
+
+## Google Sign-In Setup
+
+Google sign-in is disabled until you configure your own OAuth client ID. Create a
+Google OAuth Web client, then add this to `.env`:
+
+```env
+GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+```
+
+For local development, add these Authorized JavaScript origins to that Google
+client:
+
+```text
+http://localhost:7860
+http://127.0.0.1:7860
+```
+
+Also add your deployed app origin, for example your Hugging Face Space URL. If
+Google shows a 403 access page, check the OAuth consent screen: an Internal app
+only works for accounts in its organization, and a Testing app only works for
+listed test users.
