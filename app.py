@@ -8,6 +8,7 @@ import os
 import re
 import sqlite3
 import uuid
+from urllib.parse import urlencode
 
 import bcrypt
 import jwt
@@ -352,7 +353,6 @@ def home():
 
 
 @app.route("/register", methods=["GET", "POST"])
-@app.route("/signup", methods=["GET", "POST"])
 def register():
     if request.method == "GET":
         return render_template("signup.html", google_client_id=GOOGLE_CLIENT_ID)
@@ -361,7 +361,9 @@ def register():
     name = (data.get("name") or "").strip()
     email = normalize_email(data.get("email"))
     password = data.get("password") or ""
-    confirm_password = data.get("confirm_password") or data.get("confirmPassword") or ""
+    confirm_password = data.get("confirm_password") or data.get("confirmPassword")
+    if confirm_password is None:
+        confirm_password = password
 
     errors = validate_registration(name, email, password, confirm_password)
     if errors:
@@ -369,7 +371,7 @@ def register():
             return jsonify({"status": "error", "message": errors[0], "errors": errors}), 400
 
         return render_template(
-            "register.html",
+            "signup.html",
             error=errors[0],
             form={"name": name, "email": email},
             google_client_id=GOOGLE_CLIENT_ID,
@@ -434,9 +436,21 @@ def google_login():
             return jsonify({"status": "error", "message": "Google login is not configured."}), 503
         return redirect(url_for("login"))
 
-    # Handle GET: serve a page that extracts id_token from URL fragment via JS
     if request.method == "GET":
-        return render_template("google_callback.html", google_client_id=GOOGLE_CLIENT_ID)
+        nonce = uuid.uuid4().hex
+        session["google_oauth_nonce"] = nonce
+        callback_url = url_for("google_callback", _external=True)
+        if request.headers.get("X-Forwarded-Proto") == "https":
+            callback_url = callback_url.replace("http://", "https://", 1)
+        params = {
+            "client_id": GOOGLE_CLIENT_ID,
+            "redirect_uri": callback_url,
+            "response_type": "id_token",
+            "scope": "openid email profile",
+            "nonce": nonce,
+            "prompt": "select_account",
+        }
+        return redirect("https://accounts.google.com/o/oauth2/v2/auth?" + urlencode(params))
 
     # Handle POST: credential from GSI button or form_post redirect
     data = request.get_json(silent=True) or {}
@@ -470,6 +484,11 @@ def google_login():
         user = create_user(name, email, google_id=google_id, profile_image=profile_image)
 
     return auth_success_response(user, "Signed in with Google.")
+
+
+@app.route("/google-callback")
+def google_callback():
+    return render_template("google_callback.html", google_client_id=GOOGLE_CLIENT_ID)
 
 
 @app.route("/logout", methods=["GET", "POST"])

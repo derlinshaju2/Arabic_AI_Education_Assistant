@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IntelliArabic — Create Account</title>
+  <title>IntelliArabic - Create Account</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     * {
@@ -186,6 +186,7 @@
             id="name" 
             name="name" 
             placeholder="John Doe"
+            value="{{ form.name if form is defined and form.name is defined else '' }}"
             class="input-field w-full px-4 py-3 rounded-[16px] text-sm text-slate-900 placeholder:text-slate-400"
             required
           />
@@ -201,6 +202,7 @@
             id="email" 
             name="email" 
             placeholder="you@example.com"
+            value="{{ form.email if form is defined and form.email is defined else '' }}"
             class="input-field w-full px-4 py-3 rounded-[16px] text-sm text-slate-900 placeholder:text-slate-400"
             required
           />
@@ -223,11 +225,9 @@
         </div>
 
         <!-- Error Message (if any) -->
-        {% if error %}
-        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-[12px] text-sm font-medium">
-          {{ error }}
+        <div id="signupError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-[12px] text-sm font-medium" {% if not error %}style="display: none;"{% endif %}>
+          {{ error or '' }}
         </div>
-        {% endif %}
 
         <!-- Sign Up Button -->
         <button 
@@ -279,27 +279,38 @@
       const data = {
         name: formData.get('name'),
         email: formData.get('email'),
-        password: formData.get('password')
+        password: formData.get('password'),
+        confirm_password: formData.get('password')
       };
+      const errorBox = document.getElementById('signupError');
+      const submitButton = this.querySelector('button[type="submit"]');
+      errorBox.style.display = 'none';
+      errorBox.textContent = '';
+      submitButton.disabled = true;
 
       fetch('/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
+        credentials: 'same-origin'
       })
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === 'success') {
+      .then(response => response.json().then(data => ({ ok: response.ok, data })))
+      .then(result => {
+        if (result.ok && result.data.status === 'success') {
           window.location.href = '/dashboard';
-        } else {
-          alert(data.message || 'An error occurred. Please try again.');
+          return;
         }
+        throw new Error(result.data.message || 'Could not create your account. Please try again.');
       })
       .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred. Please try again.');
+        errorBox.textContent = error.message || 'An error occurred. Please try again.';
+        errorBox.style.display = 'block';
+      })
+      .finally(() => {
+        submitButton.disabled = false;
       });
     });
   </script>
