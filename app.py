@@ -3,21 +3,21 @@ load_dotenv()
 
 from datetime import datetime, timedelta, timezone
 from functools import wraps
-import json
 import os
 import re
 import sqlite3
 import uuid
-from urllib.parse import urlencode
 
 import bcrypt
 import jwt
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token as google_id_token
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "arabic-ai-education-assistant")
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 
 UPLOAD_FOLDER = os.path.join("static", "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -27,18 +27,15 @@ JWT_SECRET = os.environ.get("JWT_SECRET", app.secret_key)
 JWT_ALGORITHM = "HS256"
 JWT_COOKIE_NAME = "auth_token"
 JWT_MAX_AGE_SECONDS = 7 * 24 * 60 * 60
-BLOCKED_GOOGLE_CLIENT_IDS = {
-    "627211809131-58jfkp4f2dcsfp45imli47iihiegsrvp.apps.googleusercontent.com",
-}
 GOOGLE_CLIENT_ID = (os.environ.get("GOOGLE_CLIENT_ID") or "").strip()
-if GOOGLE_CLIENT_ID in BLOCKED_GOOGLE_CLIENT_IDS:
-    GOOGLE_CLIENT_ID = ""
 EMAIL_PATTERN = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 AUTH_ERROR_MESSAGES = {
     "google_not_configured": (
         "Google sign-in is not configured yet. Add your Google OAuth client ID "
         "to GOOGLE_CLIENT_ID in .env, then restart the app."
     ),
+    "google_button_required": "Open the login page and use the Google sign-in button.",
+    "google_failed": "Google sign-in failed. Please try again.",
 }
 
 
@@ -231,7 +228,8 @@ def current_user():
 
 def cookie_secure():
     forwarded_proto = request.headers.get("X-Forwarded-Proto", request.scheme)
-    return forwarded_proto == "https"
+    forwarded_proto = forwarded_proto.split(",")[0].strip().lower()
+    return request.is_secure or forwarded_proto == "https"
 
 
 def set_auth_cookie(response, token):
@@ -284,6 +282,15 @@ def request_data():
 
 def auth_error_message():
     return AUTH_ERROR_MESSAGES.get(request.args.get("error"))
+
+
+def google_signin_nonce():
+    if not GOOGLE_CLIENT_ID:
+        return ""
+
+    nonce = uuid.uuid4().hex
+    session["google_oauth_nonce"] = nonce
+    return nonce
 
 
 def caption_image(file):
@@ -379,7 +386,12 @@ def home():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "GET":
-        return render_template("signup.html", google_client_id=GOOGLE_CLIENT_ID, error=auth_error_message())
+        return render_template(
+            "signup.html",
+            google_client_id=GOOGLE_CLIENT_ID,
+            google_nonce=google_signin_nonce(),
+            error=auth_error_message(),
+        )
 
     data = request_data()
     name = (data.get("name") or "").strip()
@@ -399,6 +411,7 @@ def register():
             error=errors[0],
             form={"name": name, "email": email},
             google_client_id=GOOGLE_CLIENT_ID,
+            google_nonce=google_signin_nonce(),
         ), 400
 
     user = create_user(name, email, hash_password(password))
@@ -414,7 +427,12 @@ def signup():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-        return render_template("login.html", google_client_id=GOOGLE_CLIENT_ID, error=auth_error_message())
+        return render_template(
+            "login.html",
+            google_client_id=GOOGLE_CLIENT_ID,
+            google_nonce=google_signin_nonce(),
+            error=auth_error_message(),
+        )
 
     data = request_data()
     email = normalize_email(data.get("email"))
@@ -436,6 +454,7 @@ def login():
         error=message,
         form={"email": email},
         google_client_id=GOOGLE_CLIENT_ID,
+        google_nonce=google_signin_nonce(),
     ), 401
 
 
@@ -461,28 +480,18 @@ def google_login():
         return redirect(url_for("login", error="google_not_configured"))
 
     if request.method == "GET":
-        nonce = uuid.uuid4().hex
-        session["google_oauth_nonce"] = nonce
-        callback_url = url_for("google_callback", _external=True)
-        if request.headers.get("X-Forwarded-Proto") == "https":
-            callback_url = callback_url.replace("http://", "https://", 1)
-        params = {
-            "client_id": GOOGLE_CLIENT_ID,
-            "redirect_uri": callback_url,
-            "response_type": "id_token",
-            "scope": "openid email profile",
-            "nonce": nonce,
-            "prompt": "select_account",
-        }
-        return redirect("https://accounts.google.com/o/oauth2/v2/auth?" + urlencode(params))
+        return redirect(url_for("login", error="google_button_required"))
 
-    # Handle POST: credential from the Google callback page.
+    # Handle POST: credential from the Google Identity Services button.
     data = request.get_json(silent=True) or {}
     if not data:
         data = request.form.to_dict()
     credential = data.get("credential") or data.get("id_token") or request.form.get("credential") or request.form.get("id_token")
     if not credential:
         return jsonify({"status": "error", "message": "Missing Google credential."}), 400
+    expected_nonce = session.pop("google_oauth_nonce", None)
+    if not expected_nonce:
+        return jsonify({"status": "error", "message": "Google sign-in session expired. Please try again."}), 401
 
     try:
         profile = google_id_token.verify_oauth2_token(
@@ -493,6 +502,9 @@ def google_login():
     except ValueError:
         return jsonify({"status": "error", "message": "Invalid Google credential."}), 401
 
+    if profile.get("nonce") != expected_nonce:
+        return jsonify({"status": "error", "message": "Invalid Google sign-in session."}), 401
+
     email = normalize_email(profile.get("email"))
     google_id = profile.get("sub")
     name = profile.get("name") or email.split("@")[0]
@@ -500,6 +512,10 @@ def google_login():
 
     if not email or not google_id:
         return jsonify({"status": "error", "message": "Google profile is missing required information."}), 400
+
+    email_verified = profile.get("email_verified")
+    if email_verified is not True and str(email_verified).lower() != "true":
+        return jsonify({"status": "error", "message": "Google email address is not verified."}), 401
 
     existing = find_user_by_email(email)
     if existing:
