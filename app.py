@@ -8,6 +8,7 @@ import os
 import re
 import sqlite3
 import uuid
+from urllib.parse import urlencode
 
 import bcrypt
 import jwt
@@ -26,15 +27,8 @@ JWT_SECRET = os.environ.get("JWT_SECRET", app.secret_key)
 JWT_ALGORITHM = "HS256"
 JWT_COOKIE_NAME = "auth_token"
 JWT_MAX_AGE_SECONDS = 7 * 24 * 60 * 60
-GOOGLE_CLIENT_ID = (os.environ.get("GOOGLE_CLIENT_ID") or "").strip()
+GOOGLE_CLIENT_ID = (os.environ.get("GOOGLE_CLIENT_ID", "627211809131-58jfkp4f2dcsfp45imli47iihiegsrvp.apps.googleusercontent.com") or "").strip()
 EMAIL_PATTERN = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
-AUTH_ERROR_MESSAGES = {
-    "google_not_configured": (
-        "Google sign-in is not configured yet. Add your Google OAuth client ID "
-        "to GOOGLE_CLIENT_ID in .env, then restart the app."
-    ),
-    "google_button_required": "Use the Continue with Google button on the sign-in page.",
-}
 
 
 # ---------------- DATABASE ----------------
@@ -268,10 +262,6 @@ def request_data():
     return (request.get_json(silent=True) or {}) if request.is_json else request.form
 
 
-def auth_error_message():
-    return AUTH_ERROR_MESSAGES.get(request.args.get("error"))
-
-
 def caption_image(file):
     from src.image_captioning.pipeline import generate_caption
     from src.image_captioning.translator import translate_to_arabic
@@ -365,7 +355,7 @@ def home():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "GET":
-        return render_template("signup.html", google_client_id=GOOGLE_CLIENT_ID, error=auth_error_message())
+        return render_template("signup.html", google_client_id=GOOGLE_CLIENT_ID)
 
     data = request_data()
     name = (data.get("name") or "").strip()
@@ -400,7 +390,7 @@ def signup():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-        return render_template("login.html", google_client_id=GOOGLE_CLIENT_ID, error=auth_error_message())
+        return render_template("login.html", google_client_id=GOOGLE_CLIENT_ID)
 
     data = request_data()
     email = normalize_email(data.get("email"))
@@ -444,12 +434,25 @@ def google_login():
     if not GOOGLE_CLIENT_ID:
         if wants_json_response():
             return jsonify({"status": "error", "message": "Google login is not configured."}), 503
-        return redirect(url_for("login", error="google_not_configured"))
+        return redirect(url_for("login"))
 
     if request.method == "GET":
-        return redirect(url_for("login", error="google_button_required"))
+        nonce = uuid.uuid4().hex
+        session["google_oauth_nonce"] = nonce
+        callback_url = url_for("google_callback", _external=True)
+        if request.headers.get("X-Forwarded-Proto") == "https":
+            callback_url = callback_url.replace("http://", "https://", 1)
+        params = {
+            "client_id": GOOGLE_CLIENT_ID,
+            "redirect_uri": callback_url,
+            "response_type": "id_token",
+            "scope": "openid email profile",
+            "nonce": nonce,
+            "prompt": "select_account",
+        }
+        return redirect("https://accounts.google.com/o/oauth2/v2/auth?" + urlencode(params))
 
-    # Handle POST: credential from the Google Identity Services button.
+    # Handle POST: credential from GSI button or form_post redirect
     data = request.get_json(silent=True) or {}
     if not data:
         data = request.form.to_dict()

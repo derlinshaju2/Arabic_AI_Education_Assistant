@@ -93,23 +93,6 @@
       background: #f8f9fa;
       border-color: #d0d6e0;
     }
-
-    .google-button:disabled {
-      cursor: not-allowed;
-      opacity: 0.62;
-    }
-
-    .google-signin-host {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-      min-height: 40px;
-    }
-
-    .google-signin-host > div,
-    .google-signin-host iframe {
-      width: 100% !important;
-    }
     
     .divider-text {
       color: #8b92a5;
@@ -262,13 +245,9 @@
         </div>
 
         <!-- Google Signup Button -->
-        {% if google_client_id %}
-        <div id="googleSignInButton" class="google-signin-host" aria-label="Continue with Google"></div>
-        {% else %}
-        <button
+        <button 
           type="button"
-          disabled
-          title="Set GOOGLE_CLIENT_ID in .env to enable Google sign-in."
+          onclick="window.location.href='/google-login'"
           class="google-button w-full py-3 rounded-[16px] flex items-center justify-center gap-3 font-bold text-sm text-slate-900 transition-all duration-300"
         >
           <svg class="w-5 h-5" viewBox="0 0 24 24">
@@ -277,9 +256,8 @@
             <path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
             <path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>
-          Google sign-in unavailable
+          Continue with Google
         </button>
-        {% endif %}
       </form>
 
       <!-- Login Link -->
@@ -291,18 +269,6 @@
       </div>
     </div>
   </div>
-
-  {% if google_client_id %}
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="{{ url_for('static', filename='google-auth.js') }}"></script>
-  <script>
-    window.IntelliArabicGoogleAuth.render({
-      clientId: {{ google_client_id|tojson }},
-      buttonId: 'googleSignInButton',
-      alertId: 'signupError'
-    });
-  </script>
-  {% endif %}
 
   <script>
     // Handle form submission
