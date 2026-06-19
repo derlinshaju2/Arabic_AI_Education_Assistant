@@ -29,38 +29,26 @@
     }
 
     function createButton(config) {
-        var button = document.createElement("button");
-        button.type = "button";
+        var button = document.createElement("a");
         button.className = "google-button";
         button.setAttribute("aria-label", "Continue with Google");
         button.innerHTML = googleIcon() + "<span>Continue with Google</span>";
 
         if (!config.clientId) {
-            button.disabled = true;
+            button.setAttribute("aria-disabled", "true");
             button.title = "Set GOOGLE_CLIENT_ID to enable Google sign-in.";
             return button;
         }
 
+        button.href = config.loginUrl || "/google-login";
+        button.target = "_blank";
+        button.rel = "noopener noreferrer";
+
         button.addEventListener("click", function () {
-            button.disabled = true;
             button.classList.add("is-loading");
-            navigateToGoogle(config.loginUrl || "/google-login");
         });
 
         return button;
-    }
-
-    function navigateToGoogle(url) {
-        try {
-            if (window.top && window.top !== window.self) {
-                window.top.location.href = url;
-                return;
-            }
-        } catch (error) {
-            // Cross-origin frames can block top navigation; fall back to this frame.
-        }
-
-        window.location.href = url;
     }
 
     function render(config) {
