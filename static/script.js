@@ -633,7 +633,7 @@
 // DASHBOARD MODULE SWITCHING
 // ============================================
 
-var currentModule = 'captioning';
+var currentModule = null;
 var moduleConfig = {
     captioning: {
         title: 'Image Captioning',
@@ -1017,99 +1017,92 @@ window.downloadCaption = function() {
     a.click();
     URL.revokeObjectURL(url);
 };
-            .catch(function(err) {
-                console.warn('[Dashboard] History error:', err);
-                container.innerHTML = '<div class="empty-state"><p>Failed to load history. Please try again.</p></div>';
-            });
-    }
 
-    function escapeHtml(text) {
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 
-    // ---- TOAST NOTIFICATIONS ----
-    function showToast(message) {
-        var existing = document.querySelector('.toast');
-        if (existing) existing.remove();
+// ---- TOAST NOTIFICATIONS ----
+function showToast(message) {
+    var existing = document.querySelector('.toast');
+    if (existing) existing.remove();
 
-        var toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.textContent = message;
-        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;background:#0f172a;color:#fff;border-radius:8px;font-size:14px;font-weight:600;z-index:2000;animation:fadeIn 0.2s ease;box-shadow:0 4px 16px rgba(0,0,0,0.2)';
-        document.body.appendChild(toast);
+    var toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;background:#0f172a;color:#fff;border-radius:8px;font-size:14px;font-weight:600;z-index:2000;animation:fadeIn 0.2s ease;box-shadow:0 4px 16px rgba(0,0,0,0.2)';
+    document.body.appendChild(toast);
 
-        setTimeout(function() {
-            toast.style.opacity = '0';
-            toast.style.transition = 'opacity 0.3s ease';
-            setTimeout(function() { if (toast.parentNode) toast.remove(); }, 300);
-        }, 2000);
-    }
+    setTimeout(function() {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(function() { if (toast.parentNode) toast.remove(); }, 300);
+    }, 2000);
+}
 
-    // ---- AUTH FORM LOADING STATE ----
-    document.querySelectorAll('form[action="/login"], form[action="/register"], form[action="/reset-password"]').forEach(function(form) {
-        var btn = form.querySelector('.button[type="submit"]');
-        if (!btn) return;
+// ---- AUTH FORM LOADING STATE ----
+document.querySelectorAll('form[action="/login"], form[action="/register"], form[action="/reset-password"]').forEach(function(form) {
+    var btn = form.querySelector('.button[type="submit"]');
+    if (!btn) return;
 
-        form.addEventListener('submit', function(e) {
-            var password = this.querySelector('input[name="password"]');
-            var confirm = this.querySelector('input[name="confirm_password"]');
-            if (password && confirm && password.value !== confirm.value) {
-                e.preventDefault();
-                showErrorMsg(this, 'Passwords do not match.');
-                return;
-            }
+    form.addEventListener('submit', function(e) {
+        var password = this.querySelector('input[name="password"]');
+        var confirm = this.querySelector('input[name="confirm_password"]');
+        if (password && confirm && password.value !== confirm.value) {
+            e.preventDefault();
+            showErrorMsg(this, 'Passwords do not match.');
+            return;
+        }
 
-            btn.disabled = true;
-            var originalText = btn.textContent;
-            btn.innerHTML = '<span class="spinner"></span>';
-            btn.dataset.originalText = originalText;
-        });
+        btn.disabled = true;
+        var originalText = btn.textContent;
+        btn.innerHTML = '<span class="spinner"></span>';
+        btn.dataset.originalText = originalText;
     });
+});
 
-    function showErrorMsg(form, message) {
-        var existing = form.querySelector('.alert.error-msg');
-        if (existing) existing.remove();
+function showErrorMsg(form, message) {
+    var existing = form.querySelector('.alert.error-msg');
+    if (existing) existing.remove();
 
-        var alert = document.createElement('p');
-        alert.className = 'alert error-msg';
-        alert.textContent = message;
-        form.insertBefore(alert, form.querySelector('.button'));
-    }
+    var alert = document.createElement('p');
+    alert.className = 'alert error-msg';
+    alert.textContent = message;
+    form.insertBefore(alert, form.querySelector('.button'));
+}
 
-    // Re-enable buttons on page load
-    window.addEventListener('pageshow', function() {
-        document.querySelectorAll('.button[disabled]').forEach(function(btn) {
-            btn.disabled = false;
-            var original = btn.dataset.originalText;
-            if (original) btn.textContent = original;
-        });
+// Re-enable buttons on page load
+window.addEventListener('pageshow', function() {
+    document.querySelectorAll('.button[disabled]').forEach(function(btn) {
+        btn.disabled = false;
+        var original = btn.dataset.originalText;
+        if (original) btn.textContent = original;
     });
+});
 
-    // ---- PASSWORD TOGGLE VISIBILITY ----
-    document.querySelectorAll('input[type="password"]').forEach(function(input) {
-        var wrapper = input.closest('.field');
-        if (!wrapper) return;
-        wrapper.style.position = 'relative';
-        input.style.paddingRight = '40px';
+// ---- PASSWORD TOGGLE VISIBILITY ----
+document.querySelectorAll('input[type="password"]').forEach(function(input) {
+    var wrapper = input.closest('.field');
+    if (!wrapper) return;
+    wrapper.style.position = 'relative';
+    input.style.paddingRight = '40px';
 
-        var toggle = document.createElement('button');
-        toggle.type = 'button';
-        toggle.className = 'password-toggle';
-        toggle.setAttribute('aria-label', 'Toggle password visibility');
-        toggle.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" role="img"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
-        wrapper.appendChild(toggle);
+    var toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'password-toggle';
+    toggle.setAttribute('aria-label', 'Toggle password visibility');
+    toggle.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" role="img"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+    wrapper.appendChild(toggle);
 
-        toggle.addEventListener('click', function() {
-            var isPassword = input.type === 'password';
-            input.type = isPassword ? 'text' : 'password';
-            this.innerHTML = isPassword
-                ? '<svg viewBox="0 0 24 24" width="18" height="18" role="img"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
-                : '<svg viewBox="0 0 24 24" width="18" height="18" role="img"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
-        });
+    toggle.addEventListener('click', function() {
+        var isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        this.innerHTML = isPassword
+            ? '<svg viewBox="0 0 24 24" width="18" height="18" role="img"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+            : '<svg viewBox="0 0 24 24" width="18" height="18" role="img"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
     });
+});
 
-    console.log('[Dashboard] Script initialization complete');
-
-})();
+console.log('[Dashboard] Script initialization complete');
