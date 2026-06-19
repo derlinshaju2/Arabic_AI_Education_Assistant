@@ -40,3 +40,9 @@ OPEN AI.txt
 *.out
 .DS_Store
 Thumbs.db
+
+*.key
+*.pem
+secrets.json
+credentials.json
+config.local.py

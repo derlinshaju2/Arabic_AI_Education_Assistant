@@ -352,9 +352,10 @@ def home():
 
 
 @app.route("/register", methods=["GET", "POST"])
+@app.route("/signup", methods=["GET", "POST"])
 def register():
     if request.method == "GET":
-        return redirect(url_for("home"))
+        return render_template("signup.html", google_client_id=GOOGLE_CLIENT_ID)
 
     data = request_data()
     name = (data.get("name") or "").strip()
@@ -378,10 +379,16 @@ def register():
     return auth_success_response(user, "Account created successfully.")
 
 
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    """Alias for /register - for modern UI compatibility"""
+    return register()
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-        return redirect(url_for("home"))
+        return render_template("login.html", google_client_id=GOOGLE_CLIENT_ID)
 
     data = request_data()
     email = normalize_email(data.get("email"))
@@ -404,8 +411,6 @@ def login():
         form={"email": email},
         google_client_id=GOOGLE_CLIENT_ID,
     ), 401
-
-    return auth_success_response(row_to_user(row), "Welcome back.")
 
 
 @app.route("/reset-password", methods=["GET", "POST"])
