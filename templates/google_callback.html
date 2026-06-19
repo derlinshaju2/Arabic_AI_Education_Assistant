@@ -24,6 +24,16 @@
     <script>
         (function() {
             var hash = window.location.hash;
+            var params = new URLSearchParams(hash ? hash.substring(1) : '');
+            var error = params.get('error');
+
+            if (error) {
+                document.getElementById('title').textContent = 'Authentication Error';
+                document.getElementById('message').textContent = params.get('error_description') || 'Google could not complete sign-in.';
+                document.getElementById('spinner').style.display = 'none';
+                return;
+            }
+
             if (!hash || hash.indexOf('id_token') === -1) {
                 document.getElementById('title').textContent = 'Authentication Error';
                 document.getElementById('message').textContent = 'No token found in the URL.';
@@ -31,9 +41,8 @@
                 return;
             }
 
-            // Extract id_token from URL fragment
-            var params = new URLSearchParams(hash.substring(1));
             var idToken = params.get('id_token');
+            var state = params.get('state');
 
             if (!idToken) {
                 document.getElementById('title').textContent = 'Authentication Error';
@@ -46,7 +55,8 @@
             fetch('/google-login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ credential: idToken })
+                credentials: 'same-origin',
+                body: JSON.stringify({ credential: idToken, state: state })
             })
             .then(function(res) {
                 if (res.ok || res.redirected) {

@@ -7,6 +7,7 @@ import os
 import re
 import sqlite3
 import uuid
+from urllib.parse import urlencode
 
 import bcrypt
 import jwt
@@ -28,6 +29,7 @@ JWT_ALGORITHM = "HS256"
 JWT_COOKIE_NAME = "auth_token"
 JWT_MAX_AGE_SECONDS = 7 * 24 * 60 * 60
 GOOGLE_CLIENT_ID = (os.environ.get("GOOGLE_CLIENT_ID") or "").strip()
+GOOGLE_REDIRECT_URI = (os.environ.get("GOOGLE_REDIRECT_URI") or "").strip()
 EMAIL_PATTERN = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 AUTH_ERROR_MESSAGES = {
     "google_not_configured": (
@@ -293,6 +295,13 @@ def google_signin_nonce():
     return nonce
 
 
+def google_callback_url():
+    if GOOGLE_REDIRECT_URI:
+        return GOOGLE_REDIRECT_URI
+
+    return url_for("google_callback", _external=True)
+
+
 def caption_image(file):
     from src.image_captioning.pipeline import generate_caption
     from src.image_captioning.translator import translate_to_arabic
@@ -480,9 +489,23 @@ def google_login():
         return redirect(url_for("login", error="google_not_configured"))
 
     if request.method == "GET":
-        return redirect(url_for("login", error="google_button_required"))
+        nonce = uuid.uuid4().hex
+        state = uuid.uuid4().hex
+        session["google_oauth_nonce"] = nonce
+        session["google_oauth_state"] = state
 
-    # Handle POST: credential from the Google Identity Services button.
+        params = {
+            "client_id": GOOGLE_CLIENT_ID,
+            "redirect_uri": google_callback_url(),
+            "response_type": "id_token",
+            "scope": "openid email profile",
+            "nonce": nonce,
+            "state": state,
+            "prompt": "select_account",
+        }
+        return redirect("https://accounts.google.com/o/oauth2/v2/auth?" + urlencode(params))
+
+    # Handle POST: credential from the Google account chooser callback.
     data = request.get_json(silent=True) or {}
     if not data:
         data = request.form.to_dict()
@@ -490,7 +513,9 @@ def google_login():
     if not credential:
         return jsonify({"status": "error", "message": "Missing Google credential."}), 400
     expected_nonce = session.pop("google_oauth_nonce", None)
-    if not expected_nonce:
+    expected_state = session.pop("google_oauth_state", None)
+    received_state = data.get("state") or request.form.get("state")
+    if not expected_nonce or not expected_state or received_state != expected_state:
         return jsonify({"status": "error", "message": "Google sign-in session expired. Please try again."}), 401
 
     try:

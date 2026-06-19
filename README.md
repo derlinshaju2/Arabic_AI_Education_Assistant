@@ -44,8 +44,8 @@ This is a Flask-based AI backend system for Arabic education tasks including ima
 ## Google Sign-In Setup
 
 Google sign-in is disabled until you configure your own OAuth client ID. The app
-uses the Google Identity Services button, so create a Google OAuth Web client,
-then add this to `.env`:
+uses Google's account chooser so learners can pick an account every time. Create
+a Google OAuth Web client, then add this to `.env`:
 
 ```env
 GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
@@ -65,7 +65,13 @@ For Hugging Face or another deployed host, add your deployed app origin:
 https://derlinshaju2-arabic-ai-education-assistant.hf.space
 ```
 
-No redirect URI is required for the default Google button flow.
+Also add these Authorized redirect URIs:
+
+```text
+http://localhost:7860/google-callback
+http://127.0.0.1:7860/google-callback
+https://derlinshaju2-arabic-ai-education-assistant.hf.space/google-callback
+```
 
 If Google shows a 403 access page, check the OAuth consent screen: an Internal
 app only works for accounts in its organization, and a Testing app only works

@@ -1,9 +1,6 @@
 (function () {
     "use strict";
 
-    var GOOGLE_SCRIPT_URL = "https://accounts.google.com/gsi/client";
-    var scriptPromise = null;
-
     function googleIcon() {
         return [
             '<svg viewBox="0 0 24 24" aria-hidden="true">',
@@ -31,105 +28,26 @@
         alert.style.display = "block";
     }
 
-    function fallbackButton(message, disabled) {
+    function createButton(config) {
         var button = document.createElement("button");
         button.type = "button";
-        button.className = "google-button google-fallback-button";
-        button.disabled = Boolean(disabled);
-        button.innerHTML = googleIcon() + "<span>" + message + "</span>";
+        button.className = "google-button";
+        button.setAttribute("aria-label", "Continue with Google");
+        button.innerHTML = googleIcon() + "<span>Continue with Google</span>";
+
+        if (!config.clientId) {
+            button.disabled = true;
+            button.title = "Set GOOGLE_CLIENT_ID to enable Google sign-in.";
+            return button;
+        }
+
+        button.addEventListener("click", function () {
+            button.disabled = true;
+            button.classList.add("is-loading");
+            window.location.href = config.loginUrl || "/google-login";
+        });
+
         return button;
-    }
-
-    function loadGoogleScript() {
-        if (window.google && window.google.accounts && window.google.accounts.id) {
-            return Promise.resolve();
-        }
-
-        if (scriptPromise) {
-            return scriptPromise;
-        }
-
-        scriptPromise = new Promise(function (resolve, reject) {
-            var existing = document.querySelector('script[src="' + GOOGLE_SCRIPT_URL + '"]');
-            var script = existing || document.createElement("script");
-
-            script.addEventListener("load", resolve, { once: true });
-            script.addEventListener("error", reject, { once: true });
-
-            if (!existing) {
-                script.src = GOOGLE_SCRIPT_URL;
-                script.async = true;
-                script.defer = true;
-                document.head.appendChild(script);
-            }
-        });
-
-        return scriptPromise;
-    }
-
-    function postCredential(config, response) {
-        var credential = response && response.credential;
-        var alertId = config.alertId;
-
-        if (!credential) {
-            showAlert(alertId, "Google did not return a sign-in credential. Please try again.");
-            return;
-        }
-
-        fetch(config.loginUrl || "/google-login", {
-            method: "POST",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            credentials: "same-origin",
-            body: JSON.stringify({ credential: credential })
-        })
-            .then(function (res) {
-                return res.json().catch(function () {
-                    return {};
-                }).then(function (data) {
-                    return { ok: res.ok, data: data };
-                });
-            })
-            .then(function (result) {
-                if (result.ok && result.data.status === "success") {
-                    window.location.href = config.nextUrl || "/dashboard";
-                    return;
-                }
-
-                throw new Error(result.data.message || "Could not sign in with Google.");
-            })
-            .catch(function (error) {
-                showAlert(alertId, error.message || "Could not sign in with Google.");
-            });
-    }
-
-    function renderOfficialButton(buttonHost, config) {
-        var bounds = buttonHost.getBoundingClientRect();
-        var width = Math.min(400, Math.max(240, Math.floor(bounds.width || 400)));
-        var options = {
-            client_id: config.clientId,
-            callback: function (response) {
-                postCredential(config, response);
-            },
-            ux_mode: "popup"
-        };
-
-        if (config.nonce) {
-            options.nonce = config.nonce;
-        }
-
-        window.google.accounts.id.initialize(options);
-        window.google.accounts.id.renderButton(buttonHost, {
-            type: "standard",
-            theme: "outline",
-            size: "large",
-            shape: "rectangular",
-            text: "continue_with",
-            logo_alignment: "left",
-            width: width
-        });
     }
 
     function render(config) {
@@ -138,31 +56,23 @@
 
         buttonHost.classList.add("google-auth-host");
         clearElement(buttonHost);
+        buttonHost.appendChild(createButton(config));
 
         if (!config.clientId) {
-            buttonHost.appendChild(fallbackButton("Google sign-in is not configured", true));
-            return;
+            showAlert(config.alertId, "Google sign-in is not configured yet.");
         }
 
-        buttonHost.appendChild(fallbackButton("Loading Google sign-in...", true));
-
-        loadGoogleScript()
-            .then(function () {
-                if (!window.google || !window.google.accounts || !window.google.accounts.id) {
-                    throw new Error("Google sign-in could not load.");
-                }
-
-                clearElement(buttonHost);
-                renderOfficialButton(buttonHost, config);
-            })
-            .catch(function () {
-                clearElement(buttonHost);
-                buttonHost.appendChild(fallbackButton("Google sign-in is unavailable", true));
-                showAlert(config.alertId, "Google sign-in could not load. Check your connection or browser settings.");
-            });
+        window.IntelliArabicGoogleAuth.config = {
+            auto_select: false,
+            prompt: "select_account"
+        };
     }
 
     window.IntelliArabicGoogleAuth = {
-        render: render
+        render: render,
+        config: {
+            auto_select: false,
+            prompt: "select_account"
+        }
     };
 })();
