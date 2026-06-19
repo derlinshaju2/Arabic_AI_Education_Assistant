@@ -252,12 +252,7 @@
         <!-- Google Signup Button -->
         <button
           type="button"
-          {% if google_client_id %}
           onclick="window.location.href='/google-login'"
-          {% else %}
-          disabled
-          title="Set GOOGLE_CLIENT_ID in .env to enable Google sign-in."
-          {% endif %}
           class="google-button w-full py-3 rounded-[16px] flex items-center justify-center gap-3 font-bold text-sm text-slate-900 transition-all duration-300"
         >
           <svg class="w-5 h-5" viewBox="0 0 24 24">
