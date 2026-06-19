@@ -8,6 +8,7 @@ import os
 import re
 import sqlite3
 import uuid
+from urllib.parse import urlencode
 
 import bcrypt
 import jwt
@@ -33,7 +34,6 @@ AUTH_ERROR_MESSAGES = {
         "Google sign-in is not configured yet. Add your Google OAuth client ID "
         "to GOOGLE_CLIENT_ID in .env, then restart the app."
     ),
-    "google_button_required": "Use the Continue with Google button on the sign-in page.",
 }
 
 
@@ -447,9 +447,22 @@ def google_login():
         return redirect(url_for("login", error="google_not_configured"))
 
     if request.method == "GET":
-        return redirect(url_for("login", error="google_button_required"))
+        nonce = uuid.uuid4().hex
+        session["google_oauth_nonce"] = nonce
+        callback_url = url_for("google_callback", _external=True)
+        if request.headers.get("X-Forwarded-Proto") == "https":
+            callback_url = callback_url.replace("http://", "https://", 1)
+        params = {
+            "client_id": GOOGLE_CLIENT_ID,
+            "redirect_uri": callback_url,
+            "response_type": "id_token",
+            "scope": "openid email profile",
+            "nonce": nonce,
+            "prompt": "select_account",
+        }
+        return redirect("https://accounts.google.com/o/oauth2/v2/auth?" + urlencode(params))
 
-    # Handle POST: credential from the Google Identity Services button.
+    # Handle POST: credential from the Google callback page.
     data = request.get_json(silent=True) or {}
     if not data:
         data = request.form.to_dict()

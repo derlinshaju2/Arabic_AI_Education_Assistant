@@ -58,7 +58,20 @@ http://localhost:7860
 http://127.0.0.1:7860
 ```
 
-Also add your deployed app origin, for example your Hugging Face Space URL. If
-Google shows a 403 access page, check the OAuth consent screen: an Internal app
-only works for accounts in its organization, and a Testing app only works for
-listed test users.
+Also add these Authorized redirect URIs:
+
+```text
+http://localhost:7860/google-callback
+http://127.0.0.1:7860/google-callback
+https://derlinshaju2-arabic-ai-education-assistant.hf.space/google-callback
+```
+
+For Hugging Face, also add your deployed app origin:
+
+```text
+https://derlinshaju2-arabic-ai-education-assistant.hf.space
+```
+
+If Google shows a 403 access page, check the OAuth consent screen: an Internal
+app only works for accounts in its organization, and a Testing app only works
+for listed test users.
