@@ -27,7 +27,12 @@ JWT_SECRET = os.environ.get("JWT_SECRET", app.secret_key)
 JWT_ALGORITHM = "HS256"
 JWT_COOKIE_NAME = "auth_token"
 JWT_MAX_AGE_SECONDS = 7 * 24 * 60 * 60
+BLOCKED_GOOGLE_CLIENT_IDS = {
+    "627211809131-58jfkp4f2dcsfp45imli47iihiegsrvp.apps.googleusercontent.com",
+}
 GOOGLE_CLIENT_ID = (os.environ.get("GOOGLE_CLIENT_ID") or "").strip()
+if GOOGLE_CLIENT_ID in BLOCKED_GOOGLE_CLIENT_IDS:
+    GOOGLE_CLIENT_ID = ""
 EMAIL_PATTERN = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 AUTH_ERROR_MESSAGES = {
     "google_not_configured": (
