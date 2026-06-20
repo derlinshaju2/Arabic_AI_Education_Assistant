@@ -607,7 +607,7 @@
       clientId: {{ google_client_id|tojson }},
       nonce: {{ google_nonce|default('')|tojson }},
       loginUrl: {{ url_for('google_login')|tojson }},
-      nextUrl: {{ url_for('dashboard')|tojson }}
+      nextUrl: {{ url_for('modules')|tojson }}
     });
   </script>
 </body>

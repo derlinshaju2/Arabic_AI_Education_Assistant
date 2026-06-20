@@ -60,7 +60,7 @@
             })
             .then(function(res) {
                 if (res.ok || res.redirected) {
-                    window.location.href = '/dashboard';
+                    window.location.href = '/modules';
                 } else {
                     return res.json().then(function(data) {
                         document.getElementById('title').textContent = 'Sign-In Failed';

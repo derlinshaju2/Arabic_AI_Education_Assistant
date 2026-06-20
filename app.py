@@ -257,7 +257,7 @@ def auth_success_response(user, message="Signed in successfully."):
     if wants_json_response():
         response = jsonify({"status": "success", "message": message, "token": token, "user": user})
     else:
-        response = redirect(url_for("dashboard"))
+        response = redirect(url_for("modules"))
 
     session["user"] = user["email"]
     return set_auth_cookie(response, token)
@@ -387,7 +387,7 @@ def get_user_history(user_id, limit=20):
 @app.route("/")
 def home():
     if current_user():
-        return redirect(url_for("dashboard"))
+        return redirect(url_for("modules"))
 
     return render_template("hero.html", google_client_id=GOOGLE_CLIENT_ID)
 
@@ -572,6 +572,12 @@ def logout():
 @app.route("/dashboard")
 @login_required
 def dashboard(user):
+    return render_template("dashboard.html", user=user)
+
+
+@app.route("/modules")
+@login_required
+def modules(user):
     return render_template("dashboard.html", user=user)
 
 

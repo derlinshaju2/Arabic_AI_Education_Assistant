@@ -530,7 +530,7 @@
       .then(response => response.json().then(data => ({ ok: response.ok, data })))
       .then(result => {
         if (result.ok && result.data.status === 'success') {
-          window.location.href = '/dashboard';
+          window.location.href = '/modules';
           return;
         }
         throw new Error(result.data.message || 'Could not create your account. Please try again.');
@@ -553,7 +553,7 @@
       clientId: {{ google_client_id|tojson }},
       nonce: {{ google_nonce|default('')|tojson }},
       loginUrl: {{ url_for('google_login')|tojson }},
-      nextUrl: {{ url_for('dashboard')|tojson }}
+      nextUrl: {{ url_for('modules')|tojson }}
     });
   </script>
 </body>
