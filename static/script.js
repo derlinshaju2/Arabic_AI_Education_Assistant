@@ -718,9 +718,13 @@ window.switchModule = function(event, moduleName) {
     // Update active nav item
     document.querySelectorAll('.nav-item').forEach(function(item) {
         item.classList.remove('active');
+        item.removeAttribute('aria-current');
     });
     var activeItem = document.querySelector('.nav-item[data-module="' + moduleName + '"]');
-    if (activeItem) activeItem.classList.add('active');
+    if (activeItem) {
+        activeItem.classList.add('active');
+        activeItem.setAttribute('aria-current', 'page');
+    }
 
     // Update page title
     var pageTitle = document.getElementById('pageTitle');
