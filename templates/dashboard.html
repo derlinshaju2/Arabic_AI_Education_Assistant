@@ -17,7 +17,7 @@
                     </div>
                     <span class="brand-text">IntelliArabic</span>
                 </div>
-                <button class="sidebar-toggle-mobile" id="sidebarToggleMobile" aria-label="Toggle sidebar">
+                <button class="sidebar-toggle-mobile" id="sidebarToggleMobile" type="button" aria-label="Toggle sidebar" aria-expanded="false">
                     <svg viewBox="0 0 24 24" width="20" height="20">
                         <path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     </svg>
@@ -59,6 +59,11 @@
             <!-- TOP NAVIGATION -->
             <header class="topbar">
                 <div class="topbar-left">
+                    <button class="sidebar-toggle-mobile topbar-sidebar-toggle" id="sidebarToggleTop" type="button" aria-label="Open modules menu" aria-expanded="false">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
                     <h1 class="page-title" id="pageTitle">Image Captioning</h1>
                 </div>
                 <nav class="top-actions" aria-label="Account">

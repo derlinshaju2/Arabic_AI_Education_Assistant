@@ -745,3 +745,193 @@ svg {
     flex-direction: column;
   }
 }
+
+@media (max-width: 720px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .nav-inner,
+  .hero-grid,
+  .content-section,
+  .workflow-section,
+  .testimonial-section > .section-heading,
+  .testimonial-grid,
+  .faq-section,
+  .site-footer {
+    width: calc(100% - 24px);
+  }
+
+  .nav-inner {
+    min-height: 64px;
+    gap: 12px;
+  }
+
+  .brand {
+    min-width: 0;
+  }
+
+  .brand img {
+    width: 36px;
+    height: 36px;
+  }
+
+  .brand span {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 15px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .menu-button {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+  }
+
+  .mobile-nav {
+    padding: 10px 12px 14px;
+  }
+
+  .mobile-nav a,
+  .mobile-nav button {
+    min-height: 44px;
+  }
+
+  .hero-section {
+    padding: 36px 0 48px;
+  }
+
+  .hero-grid {
+    gap: 28px;
+  }
+
+  .hero-copy {
+    gap: 18px;
+  }
+
+  .eyebrow,
+  .section-kicker {
+    max-width: 100%;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .eyebrow {
+    padding: 8px 10px;
+  }
+
+  .hero-copy h1 {
+    font-size: 34px;
+    line-height: 1.06;
+    letter-spacing: 0;
+  }
+
+  .hero-text {
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  .primary-action,
+  .secondary-action {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 16px;
+    text-align: center;
+  }
+
+  .preview-panel {
+    border-radius: 20px;
+  }
+
+  .preview-topbar {
+    min-height: 56px;
+  }
+
+  .preview-card,
+  .score-card,
+  .dark-note,
+  .metric-card {
+    min-width: 0;
+    border-radius: 16px;
+    padding: 16px;
+  }
+
+  .preview-card.compact {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .preview-card strong,
+  .metric-card strong,
+  .score-card strong {
+    overflow-wrap: anywhere;
+  }
+
+  .metric-card strong,
+  .score-card strong {
+    font-size: 22px;
+  }
+
+  .content-section,
+  .workflow-section,
+  .testimonial-section,
+  .faq-section {
+    padding: 48px 0;
+  }
+
+  .section-heading h2,
+  .workflow-copy h2,
+  .faq-heading h2 {
+    font-size: 30px;
+    line-height: 1.14;
+    letter-spacing: 0;
+  }
+
+  .feature-card,
+  .step-card,
+  .testimonial-grid article,
+  .faq-list article {
+    border-radius: 16px;
+    padding: 18px;
+  }
+
+  .site-footer {
+    gap: 24px;
+    padding: 34px 0;
+  }
+
+  .site-footer nav {
+    width: 100%;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .hero-copy h1 {
+    font-size: 30px;
+  }
+
+  .section-heading h2,
+  .workflow-copy h2,
+  .faq-heading h2 {
+    font-size: 26px;
+  }
+
+  .preview-content {
+    padding: 12px;
+  }
+
+  .preview-card,
+  .score-card,
+  .dark-note,
+  .metric-card {
+    padding: 14px;
+  }
+}

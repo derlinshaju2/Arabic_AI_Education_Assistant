@@ -700,6 +700,10 @@ window.switchModule = function(event, moduleName) {
             var sidebar = document.querySelector('.sidebar');
             if (sidebar && window.innerWidth <= 768) {
                 sidebar.classList.remove('open');
+                document.body.classList.remove('sidebar-open');
+                document.querySelectorAll('.sidebar-toggle-mobile').forEach(function(toggle) {
+                    toggle.setAttribute('aria-expanded', 'false');
+                });
             }
         })
         .catch(function(err) {
@@ -716,18 +720,39 @@ window.logout = function() {
 
 // Sidebar toggle for mobile
 document.addEventListener('DOMContentLoaded', function() {
-    var sidebarToggle = document.getElementById('sidebarToggleMobile');
     var sidebar = document.querySelector('.sidebar');
+    var sidebarToggles = document.querySelectorAll('.sidebar-toggle-mobile');
 
-    if (sidebarToggle && sidebar) {
-        sidebarToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('open');
+    if (sidebar && sidebarToggles.length) {
+        function setSidebarOpen(isOpen) {
+            sidebar.classList.toggle('open', isOpen);
+            document.body.classList.toggle('sidebar-open', isOpen);
+            sidebarToggles.forEach(function(toggle) {
+                toggle.setAttribute('aria-expanded', String(isOpen));
+            });
+        }
+
+        sidebarToggles.forEach(function(toggle) {
+            toggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                setSidebarOpen(!sidebar.classList.contains('open'));
+            });
         });
 
         // Close sidebar when clicking outside
         document.addEventListener('click', function(e) {
-            if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
-                sidebar.classList.remove('open');
+            var clickedToggle = Array.prototype.some.call(sidebarToggles, function(toggle) {
+                return toggle.contains(e.target);
+            });
+
+            if (!sidebar.contains(e.target) && !clickedToggle) {
+                setSidebarOpen(false);
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                setSidebarOpen(false);
             }
         });
     }
