@@ -99,15 +99,6 @@
         console.log('[Dashboard] Language switch initialized');
     }
 
-    window.toggleProfileLanguage = function() {
-        if (langSwitch) {
-            langSwitch.click();
-        }
-        if (window.closeProfileMenu) {
-            window.closeProfileMenu();
-        }
-    };
-
     // ---- STATISTICS ----
     function loadStats() {
         fetch('/api/stats')
