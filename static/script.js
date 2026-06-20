@@ -754,6 +754,8 @@ window.switchModule = function(event, moduleName) {
 };
 
 window.logout = function() {
+    sessionStorage.removeItem('authToken');
+    window.AUTH_TOKEN = '';
     window.location.href = '/logout';
 };
 

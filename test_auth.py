@@ -71,5 +71,13 @@ class LoginMigrationTests(unittest.TestCase):
         self.assertTrue(verify_password("LegacyPass123!", row["password"]))
 
 
+class LogoutTests(unittest.TestCase):
+    def test_browser_logout_redirects_to_hero_page(self):
+        response = app.test_client().get("/logout", follow_redirects=False)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/")
+
+
 if __name__ == "__main__":
     unittest.main()

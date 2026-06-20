@@ -649,7 +649,7 @@ def logout():
     if wants_json_response():
         response = jsonify({"status": "success", "message": "Signed out."})
     else:
-        response = redirect(url_for("login"))
+        response = redirect(url_for("home"))
 
     return clear_auth_cookie(response)
 
