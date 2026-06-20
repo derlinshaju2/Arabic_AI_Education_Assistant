@@ -1,8 +1,10 @@
 from dotenv import load_dotenv
 load_dotenv()
 
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from functools import wraps
+from hmac import compare_digest
 import os
 import re
 import shutil
@@ -16,6 +18,7 @@ from flask import Flask, jsonify, redirect, render_template, request, session, u
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token as google_id_token
 from werkzeug.middleware.proxy_fix import ProxyFix
+from werkzeug.security import check_password_hash as check_werkzeug_password_hash
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "arabic-ai-education-assistant")
@@ -44,6 +47,8 @@ JWT_SECRET = os.environ.get("JWT_SECRET", app.secret_key)
 JWT_ALGORITHM = "HS256"
 JWT_COOKIE_NAME = "auth_token"
 JWT_MAX_AGE_SECONDS = 7 * 24 * 60 * 60
+BCRYPT_PREFIXES = ("$2a$", "$2b$", "$2y$")
+WERKZEUG_PASSWORD_PREFIXES = ("pbkdf2:", "scrypt:")
 GOOGLE_CLIENT_ID = (os.environ.get("GOOGLE_CLIENT_ID") or "").strip()
 GOOGLE_REDIRECT_URI = (os.environ.get("GOOGLE_REDIRECT_URI") or "").strip()
 EMAIL_PATTERN = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
@@ -80,10 +85,18 @@ def ensure_database_location():
         shutil.copy2(LEGACY_DATABASE_PATH, DATABASE_PATH)
 
 
+@contextmanager
 def get_db():
     connection = sqlite3.connect(DATABASE_PATH)
     connection.row_factory = sqlite3.Row
-    return connection
+    try:
+        yield connection
+        connection.commit()
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        connection.close()
 
 
 def init_db():
@@ -177,6 +190,18 @@ def update_google_user(user_id, name, google_id, profile_image):
     return find_user_by_id(user_id)
 
 
+def update_user_password(user_id, password_hash):
+    with get_db() as db:
+        db.execute(
+            """
+            UPDATE users
+            SET password = ?
+            WHERE id = ?
+            """,
+            (password_hash, user_id),
+        )
+
+
 # ---------------- AUTH HELPERS ----------------
 def wants_json_response():
     return request.is_json or "application/json" in request.headers.get("Accept", "")
@@ -218,11 +243,36 @@ def hash_password(password):
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
+def is_bcrypt_password_hash(password_hash):
+    return (password_hash or "").startswith(BCRYPT_PREFIXES)
+
+
+def password_needs_rehash(password_hash):
+    return bool(password_hash) and not is_bcrypt_password_hash(password_hash)
+
+
 def verify_password(password, password_hash):
     if not password_hash:
         return False
 
-    return bcrypt.checkpw(password.encode("utf-8"), password_hash.encode("utf-8"))
+    if is_bcrypt_password_hash(password_hash):
+        try:
+            return bcrypt.checkpw(password.encode("utf-8"), password_hash.encode("utf-8"))
+        except ValueError:
+            return False
+
+    if password_hash.startswith(WERKZEUG_PASSWORD_PREFIXES):
+        try:
+            return check_werkzeug_password_hash(password_hash, password)
+        except (TypeError, ValueError):
+            return False
+
+    return compare_digest(password_hash, password)
+
+
+def upgrade_password_hash_if_needed(user_id, password, password_hash):
+    if password_needs_rehash(password_hash):
+        update_user_password(user_id, hash_password(password))
 
 
 def create_token(user):
@@ -488,6 +538,7 @@ def login():
     elif not row or not verify_password(password, row["password"]):
         message = "Invalid email or password."
     else:
+        upgrade_password_hash_if_needed(row["id"], password, row["password"])
         return auth_success_response(row_to_user(row), "Welcome back.")
 
     if wants_json_response():

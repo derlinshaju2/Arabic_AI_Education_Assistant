@@ -1,40 +1,75 @@
-#!/usr/bin/env python
-import sqlite3
+import atexit
+from datetime import datetime, timezone
 import os
-from app import hash_password, verify_password
+import tempfile
+import unittest
 
-# Test hash and verify
-test_password = "TestPass123!"
-hashed = hash_password(test_password)
-print(f"Original password: {test_password}")
-print(f"Hashed: {hashed}")
+from werkzeug.security import generate_password_hash
 
-# Test if verification works
-is_valid = verify_password(test_password, hashed)
-print(f"Password verification: {is_valid}")
+_TEST_DIR = tempfile.TemporaryDirectory()
+atexit.register(_TEST_DIR.cleanup)
+os.environ["DATABASE_PATH"] = os.path.join(_TEST_DIR.name, "users.db")
 
-# Test with wrong password
-is_valid_wrong = verify_password("WrongPassword", hashed)
-print(f"Wrong password verification: {is_valid_wrong}")
+from app import (  # noqa: E402
+    app,
+    get_db,
+    hash_password,
+    is_bcrypt_password_hash,
+    verify_password,
+)
 
-# Check existing user
-db_path = os.path.join(os.getcwd(), "users.db")
-conn = sqlite3.connect(db_path)
-c = conn.cursor()
-c.execute("SELECT email, password FROM users")
-users = c.fetchall()
-print(f"\nUsers in database:")
-for email, pwd_hash in users:
-    print(f"  Email: {email}, Password hash exists: {bool(pwd_hash)}")
 
-# Test verification with the existing user's password
-if users:
-    email, pwd_hash = users[0]
-    print(f"\nTesting verification with stored password for {email}:")
-    # Try common passwords
-    test_passwords = ["Test123!", "password", "test123", "123456"]
-    for test_pwd in test_passwords:
-        result = verify_password(test_pwd, pwd_hash)
-        print(f"  {test_pwd}: {result}")
+class PasswordVerificationTests(unittest.TestCase):
+    def test_bcrypt_password_verifies(self):
+        password = "TestPass123!"
+        self.assertTrue(verify_password(password, hash_password(password)))
+        self.assertFalse(verify_password("WrongPass123!", hash_password(password)))
 
-conn.close()
+    def test_legacy_plaintext_password_verifies(self):
+        self.assertTrue(verify_password("LegacyPass123!", "LegacyPass123!"))
+        self.assertFalse(verify_password("WrongPass123!", "LegacyPass123!"))
+
+    def test_werkzeug_password_hash_verifies(self):
+        password = "WerkzeugPass123!"
+        self.assertTrue(verify_password(password, generate_password_hash(password)))
+
+    def test_malformed_bcrypt_hash_is_rejected(self):
+        self.assertFalse(verify_password("TestPass123!", "$2b$not-a-real-hash"))
+
+
+class LoginMigrationTests(unittest.TestCase):
+    def setUp(self):
+        with get_db() as db:
+            db.execute("DELETE FROM activity_history")
+            db.execute("DELETE FROM users")
+
+    def test_legacy_password_login_upgrades_to_bcrypt(self):
+        created_at = datetime.now(timezone.utc).isoformat()
+        with get_db() as db:
+            db.execute(
+                """
+                INSERT INTO users (name, email, password, googleId, profileImage, createdAt)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                ("Legacy User", "legacy@example.com", "LegacyPass123!", None, None, created_at),
+            )
+
+        response = app.test_client().post(
+            "/login",
+            json={"email": "legacy@example.com", "password": "LegacyPass123!"},
+            headers={"Accept": "application/json"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        with get_db() as db:
+            row = db.execute(
+                "SELECT password FROM users WHERE email = ?",
+                ("legacy@example.com",),
+            ).fetchone()
+
+        self.assertTrue(is_bcrypt_password_hash(row["password"]))
+        self.assertTrue(verify_password("LegacyPass123!", row["password"]))
+
+
+if __name__ == "__main__":
+    unittest.main()
