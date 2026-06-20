@@ -5314,3 +5314,81 @@ body.sidebar-collapsed .sidebar-avatar-wrap {
         border-color: #111c2f;
     }
 }
+
+/* Keep workspace modules tight under the section label. */
+.sidebar-nav {
+    align-content: start;
+    align-items: start;
+    flex: 0 0 auto;
+    min-height: 0;
+    padding: 8px 10px 0;
+    overflow: visible;
+}
+
+.nav-section {
+    align-content: start;
+    align-items: stretch;
+    width: 100%;
+    gap: 5px;
+}
+
+.nav-section-title {
+    margin: 0;
+    padding: 0 8px 5px;
+}
+
+.nav-item {
+    min-height: 44px;
+    max-height: 52px;
+    padding: 7px 9px;
+    gap: 9px;
+    border-radius: 14px;
+    font-size: 13px;
+    box-shadow: 0 5px 14px rgba(15, 23, 42, 0.03);
+}
+
+.nav-item + .nav-item {
+    margin-top: 5px;
+}
+
+.nav-item svg {
+    width: 15px;
+    height: 15px;
+    padding: 6px;
+    border-radius: 10px;
+}
+
+.nav-item::after {
+    inset: 8px auto 8px 5px;
+    width: 3px;
+}
+
+.nav-item.active {
+    min-height: 46px;
+    max-height: 54px;
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.18);
+}
+
+body.sidebar-collapsed .sidebar-nav {
+    flex: 0 0 auto;
+    padding: 8px 8px 0;
+}
+
+body.sidebar-collapsed .nav-item {
+    width: 46px;
+    min-height: 46px;
+    max-height: 46px;
+}
+
+body.sidebar-collapsed .nav-item svg {
+    padding: 6px;
+}
+
+@media (max-width: 768px) {
+    body.sidebar-collapsed .nav-item,
+    .nav-item {
+        min-height: 44px;
+        max-height: 54px;
+        padding: 7px 9px;
+    }
+}
