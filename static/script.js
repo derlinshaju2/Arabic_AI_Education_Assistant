@@ -719,7 +719,8 @@ window.switchModule = function(event, moduleName) {
     document.querySelectorAll('.nav-item').forEach(function(item) {
         item.classList.remove('active');
     });
-    document.querySelector('.nav-item[data-module="' + moduleName + '"]').classList.add('active');
+    var activeItem = document.querySelector('.nav-item[data-module="' + moduleName + '"]');
+    if (activeItem) activeItem.classList.add('active');
 
     // Update page title
     var pageTitle = document.getElementById('pageTitle');
@@ -730,6 +731,8 @@ window.switchModule = function(event, moduleName) {
     // Show loading state
     var contentArea = document.getElementById('contentArea');
     if (contentArea) {
+        contentArea.classList.remove('is-ready');
+        contentArea.classList.add('is-loading');
         contentArea.innerHTML = '<div class="loading-spinner"><svg viewBox="0 0 24 24" width="48" height="48"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" opacity="0.2"/><path d="M12 3a9 9 0 019 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="20" stroke-dashoffset="0" style="animation: spin 1s linear infinite"/></svg><p>Loading module...</p></div>';
     }
 
@@ -743,6 +746,10 @@ window.switchModule = function(event, moduleName) {
             console.log('[Dashboard] Module loaded:', moduleName);
             if (contentArea) {
                 contentArea.innerHTML = html;
+                contentArea.classList.remove('is-loading');
+                requestAnimationFrame(function() {
+                    contentArea.classList.add('is-ready');
+                });
             }
             currentModule = moduleName;
 
@@ -766,6 +773,7 @@ window.switchModule = function(event, moduleName) {
         .catch(function(err) {
             console.error('[Dashboard] Failed to load module:', err);
             if (contentArea) {
+                contentArea.classList.remove('is-loading');
                 contentArea.innerHTML = '<div class="loading-spinner"><p style="color: var(--danger);">Failed to load module. Please try again.</p></div>';
             }
         });
@@ -781,6 +789,39 @@ window.logout = function() {
 document.addEventListener('DOMContentLoaded', function() {
     var sidebar = document.querySelector('.sidebar');
     var sidebarToggles = document.querySelectorAll('.sidebar-toggle-mobile');
+    var sidebarCollapseToggle = document.getElementById('sidebarCollapseToggle');
+
+    function setSidebarCollapsed(isCollapsed) {
+        document.body.classList.toggle('sidebar-collapsed', isCollapsed);
+        if (sidebarCollapseToggle) {
+            sidebarCollapseToggle.setAttribute('aria-expanded', String(!isCollapsed));
+            sidebarCollapseToggle.setAttribute('aria-label', isCollapsed ? 'Expand sidebar' : 'Collapse sidebar');
+            sidebarCollapseToggle.setAttribute('title', isCollapsed ? 'Expand sidebar' : 'Collapse sidebar');
+        }
+        try {
+            localStorage.setItem('intelliArabicSidebarCollapsed', isCollapsed ? '1' : '0');
+        } catch (err) {
+            // Ignore storage restrictions in embedded browsers.
+        }
+    }
+
+    if (sidebarCollapseToggle) {
+        try {
+            if (localStorage.getItem('intelliArabicSidebarCollapsed') === '1' && window.innerWidth > 768) {
+                setSidebarCollapsed(true);
+            }
+        } catch (err) {
+            // Ignore storage restrictions in embedded browsers.
+        }
+
+        sidebarCollapseToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            setSidebarCollapsed(!document.body.classList.contains('sidebar-collapsed'));
+            if (window.closeProfileMenu) {
+                window.closeProfileMenu();
+            }
+        });
+    }
 
     if (sidebar && sidebarToggles.length) {
         function setSidebarOpen(isOpen) {
@@ -1010,6 +1051,8 @@ function handleCaptionFileSelect(file) {
 function displayCaptionResult(result) {
     var resultsPanel = document.getElementById('captionResults');
     if (!resultsPanel) return;
+    var emptyState = document.getElementById('captionOutputEmpty');
+    if (emptyState) emptyState.style.display = 'none';
 
     document.getElementById('resultImage').src = result.image_url;
     document.getElementById('resultArabic').textContent = result.arabic_caption;
@@ -1031,9 +1074,13 @@ function showCaptionError(message) {
 function displayEvaluationResult(result) {
     var resultsPanel = document.getElementById('evaluationResults');
     if (!resultsPanel) return;
+    var emptyState = document.getElementById('evaluationOutputEmpty');
+    if (emptyState) emptyState.style.display = 'none';
 
     var score = result.score || 0;
     document.getElementById('scoreValue').textContent = score;
+    var finalScoreValue = document.getElementById('finalScoreValue');
+    if (finalScoreValue) finalScoreValue.textContent = score;
     document.getElementById('similarityValue').textContent = Math.round((result.similarity || 0) * 100) + '%';
     document.getElementById('coverageValue').textContent = Math.round((result.coverage || 0) * 100) + '%';
 
