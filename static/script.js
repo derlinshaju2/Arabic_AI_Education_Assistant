@@ -1201,7 +1201,6 @@ function displayCaptionResult(result) {
     }
     if (confidenceValue) confidenceValue.textContent = confidence + '%';
 
-    updateCaptionInsights(result);
     resultsPanel.style.display = 'grid';
     window._lastCaption = result;
 }
@@ -1213,33 +1212,6 @@ function showCaptionError(message) {
         errorDiv.hidden = false;
     }
     showToast(message, 'error');
-}
-
-function updateCaptionInsights(result) {
-    var english = (result.english_caption || '').toLowerCase();
-    var objects = inferCaptionObjects(english);
-    var scene = inferSceneCategory(english);
-
-    setText('captionSceneCategory', scene);
-    setText('captionObjectsDetected', objects.length ? objects.join(', ') : 'General visual elements');
-    result.scene_category = scene;
-    result.objects_detected = objects;
-}
-
-function inferSceneCategory(text) {
-    if (/class|school|student|teacher|book|desk|lesson|learning/.test(text)) return 'Education';
-    if (/street|road|car|bus|building|city|market/.test(text)) return 'Urban scene';
-    if (/tree|flower|mountain|river|water|sky|field|animal/.test(text)) return 'Nature';
-    if (/food|table|plate|kitchen|restaurant/.test(text)) return 'Food and lifestyle';
-    if (/person|people|child|man|woman|boy|girl/.test(text)) return 'People';
-    return 'General image';
-}
-
-function inferCaptionObjects(text) {
-    var terms = ['person', 'people', 'student', 'teacher', 'book', 'desk', 'car', 'building', 'tree', 'flower', 'water', 'food', 'table', 'animal', 'sky'];
-    return terms.filter(function(term) {
-        return text.indexOf(term) !== -1;
-    }).slice(0, 6);
 }
 
 var captionProcessingTimer = null;
@@ -1479,8 +1451,6 @@ window.downloadCaptionPdf = function() {
     downloadPdfDocument('caption-report-' + Date.now() + '.pdf', 'IntelliArabic Image Captioning Report', [
         'English Caption: ' + (result.english_caption || ''),
         'Arabic Caption: ' + (result.arabic_caption || ''),
-        'Scene Category: ' + (result.scene_category || 'General image'),
-        'Objects Detected: ' + ((result.objects_detected || []).join(', ') || 'General visual elements'),
         'Confidence: ' + (result.confidence || 75) + '%'
     ]);
     showToast('Caption PDF downloaded.', 'success');
