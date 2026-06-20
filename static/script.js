@@ -49,18 +49,36 @@
     // ---- PROFILE DROPDOWN ----
     var profileTrigger = document.getElementById('profileTrigger');
     var profileWrapper = document.querySelector('.profile-dropdown-wrapper');
+    var profileDropdown = document.getElementById('profileDropdown');
 
     if (profileTrigger && profileWrapper) {
+        function setProfileMenuOpen(isOpen) {
+            profileWrapper.classList.toggle('open', isOpen);
+            profileTrigger.setAttribute('aria-expanded', String(isOpen));
+            if (profileDropdown) {
+                profileDropdown.setAttribute('aria-hidden', String(!isOpen));
+            }
+        }
+
+        window.closeProfileMenu = function() {
+            setProfileMenuOpen(false);
+        };
+
         profileTrigger.addEventListener('click', function(e) {
             e.stopPropagation();
-            var isOpen = profileWrapper.classList.toggle('open');
-            this.setAttribute('aria-expanded', isOpen);
+            setProfileMenuOpen(!profileWrapper.classList.contains('open'));
         });
 
         document.addEventListener('click', function(e) {
             if (!profileWrapper.contains(e.target)) {
-                profileWrapper.classList.remove('open');
-                profileTrigger.setAttribute('aria-expanded', 'false');
+                setProfileMenuOpen(false);
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                setProfileMenuOpen(false);
+                profileTrigger.blur();
             }
         });
         console.log('[Dashboard] Profile dropdown initialized');
@@ -80,6 +98,15 @@
         });
         console.log('[Dashboard] Language switch initialized');
     }
+
+    window.toggleProfileLanguage = function() {
+        if (langSwitch) {
+            langSwitch.click();
+        }
+        if (window.closeProfileMenu) {
+            window.closeProfileMenu();
+        }
+    };
 
     // ---- STATISTICS ----
     function loadStats() {
