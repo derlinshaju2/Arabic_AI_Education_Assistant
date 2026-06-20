@@ -76,3 +76,16 @@ https://derlinshaju2-arabic-ai-education-assistant.hf.space/google-callback
 If Google shows a 403 access page, check the OAuth consent screen: an Internal
 app only works for accounts in its organization, and a Testing app only works
 for listed test users.
+
+---
+
+## Account persistence on Hugging Face
+
+Password accounts are stored in SQLite. The app uses `DATABASE_PATH` when set.
+If it is not set and Hugging Face persistent storage is mounted, the app stores
+accounts at `/data/users.db`. Otherwise it falls back to `users.db` in the app
+directory.
+
+Enable persistent storage on the Hugging Face Space before relying on created
+accounts. Accounts created in a non-persistent container can disappear after a
+Space rebuild or restart unless you have a backup of the old `users.db`.

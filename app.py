@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from functools import wraps
 import os
 import re
+import shutil
 import sqlite3
 import uuid
 from urllib.parse import urlencode
@@ -23,7 +24,22 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 UPLOAD_FOLDER = os.path.join("static", "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-DATABASE_PATH = os.environ.get("DATABASE_PATH", os.path.join(os.getcwd(), "users.db"))
+LEGACY_DATABASE_PATH = os.path.join(os.getcwd(), "users.db")
+
+
+def default_database_path():
+    configured_path = os.environ.get("DATABASE_PATH")
+    if configured_path:
+        return configured_path
+
+    persistent_dir = os.environ.get("PERSISTENT_STORAGE_DIR", "/data")
+    if os.path.isdir(persistent_dir) and os.access(persistent_dir, os.W_OK):
+        return os.path.join(persistent_dir, "users.db")
+
+    return LEGACY_DATABASE_PATH
+
+
+DATABASE_PATH = default_database_path()
 JWT_SECRET = os.environ.get("JWT_SECRET", app.secret_key)
 JWT_ALGORITHM = "HS256"
 JWT_COOKIE_NAME = "auth_token"
@@ -51,6 +67,19 @@ def prevent_auth_page_cache(response):
 
 
 # ---------------- DATABASE ----------------
+def ensure_database_location():
+    database_dir = os.path.dirname(os.path.abspath(DATABASE_PATH))
+    if database_dir:
+        os.makedirs(database_dir, exist_ok=True)
+
+    if (
+        os.path.abspath(DATABASE_PATH) != os.path.abspath(LEGACY_DATABASE_PATH)
+        and not os.path.exists(DATABASE_PATH)
+        and os.path.exists(LEGACY_DATABASE_PATH)
+    ):
+        shutil.copy2(LEGACY_DATABASE_PATH, DATABASE_PATH)
+
+
 def get_db():
     connection = sqlite3.connect(DATABASE_PATH)
     connection.row_factory = sqlite3.Row
@@ -58,6 +87,8 @@ def get_db():
 
 
 def init_db():
+    ensure_database_location()
+
     with get_db() as db:
         db.execute(
             """
