@@ -870,12 +870,12 @@ window.initializeCaptioningModule = function() {
 
     var captionDropZone = document.getElementById('captionDropZone');
     var captionFileInput = document.getElementById('captionFileInput');
-    var captionPreview = document.getElementById('captionPreview');
     var captionFileTitle = document.getElementById('captionFileTitle');
     var captionSubmit = document.getElementById('captionSubmit');
 
+    setCaptionButtonReady(Boolean(captionFileInput && captionFileInput.files && captionFileInput.files.length));
+
     if (captionDropZone && captionFileInput) {
-        // Drag and drop
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function(evt) {
             captionDropZone.addEventListener(evt, function(e) {
                 e.preventDefault();
@@ -883,16 +883,19 @@ window.initializeCaptioningModule = function() {
             });
         });
 
-        captionDropZone.addEventListener('dragenter', function() {
-            this.classList.add('drag-over');
+        ['dragenter', 'dragover'].forEach(function(evt) {
+            captionDropZone.addEventListener(evt, function() {
+                captionDropZone.classList.add('drag-over');
+            });
         });
 
-        captionDropZone.addEventListener('dragleave', function() {
-            this.classList.remove('drag-over');
+        ['dragleave', 'drop'].forEach(function(evt) {
+            captionDropZone.addEventListener(evt, function() {
+                captionDropZone.classList.remove('drag-over');
+            });
         });
 
         captionDropZone.addEventListener('drop', function(e) {
-            this.classList.remove('drag-over');
             var files = e.dataTransfer.files;
             if (files.length > 0) {
                 captionFileInput.files = files;
@@ -903,52 +906,61 @@ window.initializeCaptioningModule = function() {
         captionFileInput.addEventListener('change', function() {
             if (this.files.length > 0) {
                 handleCaptionFileSelect(this.files[0]);
+            } else {
+                resetCaptionSelection();
             }
         });
     }
 
-    if (captionForm) {
-        captionForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+    captionForm.addEventListener('submit', function(e) {
+        e.preventDefault();
 
-            if (!captionFileInput || !captionFileInput.files.length) {
-                showCaptionError('Please select an image first');
-                return;
-            }
+        if (!captionFileInput || !captionFileInput.files.length) {
+            showCaptionError('Please select an image first.');
+            return;
+        }
 
-            // Show loading state
-            if (captionSubmit) {
-                captionSubmit.disabled = true;
-                captionSubmit.querySelector('.btn-text').style.display = 'none';
-                captionSubmit.querySelector('.btn-loader').style.display = 'inline-flex';
-            }
+        setCaptionLoading(true);
 
-            var formData = new FormData(captionForm);
-            fetch('/caption', {
-                method: 'POST',
-                body: formData,
-                credentials: 'same-origin'
+        fetch('/caption', {
+            method: 'POST',
+            body: new FormData(captionForm),
+            credentials: 'same-origin'
+        })
+            .then(function(res) {
+                if (!res.ok) {
+                    return res.json().catch(function() {
+                        return {};
+                    }).then(function(data) {
+                        throw new Error(data.message || 'Failed to generate caption.');
+                    });
+                }
+                return res.json();
             })
-                .then(function(res) {
-                    if (!res.ok) throw new Error('Failed: ' + res.status);
-                    return res.json();
-                })
-                .then(function(result) {
-                    console.log('[Captioning] Result:', result);
-                    displayCaptionResult(result);
-                })
-                .catch(function(err) {
-                    console.error('[Captioning] Error:', err);
-                    showCaptionError('Failed to generate caption. Please try again.');
-                })
-                .finally(function() {
-                    if (captionSubmit) {
-                        captionSubmit.disabled = false;
-                        captionSubmit.querySelector('.btn-text').style.display = 'inline-flex';
-                        captionSubmit.querySelector('.btn-loader').style.display = 'none';
-                    }
-                });
-        });
+            .then(function(result) {
+                console.log('[Captioning] Result:', result);
+                displayCaptionResult(result);
+                showToast('Caption generated successfully.', 'success');
+            })
+            .catch(function(err) {
+                console.error('[Captioning] Error:', err);
+                showCaptionError(err.message || 'Failed to generate caption. Please try again.');
+            })
+            .finally(function() {
+                setCaptionLoading(false);
+                setCaptionButtonReady(Boolean(captionFileInput && captionFileInput.files.length));
+            });
+    });
+
+    function setCaptionButtonReady(isReady) {
+        if (captionSubmit) captionSubmit.disabled = !isReady;
+    }
+
+    function resetCaptionSelection() {
+        if (captionFileTitle) captionFileTitle.textContent = 'Drag & drop or click to upload';
+        if (captionDropZone) captionDropZone.classList.remove('has-file');
+        setCaptionButtonReady(false);
+        updateSelectedImagePreview(null);
     }
 };
 
@@ -963,14 +975,15 @@ window.initializeEvaluationModule = function() {
     var refCounter = document.getElementById('refCounter');
     var stuCounter = document.getElementById('stuCounter');
 
-    // Character counters
     if (referenceTextarea && refCounter) {
+        refCounter.textContent = (referenceTextarea.value || '').length;
         referenceTextarea.addEventListener('input', function() {
             refCounter.textContent = this.value.length;
         });
     }
 
     if (studentTextarea && stuCounter) {
+        stuCounter.textContent = (studentTextarea.value || '').length;
         studentTextarea.addEventListener('input', function() {
             stuCounter.textContent = this.value.length;
         });
@@ -979,22 +992,17 @@ window.initializeEvaluationModule = function() {
     evaluationForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
-        var subject = document.getElementById('subject').value.trim();
-        var reference = referenceTextarea.value.trim();
-        var student = studentTextarea.value.trim();
-        var evaluationSubmit = document.getElementById('evaluationSubmit');
+        var subjectEl = document.getElementById('subject');
+        var subject = subjectEl ? subjectEl.value.trim() : '';
+        var reference = referenceTextarea ? referenceTextarea.value.trim() : '';
+        var student = studentTextarea ? studentTextarea.value.trim() : '';
 
         if (!subject || !reference || !student) {
-            showEvaluationError('Please fill in all fields');
+            showEvaluationError('Please fill in all fields.');
             return;
         }
 
-        // Show loading state
-        if (evaluationSubmit) {
-            evaluationSubmit.disabled = true;
-            evaluationSubmit.querySelector('.btn-text').style.display = 'none';
-            evaluationSubmit.querySelector('.btn-loader').style.display = 'inline-flex';
-        }
+        setEvaluationLoading(true);
 
         fetch('/evaluate', {
             method: 'POST',
@@ -1007,170 +1015,376 @@ window.initializeEvaluationModule = function() {
             credentials: 'same-origin'
         })
             .then(function(res) {
-                if (!res.ok) throw new Error('Failed: ' + res.status);
+                if (!res.ok) {
+                    return res.json().catch(function() {
+                        return {};
+                    }).then(function(data) {
+                        throw new Error(data.message || 'Failed to evaluate answers.');
+                    });
+                }
                 return res.json();
             })
             .then(function(result) {
                 console.log('[Evaluation] Result:', result);
+                result.subject = subject;
+                result.reference_answer = result.reference_answer || reference;
+                result.student_answer = result.student_answer || student;
                 displayEvaluationResult(result);
+                showToast('Evaluation completed.', 'success');
             })
             .catch(function(err) {
                 console.error('[Evaluation] Error:', err);
-                showEvaluationError('Failed to evaluate answers. Please try again.');
+                showEvaluationError(err.message || 'Failed to evaluate answers. Please try again.');
             })
             .finally(function() {
-                if (evaluationSubmit) {
-                    evaluationSubmit.disabled = false;
-                    evaluationSubmit.querySelector('.btn-text').style.display = 'inline-flex';
-                    evaluationSubmit.querySelector('.btn-loader').style.display = 'none';
-                }
+                setEvaluationLoading(false);
             });
     });
 };
 
 // Helper functions
 function handleCaptionFileSelect(file) {
-    var captionPreview = document.getElementById('captionPreview');
+    var captionDropZone = document.getElementById('captionDropZone');
     var captionFileTitle = document.getElementById('captionFileTitle');
+    var captionSubmit = document.getElementById('captionSubmit');
 
-    if (file.type.startsWith('image/')) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            if (captionPreview) {
-                captionPreview.src = e.target.result;
-                captionPreview.style.display = 'block';
-            }
-            if (captionFileTitle) {
-                captionFileTitle.textContent = file.name;
-            }
-        };
-        reader.readAsDataURL(file);
+    if (!file || !file.type || !file.type.startsWith('image/')) {
+        showCaptionError('Please select a valid image file.');
+        if (captionSubmit) captionSubmit.disabled = true;
+        return;
+    }
+
+    if (captionFileTitle) captionFileTitle.textContent = file.name;
+    if (captionDropZone) captionDropZone.classList.add('has-file');
+    if (captionSubmit) captionSubmit.disabled = false;
+    updateSelectedImagePreview(file);
+    showToast('Image ready for captioning.', 'success');
+}
+
+function updateSelectedImagePreview(file) {
+    var emptyState = document.getElementById('captionOutputEmpty');
+    var selectedPreview = document.getElementById('captionSelectedPreview');
+    var selectedImage = document.getElementById('selectedImagePreview');
+    var selectedName = document.getElementById('selectedImageName');
+    var resultsPanel = document.getElementById('captionResults');
+    var skeleton = document.getElementById('captionSkeleton');
+
+    if (resultsPanel) resultsPanel.style.display = 'none';
+    if (skeleton) skeleton.hidden = true;
+    if (emptyState) emptyState.style.display = 'grid';
+
+    if (!file) {
+        if (selectedPreview) selectedPreview.hidden = true;
+        if (selectedImage) selectedImage.removeAttribute('src');
+        if (selectedName) selectedName.textContent = '';
+        return;
+    }
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        if (selectedImage) selectedImage.src = e.target.result;
+        if (selectedName) selectedName.textContent = file.name;
+        if (selectedPreview) selectedPreview.hidden = false;
+    };
+    reader.readAsDataURL(file);
+}
+
+function setCaptionLoading(loading) {
+    var btn = document.getElementById('captionSubmit');
+    var text = btn ? btn.querySelector('.btn-text') : null;
+    var loader = btn ? btn.querySelector('.btn-loader') : null;
+    var emptyState = document.getElementById('captionOutputEmpty');
+    var resultsPanel = document.getElementById('captionResults');
+    var skeleton = document.getElementById('captionSkeleton');
+
+    if (btn) btn.disabled = true;
+    if (text) text.style.display = loading ? 'none' : '';
+    if (loader) loader.style.display = loading ? 'inline-flex' : 'none';
+    if (skeleton) skeleton.hidden = !loading;
+    if (loading) {
+        if (emptyState) emptyState.style.display = 'none';
+        if (resultsPanel) resultsPanel.style.display = 'none';
     }
 }
 
 function displayCaptionResult(result) {
     var resultsPanel = document.getElementById('captionResults');
     if (!resultsPanel) return;
+
     var emptyState = document.getElementById('captionOutputEmpty');
+    var skeleton = document.getElementById('captionSkeleton');
+    var resultImage = document.getElementById('resultImage');
+    var resultArabic = document.getElementById('resultArabic');
+    var resultEnglish = document.getElementById('resultEnglish');
+    var confidenceFill = document.getElementById('confidenceFill');
+    var confidenceValue = document.getElementById('confidenceValue');
+    var confidence = Math.max(0, Math.min(100, Number(result.confidence || 75)));
+
     if (emptyState) emptyState.style.display = 'none';
+    if (skeleton) skeleton.hidden = true;
+    if (resultImage) resultImage.src = result.image_url || '';
+    if (resultArabic) resultArabic.textContent = result.arabic_caption || '';
+    if (resultEnglish) resultEnglish.textContent = result.english_caption || '';
+    if (confidenceFill) {
+        confidenceFill.classList.remove('low', 'medium', 'high');
+        confidenceFill.classList.add(confidence >= 80 ? 'high' : confidence >= 55 ? 'medium' : 'low');
+        confidenceFill.style.width = confidence + '%';
+    }
+    if (confidenceValue) confidenceValue.textContent = confidence + '%';
 
-    document.getElementById('resultImage').src = result.image_url;
-    document.getElementById('resultArabic').textContent = result.arabic_caption;
-    document.getElementById('resultEnglish').textContent = result.english_caption;
-    document.getElementById('confidenceFill').style.width = (result.confidence || 75) + '%';
-    document.getElementById('confidenceValue').textContent = (result.confidence || 75) + '%';
-
-    resultsPanel.style.display = 'block';
+    resultsPanel.style.display = 'grid';
+    window._lastCaption = result;
 }
 
 function showCaptionError(message) {
     var errorDiv = document.getElementById('captionError');
     if (errorDiv) {
         errorDiv.textContent = message;
-        errorDiv.style.display = 'block';
+        errorDiv.hidden = false;
+    }
+    showToast(message, 'error');
+}
+
+function setEvaluationLoading(loading) {
+    var btn = document.getElementById('evaluationSubmit');
+    var text = btn ? btn.querySelector('.btn-text') : null;
+    var loader = btn ? btn.querySelector('.btn-loader') : null;
+    var emptyState = document.getElementById('evaluationOutputEmpty');
+    var resultsPanel = document.getElementById('evaluationResults');
+    var skeleton = document.getElementById('evaluationSkeleton');
+
+    if (btn) btn.disabled = loading;
+    if (text) text.style.display = loading ? 'none' : '';
+    if (loader) loader.style.display = loading ? 'inline-flex' : 'none';
+    if (skeleton) skeleton.hidden = !loading;
+    if (loading) {
+        if (emptyState) emptyState.style.display = 'none';
+        if (resultsPanel) resultsPanel.style.display = 'none';
     }
 }
 
 function displayEvaluationResult(result) {
     var resultsPanel = document.getElementById('evaluationResults');
     if (!resultsPanel) return;
+
     var emptyState = document.getElementById('evaluationOutputEmpty');
+    var skeleton = document.getElementById('evaluationSkeleton');
+    var score = Number(result.score || 0);
+    var finalPct = Math.max(0, Math.min(100, score * 10));
+    var similarityPct = normalizePercent(result.similarity);
+    var coveragePct = normalizePercent(result.coverage);
+
     if (emptyState) emptyState.style.display = 'none';
+    if (skeleton) skeleton.hidden = true;
 
-    var score = result.score || 0;
-    document.getElementById('scoreValue').textContent = score;
-    var finalScoreValue = document.getElementById('finalScoreValue');
-    if (finalScoreValue) finalScoreValue.textContent = score;
-    document.getElementById('similarityValue').textContent = Math.round((result.similarity || 0) * 100) + '%';
-    document.getElementById('coverageValue').textContent = Math.round((result.coverage || 0) * 100) + '%';
+    setText('finalScoreValue', formatScore(score));
+    setText('similarityValue', Math.round(similarityPct) + '%');
+    setText('coverageValue', Math.round(coveragePct) + '%');
+    updateMetricCircle('finalScoreCircle', finalPct);
+    updateMetricCircle('similarityCircle', similarityPct);
+    updateMetricCircle('coverageCircle', coveragePct);
 
-    // Update feedback lists
     var feedback = result.feedback || {};
-    var correctList = document.getElementById('correctList');
-    var missingList = document.getElementById('missingList');
-    var suggestionsList = document.getElementById('suggestionsList');
+    renderList('correctList', feedback.correct_concepts, 'A clear attempt was made to address the prompt.');
+    renderList('missingList', feedback.missing_concepts, 'No major gaps detected.');
+    renderList('suggestionsList', feedback.suggestions, 'Review the answer against the reference and add precise supporting details.');
 
-    if (correctList) {
-        correctList.innerHTML = (feedback.correct_concepts || []).map(function(item) {
-            return '<li>' + escapeHtml(item) + '</li>';
-        }).join('');
-    }
+    setText('comparisonReference', result.reference_answer || '');
+    setText('comparisonStudent', result.student_answer || '');
 
-    if (missingList) {
-        missingList.innerHTML = (feedback.missing_concepts || []).map(function(item) {
-            return '<li>' + escapeHtml(item) + '</li>';
-        }).join('');
-    }
-
-    if (suggestionsList) {
-        suggestionsList.innerHTML = (feedback.suggestions || []).map(function(item) {
-            return '<li>' + escapeHtml(item) + '</li>';
-        }).join('');
-    }
-
-    // Update answer comparison
-    document.getElementById('comparisonReference').textContent = result.reference_answer || '';
-    document.getElementById('comparisonStudent').textContent = result.student_answer || '';
-
-    resultsPanel.style.display = 'block';
+    resultsPanel.style.display = 'grid';
+    window._lastEvaluation = result;
 }
 
 function showEvaluationError(message) {
     var errorDiv = document.getElementById('evaluationError');
     if (errorDiv) {
         errorDiv.textContent = message;
-        errorDiv.style.display = 'block';
+        errorDiv.hidden = false;
+    }
+    showToast(message, 'error');
+}
+
+function normalizePercent(value) {
+    var numeric = Number(value || 0);
+    if (numeric <= 1) return Math.max(0, Math.min(100, numeric * 100));
+    return Math.max(0, Math.min(100, numeric));
+}
+
+function updateMetricCircle(id, value) {
+    var circle = document.getElementById(id);
+    if (circle) circle.style.setProperty('--value', Math.round(value));
+}
+
+function formatScore(score) {
+    return Number.isInteger(score) ? String(score) : score.toFixed(1);
+}
+
+function renderList(id, items, fallback) {
+    var list = document.getElementById(id);
+    if (!list) return;
+    var values = Array.isArray(items) && items.length ? items : [fallback];
+    list.innerHTML = values.map(function(item) {
+        return '<li>' + escapeHtml(item) + '</li>';
+    }).join('');
+}
+
+function setText(id, value) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = value;
+}
+
+function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.textContent = text == null ? '' : String(text);
+    return div.innerHTML;
+}
+
+function writeClipboard(text, successMessage) {
+    if (!text) {
+        showToast('Nothing to copy yet.', 'error');
+        return;
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function() {
+            showToast(successMessage || 'Copied to clipboard.', 'success');
+        }).catch(function() {
+            fallbackCopy(text, successMessage);
+        });
+    } else {
+        fallbackCopy(text, successMessage);
     }
 }
 
-window.copyCaption = function() {
-    var arabicText = document.getElementById('resultArabic').textContent;
-    var englishText = document.getElementById('resultEnglish').textContent;
-    var text = 'Arabic: ' + arabicText + '\nEnglish: ' + englishText;
+function fallbackCopy(text, successMessage) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
 
-    navigator.clipboard.writeText(text).then(function() {
-        alert('Caption copied to clipboard!');
-    }).catch(function() {
-        alert('Failed to copy to clipboard');
-    });
+    try {
+        document.execCommand('copy');
+        showToast(successMessage || 'Copied to clipboard.', 'success');
+    } catch (err) {
+        showToast('Copy failed. Please try again.', 'error');
+    }
+
+    document.body.removeChild(ta);
+}
+
+window.copyTextFromElement = function(elementId, successMessage) {
+    var el = document.getElementById(elementId);
+    writeClipboard(el ? el.textContent.trim() : '', successMessage);
+};
+
+window.copyCaption = function() {
+    var englishText = (document.getElementById('resultEnglish') || {}).textContent || '';
+    var arabicText = (document.getElementById('resultArabic') || {}).textContent || '';
+    writeClipboard('English Caption:\n' + englishText.trim() + '\n\nArabic Caption:\n' + arabicText.trim(), 'Caption copied.');
 };
 
 window.downloadCaption = function() {
-    var arabicText = document.getElementById('resultArabic').textContent;
-    var englishText = document.getElementById('resultEnglish').textContent;
-    var content = 'Image Caption\n\nArabic:\n' + arabicText + '\n\nEnglish:\n' + englishText;
+    var englishText = (document.getElementById('resultEnglish') || {}).textContent || '';
+    var arabicText = (document.getElementById('resultArabic') || {}).textContent || '';
+    if (!englishText && !arabicText) {
+        showToast('No caption to download yet.', 'error');
+        return;
+    }
 
+    downloadTextFile(
+        'caption-result-' + Date.now() + '.txt',
+        'Image Caption Result\n\nEnglish Caption:\n' + englishText.trim() + '\n\nArabic Caption:\n' + arabicText.trim()
+    );
+    showToast('Caption downloaded.', 'success');
+};
+
+window.copyEvaluation = function() {
+    writeClipboard(buildEvaluationText(), 'Evaluation copied.');
+};
+
+window.downloadEvaluation = function() {
+    var content = buildEvaluationText();
+    if (!content) {
+        showToast('No evaluation to download yet.', 'error');
+        return;
+    }
+    downloadTextFile('evaluation-result-' + Date.now() + '.txt', content);
+    showToast('Evaluation downloaded.', 'success');
+};
+
+function buildEvaluationText() {
+    var result = window._lastEvaluation;
+    if (!result) return '';
+
+    var feedback = result.feedback || {};
+    return [
+        'Answer Evaluation Result',
+        '',
+        'Question: ' + (result.subject || ''),
+        'Final Score: ' + formatScore(Number(result.score || 0)) + '/10',
+        'Similarity Score: ' + Math.round(normalizePercent(result.similarity)) + '%',
+        'Coverage: ' + Math.round(normalizePercent(result.coverage)) + '%',
+        '',
+        'AI Feedback:',
+        listToText(feedback.suggestions),
+        '',
+        'Strengths:',
+        listToText(feedback.correct_concepts),
+        '',
+        'Areas for Improvement:',
+        listToText(feedback.missing_concepts)
+    ].join('\n');
+}
+
+function listToText(items) {
+    if (!Array.isArray(items) || !items.length) return '- None';
+    return items.map(function(item) {
+        return '- ' + item;
+    }).join('\n');
+}
+
+function downloadTextFile(filename, content) {
     var blob = new Blob([content], { type: 'text/plain' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
-    a.download = 'caption.txt';
+    a.download = filename;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
-};
-
-function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
 }
 
 // ---- TOAST NOTIFICATIONS ----
-function showToast(message) {
-    var existing = document.querySelector('.toast');
-    if (existing) existing.remove();
+function showToast(message, type) {
+    var stack = document.querySelector('.toast-stack');
+    if (!stack) {
+        stack = document.createElement('div');
+        stack.className = 'toast-stack';
+        document.body.appendChild(stack);
+    }
 
     var toast = document.createElement('div');
-    toast.className = 'toast';
+    toast.className = 'toast ' + (type || 'info');
+    toast.setAttribute('role', 'status');
     toast.textContent = message;
-    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;background:#0f172a;color:#fff;border-radius:8px;font-size:14px;font-weight:600;z-index:2000;animation:fadeIn 0.2s ease;box-shadow:0 4px 16px rgba(0,0,0,0.2)';
-    document.body.appendChild(toast);
+    stack.appendChild(toast);
+
+    requestAnimationFrame(function() {
+        toast.classList.add('show');
+    });
 
     setTimeout(function() {
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.3s ease';
-        setTimeout(function() { if (toast.parentNode) toast.remove(); }, 300);
-    }, 2000);
+        toast.classList.remove('show');
+        setTimeout(function() {
+            if (toast.parentNode) toast.remove();
+            if (stack && !stack.children.length) stack.remove();
+        }, 220);
+    }, 2600);
 }
 
 // ---- AUTH FORM LOADING STATE ----
