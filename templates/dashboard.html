@@ -53,11 +53,14 @@
             <div class="sidebar-footer">
                 <div class="profile-dropdown-wrapper sidebar-profile-wrapper">
                     <button class="sidebar-profile-trigger" id="profileTrigger" type="button" aria-label="User profile menu" aria-haspopup="menu" aria-controls="profileDropdown" aria-expanded="false">
+                        <span class="sidebar-avatar-wrap">
                         {% if user.profileImage %}
                         <img class="sidebar-profile-avatar" src="{{ user.profileImage }}" alt="{{ user.name }}" width="38" height="38">
                         {% else %}
                         <div class="sidebar-profile-avatar initial">{{ user.name[:1].upper() if user.name else 'U' }}</div>
                         {% endif %}
+                            <span class="sidebar-online-dot" aria-hidden="true"></span>
+                        </span>
                         <span class="sidebar-profile-copy">
                             <span class="sidebar-profile-name">{{ user.name }}</span>
                             <span class="sidebar-profile-email">{{ user.email }}</span>
