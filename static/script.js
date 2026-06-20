@@ -613,6 +613,8 @@
         }
     };
 
+    window.openHistoryModal = window.showHistoryModal;
+
     window.closeHistoryModal = function() {
         var modal = document.getElementById('historyModal');
         if (modal) modal.style.display = 'none';
@@ -965,6 +967,7 @@ window.initializeCaptioningModule = function() {
         if (captionDropZone) captionDropZone.classList.remove('has-file');
         setCaptionButtonReady(false);
         updateSelectedImagePreview(null);
+        resetCaptionUploadMeta();
     }
 };
 
@@ -976,20 +979,33 @@ window.initializeEvaluationModule = function() {
 
     var referenceTextarea = document.getElementById('reference');
     var studentTextarea = document.getElementById('student');
+    var questionInput = document.getElementById('subject');
     var refCounter = document.getElementById('refCounter');
     var stuCounter = document.getElementById('stuCounter');
+    var questionCounter = document.getElementById('questionCounter');
+    var refWordCounter = document.getElementById('refWordCounter');
+    var stuWordCounter = document.getElementById('stuWordCounter');
 
     if (referenceTextarea && refCounter) {
-        refCounter.textContent = (referenceTextarea.value || '').length;
+        updateEvaluationTextStats(referenceTextarea, refCounter, refWordCounter);
         referenceTextarea.addEventListener('input', function() {
-            refCounter.textContent = this.value.length;
+            updateEvaluationTextStats(this, refCounter, refWordCounter);
         });
     }
 
     if (studentTextarea && stuCounter) {
-        stuCounter.textContent = (studentTextarea.value || '').length;
+        updateEvaluationTextStats(studentTextarea, stuCounter, stuWordCounter);
         studentTextarea.addEventListener('input', function() {
-            stuCounter.textContent = this.value.length;
+            updateEvaluationTextStats(this, stuCounter, stuWordCounter);
+            autoExpandTextarea(this);
+        });
+        autoExpandTextarea(studentTextarea);
+    }
+
+    if (questionInput && questionCounter) {
+        questionCounter.textContent = (questionInput.value || '').length;
+        questionInput.addEventListener('input', function() {
+            questionCounter.textContent = this.value.length;
         });
     }
 
@@ -1062,6 +1078,7 @@ function handleCaptionFileSelect(file) {
     if (captionDropZone) captionDropZone.classList.add('has-file');
     if (captionSubmit) captionSubmit.disabled = false;
     updateSelectedImagePreview(file);
+    populateCaptionUploadMeta(file);
     showToast('Image ready for captioning.', 'success');
 }
 
@@ -1093,6 +1110,53 @@ function updateSelectedImagePreview(file) {
     reader.readAsDataURL(file);
 }
 
+function populateCaptionUploadMeta(file) {
+    var metaCard = document.getElementById('captionUploadMeta');
+    var inputPreview = document.getElementById('captionInputPreview');
+    var nameEl = document.getElementById('captionMetaName');
+    var sizeEl = document.getElementById('captionMetaSize');
+    var typeEl = document.getElementById('captionMetaType');
+    var dimensionsEl = document.getElementById('captionMetaDimensions');
+
+    if (!file || !metaCard) return;
+
+    metaCard.hidden = false;
+    setText('captionMetaName', file.name);
+    if (sizeEl) sizeEl.textContent = formatBytes(file.size);
+    if (typeEl) typeEl.textContent = file.type.replace('image/', '').toUpperCase();
+    if (dimensionsEl) dimensionsEl.textContent = 'Reading...';
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        if (inputPreview) inputPreview.src = e.target.result;
+
+        var img = new Image();
+        img.onload = function() {
+            if (dimensionsEl) dimensionsEl.textContent = img.naturalWidth + ' x ' + img.naturalHeight;
+            window._lastCaptionFileMeta = {
+                name: file.name,
+                size: formatBytes(file.size),
+                type: file.type.replace('image/', '').toUpperCase(),
+                dimensions: img.naturalWidth + ' x ' + img.naturalHeight
+            };
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function resetCaptionUploadMeta() {
+    var metaCard = document.getElementById('captionUploadMeta');
+    var inputPreview = document.getElementById('captionInputPreview');
+    if (metaCard) metaCard.hidden = true;
+    if (inputPreview) inputPreview.removeAttribute('src');
+    setText('captionMetaName', 'No image selected');
+    setText('captionMetaSize', '-');
+    setText('captionMetaDimensions', '-');
+    setText('captionMetaType', '-');
+    window._lastCaptionFileMeta = null;
+}
+
 function setCaptionLoading(loading) {
     var btn = document.getElementById('captionSubmit');
     var text = btn ? btn.querySelector('.btn-text') : null;
@@ -1109,6 +1173,7 @@ function setCaptionLoading(loading) {
         if (emptyState) emptyState.style.display = 'none';
         if (resultsPanel) resultsPanel.style.display = 'none';
     }
+    runCaptionProcessingSequence(loading);
 }
 
 function displayCaptionResult(result) {
@@ -1136,6 +1201,7 @@ function displayCaptionResult(result) {
     }
     if (confidenceValue) confidenceValue.textContent = confidence + '%';
 
+    updateCaptionInsights(result);
     resultsPanel.style.display = 'grid';
     window._lastCaption = result;
 }
@@ -1147,6 +1213,77 @@ function showCaptionError(message) {
         errorDiv.hidden = false;
     }
     showToast(message, 'error');
+}
+
+function updateCaptionInsights(result) {
+    var english = (result.english_caption || '').toLowerCase();
+    var objects = inferCaptionObjects(english);
+    var scene = inferSceneCategory(english);
+
+    setText('captionSceneCategory', scene);
+    setText('captionObjectsDetected', objects.length ? objects.join(', ') : 'General visual elements');
+    result.scene_category = scene;
+    result.objects_detected = objects;
+}
+
+function inferSceneCategory(text) {
+    if (/class|school|student|teacher|book|desk|lesson|learning/.test(text)) return 'Education';
+    if (/street|road|car|bus|building|city|market/.test(text)) return 'Urban scene';
+    if (/tree|flower|mountain|river|water|sky|field|animal/.test(text)) return 'Nature';
+    if (/food|table|plate|kitchen|restaurant/.test(text)) return 'Food and lifestyle';
+    if (/person|people|child|man|woman|boy|girl/.test(text)) return 'People';
+    return 'General image';
+}
+
+function inferCaptionObjects(text) {
+    var terms = ['person', 'people', 'student', 'teacher', 'book', 'desk', 'car', 'building', 'tree', 'flower', 'water', 'food', 'table', 'animal', 'sky'];
+    return terms.filter(function(term) {
+        return text.indexOf(term) !== -1;
+    }).slice(0, 6);
+}
+
+var captionProcessingTimer = null;
+
+function runCaptionProcessingSequence(isRunning) {
+    var steps = ['uploading', 'analyzing', 'generating', 'translating'];
+    var container = document.getElementById('captionProcessingSteps');
+    if (!container) return;
+
+    if (captionProcessingTimer) {
+        clearInterval(captionProcessingTimer);
+        captionProcessingTimer = null;
+    }
+
+    if (!isRunning) {
+        container.hidden = true;
+        container.querySelectorAll('span').forEach(function(step) {
+            step.classList.remove('active', 'done');
+        });
+        return;
+    }
+
+    var index = 0;
+    container.hidden = false;
+    setCaptionProcessingStep(steps[index]);
+    captionProcessingTimer = setInterval(function() {
+        index = Math.min(index + 1, steps.length - 1);
+        setCaptionProcessingStep(steps[index]);
+        if (index === steps.length - 1) {
+            clearInterval(captionProcessingTimer);
+            captionProcessingTimer = null;
+        }
+    }, 800);
+}
+
+function setCaptionProcessingStep(activeStep) {
+    var stepNodes = document.querySelectorAll('#captionProcessingSteps span');
+    var foundActive = false;
+    stepNodes.forEach(function(node) {
+        var isActive = node.getAttribute('data-step') === activeStep;
+        node.classList.toggle('active', isActive);
+        node.classList.toggle('done', !isActive && !foundActive);
+        if (isActive) foundActive = true;
+    });
 }
 
 function setEvaluationLoading(loading) {
@@ -1184,9 +1321,14 @@ function displayEvaluationResult(result) {
     setText('finalScoreValue', formatScore(score));
     setText('similarityValue', Math.round(similarityPct) + '%');
     setText('coverageValue', Math.round(coveragePct) + '%');
+    setText('summarySimilarity', Math.round(similarityPct) + '%');
+    setText('summaryFinalScore', formatScore(score));
     updateMetricCircle('finalScoreCircle', finalPct);
     updateMetricCircle('similarityCircle', similarityPct);
     updateMetricCircle('coverageCircle', coveragePct);
+    updateProgressBar('similarityProgress', similarityPct);
+    updateProgressBar('scoreProgress', finalPct);
+    updateProgressBar('coverageProgress', coveragePct);
 
     var feedback = result.feedback || {};
     renderList('correctList', feedback.correct_concepts, 'A clear attempt was made to address the prompt.');
@@ -1218,6 +1360,27 @@ function normalizePercent(value) {
 function updateMetricCircle(id, value) {
     var circle = document.getElementById(id);
     if (circle) circle.style.setProperty('--value', Math.round(value));
+}
+
+function updateProgressBar(id, value) {
+    var bar = document.getElementById(id);
+    if (bar) bar.style.width = Math.max(0, Math.min(100, Math.round(value))) + '%';
+}
+
+function updateEvaluationTextStats(textarea, charEl, wordEl) {
+    var value = textarea ? textarea.value || '' : '';
+    if (charEl) charEl.textContent = value.length;
+    if (wordEl) wordEl.textContent = countWords(value);
+}
+
+function countWords(value) {
+    return (value || '').trim().split(/\s+/).filter(Boolean).length;
+}
+
+function autoExpandTextarea(textarea) {
+    if (!textarea) return;
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(Math.max(textarea.scrollHeight, 142), 280) + 'px';
 }
 
 function formatScore(score) {
@@ -1306,6 +1469,58 @@ window.downloadCaption = function() {
     showToast('Caption downloaded.', 'success');
 };
 
+window.downloadCaptionPdf = function() {
+    var result = window._lastCaption;
+    if (!result) {
+        showToast('No caption result to download yet.', 'error');
+        return;
+    }
+
+    downloadPdfDocument('caption-report-' + Date.now() + '.pdf', 'IntelliArabic Image Captioning Report', [
+        'English Caption: ' + (result.english_caption || ''),
+        'Arabic Caption: ' + (result.arabic_caption || ''),
+        'Scene Category: ' + (result.scene_category || 'General image'),
+        'Objects Detected: ' + ((result.objects_detected || []).join(', ') || 'General visual elements'),
+        'Confidence: ' + (result.confidence || 75) + '%'
+    ]);
+    showToast('Caption PDF downloaded.', 'success');
+};
+
+window.regenerateCaption = function() {
+    var form = document.getElementById('captionForm');
+    var fileInput = document.getElementById('captionFileInput');
+    if (!form || !fileInput || !fileInput.files.length) {
+        showToast('Select an image before regenerating.', 'error');
+        return;
+    }
+    form.requestSubmit();
+};
+
+window.removeCaptionImage = function() {
+    var fileInput = document.getElementById('captionFileInput');
+    var dropZone = document.getElementById('captionDropZone');
+    var submit = document.getElementById('captionSubmit');
+    var emptyState = document.getElementById('captionOutputEmpty');
+    var resultsPanel = document.getElementById('captionResults');
+    var skeleton = document.getElementById('captionSkeleton');
+
+    if (fileInput) fileInput.value = '';
+    if (dropZone) dropZone.classList.remove('has-file');
+    if (submit) submit.disabled = true;
+    setText('captionFileTitle', 'Drag & drop or click to upload');
+    updateSelectedImagePreview(null);
+    resetCaptionUploadMeta();
+    if (resultsPanel) resultsPanel.style.display = 'none';
+    if (skeleton) skeleton.hidden = true;
+    if (emptyState) emptyState.style.display = 'grid';
+    window._lastCaption = null;
+    showToast('Image removed.', 'success');
+};
+
+window.clearCaptionModule = function() {
+    removeCaptionImage();
+};
+
 window.copyEvaluation = function() {
     writeClipboard(buildEvaluationText(), 'Evaluation copied.');
 };
@@ -1318,6 +1533,71 @@ window.downloadEvaluation = function() {
     }
     downloadTextFile('evaluation-result-' + Date.now() + '.txt', content);
     showToast('Evaluation downloaded.', 'success');
+};
+
+window.downloadEvaluationPdf = function() {
+    var content = buildEvaluationText();
+    if (!content) {
+        showToast('No evaluation report to download yet.', 'error');
+        return;
+    }
+
+    downloadPdfDocument('evaluation-report-' + Date.now() + '.pdf', 'IntelliArabic Answer Evaluation Report', content.split('\n'));
+    showToast('Evaluation PDF downloaded.', 'success');
+};
+
+window.exportEvaluationResults = function() {
+    if (!window._lastEvaluation) {
+        showToast('No evaluation result to export yet.', 'error');
+        return;
+    }
+
+    downloadJsonFile('evaluation-results-' + Date.now() + '.json', window._lastEvaluation);
+    showToast('Evaluation exported.', 'success');
+};
+
+window.reevaluateAnswer = function() {
+    var form = document.getElementById('evaluationForm');
+    if (!form) return;
+    form.requestSubmit();
+};
+
+window.clearEvaluationModule = function() {
+    var form = document.getElementById('evaluationForm');
+    var resultsPanel = document.getElementById('evaluationResults');
+    var emptyState = document.getElementById('evaluationOutputEmpty');
+    var skeleton = document.getElementById('evaluationSkeleton');
+
+    if (form) form.reset();
+    ['questionCounter', 'refCounter', 'stuCounter', 'refWordCounter', 'stuWordCounter'].forEach(function(id) {
+        setText(id, '0');
+    });
+    document.querySelectorAll('#evaluationForm textarea').forEach(function(textarea) {
+        textarea.style.height = '';
+    });
+    if (resultsPanel) resultsPanel.style.display = 'none';
+    if (emptyState) emptyState.style.display = 'grid';
+    if (skeleton) skeleton.hidden = true;
+    window._lastEvaluation = null;
+    showToast('Evaluation form cleared.', 'success');
+};
+
+window.applyEvaluationExample = function(type) {
+    var subject = document.getElementById('subject');
+    if (!subject) return;
+    subject.value = type === 'culture'
+        ? 'Explain the role of Arabic calligraphy in Islamic art.'
+        : 'Identify the correct use of Arabic noun-adjective agreement.';
+    var counter = document.getElementById('questionCounter');
+    if (counter) counter.textContent = subject.value.length;
+};
+
+window.fillSampleReference = function() {
+    var reference = document.getElementById('reference');
+    if (!reference) return;
+    reference.value = 'A strong answer explains the main idea clearly, uses accurate Arabic terminology, and includes relevant supporting details or examples.';
+    updateEvaluationTextStats(reference, document.getElementById('refCounter'), document.getElementById('refWordCounter'));
+    autoExpandTextarea(reference);
 };
 
 function buildEvaluationText() {
@@ -1361,6 +1641,78 @@ function downloadTextFile(filename, content) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+}
+
+function downloadJsonFile(filename, data) {
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function downloadPdfDocument(filename, title, lines) {
+    var safeLines = [title, '', 'Generated: ' + new Date().toLocaleString()].concat(lines || []);
+    var contentLines = safeLines.map(function(line) {
+        return escapePdfText(String(line || '').replace(/[^\x20-\x7E]/g, ' '));
+    });
+    var textCommands = ['BT', '/F1 12 Tf', '50 780 Td'];
+    contentLines.forEach(function(line, index) {
+        if (index > 0) textCommands.push('0 -18 Td');
+        textCommands.push('(' + line + ') Tj');
+    });
+    textCommands.push('ET');
+
+    var stream = textCommands.join('\n');
+    var objects = [
+        '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n',
+        '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n',
+        '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n',
+        '4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n',
+        '5 0 obj\n<< /Length ' + stream.length + ' >>\nstream\n' + stream + '\nendstream\nendobj\n'
+    ];
+    var pdf = '%PDF-1.4\n';
+    var offsets = [0];
+    objects.forEach(function(obj) {
+        offsets.push(pdf.length);
+        pdf += obj;
+    });
+    var xref = pdf.length;
+    pdf += 'xref\n0 ' + (objects.length + 1) + '\n0000000000 65535 f \n';
+    offsets.slice(1).forEach(function(offset) {
+        pdf += String(offset).padStart(10, '0') + ' 00000 n \n';
+    });
+    pdf += 'trailer\n<< /Size ' + (objects.length + 1) + ' /Root 1 0 R >>\nstartxref\n' + xref + '\n%%EOF';
+
+    var blob = new Blob([pdf], { type: 'application/pdf' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function escapePdfText(value) {
+    return value.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+}
+
+function formatBytes(bytes) {
+    if (!bytes && bytes !== 0) return '-';
+    var units = ['B', 'KB', 'MB', 'GB'];
+    var size = bytes;
+    var unit = 0;
+    while (size >= 1024 && unit < units.length - 1) {
+        size /= 1024;
+        unit += 1;
+    }
+    return (unit === 0 ? size : size.toFixed(1)) + ' ' + units[unit];
 }
 
 // ---- TOAST NOTIFICATIONS ----

@@ -1,16 +1,32 @@
 <!-- Image Captioning Module Content -->
 <div class="module-content-wrapper sider-workspace" data-module-view="captioning">
     <section class="workspace-heading">
-        <div class="workspace-heading-icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
-                <path d="m8.5 15 2.1-2.2 2 1.8 2.1-3 2.8 3.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+        <div class="workspace-title-group">
+            <div class="workspace-heading-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="m8.5 15 2.1-2.2 2 1.8 2.1-3 2.8 3.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div>
+                <p class="workspace-kicker">AI IMAGE UNDERSTANDING</p>
+                <h2>Image Captioning</h2>
+                <p class="subtitle">Upload an image and generate intelligent English and Arabic captions.</p>
+            </div>
         </div>
-        <div>
-            <p class="workspace-kicker">AI Image Understanding</p>
-            <h2>Image Captioning</h2>
-            <p class="subtitle">Upload an image and generate classroom-ready English and Arabic captions.</p>
+        <div class="workspace-actions">
+            <span class="ai-ready-badge">
+                <span></span>
+                AI Ready
+            </span>
+            <button class="icon-btn" type="button" onclick="openHistoryModal()" title="History">
+                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 8v5l3 2M4.2 11A8 8 0 1 1 6 16.1M4 16v-5h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                History
+            </button>
+            <button class="icon-btn" type="button" onclick="clearCaptionModule()" title="Clear">
+                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Clear
+            </button>
         </div>
     </section>
 
@@ -38,11 +54,38 @@
                     </div>
                 </div>
 
+                <div class="upload-meta-card" id="captionUploadMeta" hidden>
+                    <div class="upload-thumb">
+                        <img id="captionInputPreview" alt="Selected image preview">
+                    </div>
+                    <div class="upload-meta-content">
+                        <div class="upload-meta-header">
+                            <span id="captionMetaName">No image selected</span>
+                            <button class="mini-action danger" type="button" onclick="removeCaptionImage()">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                                Remove
+                            </button>
+                        </div>
+                        <div class="upload-meta-grid">
+                            <span><strong>Size</strong><em id="captionMetaSize">-</em></span>
+                            <span><strong>Dimensions</strong><em id="captionMetaDimensions">-</em></span>
+                            <span><strong>Type</strong><em id="captionMetaType">-</em></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="processing-steps" id="captionProcessingSteps" hidden>
+                    <span data-step="uploading">Uploading...</span>
+                    <span data-step="analyzing">Analyzing image...</span>
+                    <span data-step="generating">Generating caption...</span>
+                    <span data-step="translating">Translating to Arabic...</span>
+                </div>
+
                 <div id="captionError" class="sr-only" role="status" aria-live="polite" hidden></div>
 
                 <button class="button primary full" type="submit" id="captionSubmit" disabled>
                     <span class="btn-text">Generate Caption</span>
-                    <span class="btn-loader" style="display:none;"><span class="spinner"></span> Analyzing image...</span>
+                    <span class="btn-loader" style="display:none;"><span class="spinner"></span> Processing...</span>
                 </button>
             </form>
         </section>
@@ -56,11 +99,15 @@
                 <div class="panel-actions">
                     <button class="icon-btn" type="button" onclick="copyCaption()" title="Copy captions">
                         <svg viewBox="0 0 24 24" width="16" height="16"><rect x="9" y="9" width="13" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-                        Copy
+                        Copy Results
                     </button>
-                    <button class="icon-btn" type="button" onclick="downloadCaption()" title="Download captions">
+                    <button class="icon-btn" type="button" onclick="downloadCaptionPdf()" title="Download PDF">
                         <svg viewBox="0 0 24 24" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        Download
+                        PDF
+                    </button>
+                    <button class="icon-btn" type="button" onclick="regenerateCaption()" title="Regenerate Caption">
+                        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Regenerate
                     </button>
                 </div>
             </div>
@@ -86,13 +133,16 @@
                 <div class="skeleton-card short"></div>
             </div>
 
-            <div class="result-panel" id="captionResults" style="display:none;">
-                <div class="result-header">
-                    <h3>Generated Caption</h3>
-                </div>
-                <img class="preview-image" id="resultImage" src="" alt="Uploaded image">
+            <div class="result-panel premium-result-grid" id="captionResults" style="display:none;">
+                <article class="result-item image-preview-card">
+                    <div class="result-item-header">
+                        <span class="result-tag image-tag">Image Preview</span>
+                    </div>
+                    <img class="preview-image" id="resultImage" src="" alt="Uploaded image">
+                </article>
+
                 <div class="result-list">
-                    <div class="result-item">
+                    <article class="result-item">
                         <div class="result-item-header">
                             <span class="result-tag english-tag">English Caption</span>
                             <button class="mini-action" type="button" onclick="copyTextFromElement('resultEnglish', 'English caption copied')">
@@ -101,8 +151,8 @@
                             </button>
                         </div>
                         <p id="resultEnglish"></p>
-                    </div>
-                    <div class="result-item">
+                    </article>
+                    <article class="result-item">
                         <div class="result-item-header">
                             <span class="result-tag arabic-tag">Arabic Caption</span>
                             <button class="mini-action" type="button" onclick="copyTextFromElement('resultArabic', 'Arabic caption copied')">
@@ -111,8 +161,19 @@
                             </button>
                         </div>
                         <p class="arabic-text" id="resultArabic" dir="rtl"></p>
-                    </div>
+                    </article>
                 </div>
+
+                <article class="result-item insights-card">
+                    <div class="result-item-header">
+                        <span class="result-tag insight-tag">AI Insights</span>
+                    </div>
+                    <div class="insight-grid">
+                        <span><strong>Scene category</strong><em id="captionSceneCategory">General image</em></span>
+                        <span><strong>Objects detected</strong><em id="captionObjectsDetected">Awaiting analysis</em></span>
+                    </div>
+                </article>
+
                 <div class="confidence-bar">
                     <span class="confidence-label">Confidence</span>
                     <div class="confidence-track">
