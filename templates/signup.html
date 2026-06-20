@@ -601,7 +601,11 @@
       .then(response => response.json().then(data => ({ ok: response.ok, data })))
       .then(result => {
         if (result.ok && result.data.status === 'success') {
-          window.location.href = '/modules';
+          if (result.data.token) {
+            sessionStorage.setItem('authToken', result.data.token);
+          }
+          const tokenParam = result.data.token ? ('?auth_token=' + encodeURIComponent(result.data.token)) : '';
+          window.location.href = '/modules' + tokenParam;
           return;
         }
         throw new Error(result.data.message || 'Could not create your account. Please try again.');

@@ -675,6 +675,56 @@
       eyeOff.hidden = isHidden;
       eye.hidden = !isHidden;
     });
+
+    function showAuthError(message) {
+      const alert = document.getElementById('authAlert');
+      alert.textContent = message;
+      alert.hidden = false;
+      alert.removeAttribute('hidden');
+      alert.style.display = 'block';
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const submitButton = this.querySelector('button[type="submit"]');
+      const formData = new FormData(this);
+      const payload = {
+        email: formData.get('email'),
+        password: formData.get('password')
+      };
+
+      submitButton.disabled = true;
+
+      fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload),
+        credentials: 'same-origin'
+      })
+      .then(response => response.json().then(data => ({ ok: response.ok, data })))
+      .then(result => {
+        if (result.ok && result.data.status === 'success') {
+          if (result.data.token) {
+            sessionStorage.setItem('authToken', result.data.token);
+          }
+          const tokenParam = result.data.token ? ('?auth_token=' + encodeURIComponent(result.data.token)) : '';
+          window.location.href = '/modules' + tokenParam;
+          return;
+        }
+
+        throw new Error(result.data.message || 'Could not sign in. Please try again.');
+      })
+      .catch(error => {
+        showAuthError(error.message || 'An error occurred. Please try again.');
+      })
+      .finally(() => {
+        submitButton.disabled = false;
+      });
+    });
   </script>
   <script src="{{ url_for('static', filename='google-auth.js') }}"></script>
   <script>

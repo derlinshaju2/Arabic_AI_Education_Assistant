@@ -5,6 +5,45 @@
 (function() {
     'use strict';
 
+    if (!window.fetch || window.__INTELLI_ARABIC_AUTH_FETCH__) return;
+
+    var nativeFetch = window.fetch.bind(window);
+    window.__INTELLI_ARABIC_AUTH_FETCH__ = true;
+
+    function authToken() {
+        return window.AUTH_TOKEN || sessionStorage.getItem('authToken') || '';
+    }
+
+    function isSameOrigin(input) {
+        var rawUrl = typeof input === 'string' ? input : input && input.url;
+        if (!rawUrl) return true;
+
+        try {
+            return new URL(rawUrl, window.location.origin).origin === window.location.origin;
+        } catch (err) {
+            return true;
+        }
+    }
+
+    window.fetch = function(input, init) {
+        var token = authToken();
+        var options = init ? Object.assign({}, init) : {};
+
+        if (token && isSameOrigin(input)) {
+            var headers = new Headers(options.headers || (input && input.headers) || {});
+            if (!headers.has('Authorization')) {
+                headers.set('Authorization', 'Bearer ' + token);
+            }
+            options.headers = headers;
+        }
+
+        return nativeFetch(input, options);
+    };
+})();
+
+(function() {
+    'use strict';
+
     console.log('[Dashboard] Script loaded');
 
     // ---- PROFILE DROPDOWN ----

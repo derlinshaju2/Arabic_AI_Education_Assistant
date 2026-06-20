@@ -247,7 +247,7 @@ def decode_token(token):
 
 
 def current_user():
-    token = request.cookies.get(JWT_COOKIE_NAME)
+    token = request.cookies.get(JWT_COOKIE_NAME) or request.args.get(JWT_COOKIE_NAME)
     authorization = request.headers.get("Authorization", "")
 
     if not token and authorization.startswith("Bearer "):
@@ -265,6 +265,10 @@ def cookie_secure():
     return request.is_secure or forwarded_proto == "https"
 
 
+def cookie_samesite():
+    return "None" if cookie_secure() else "Lax"
+
+
 def set_auth_cookie(response, token):
     response.set_cookie(
         JWT_COOKIE_NAME,
@@ -272,7 +276,7 @@ def set_auth_cookie(response, token):
         max_age=JWT_MAX_AGE_SECONDS,
         httponly=True,
         secure=cookie_secure(),
-        samesite="Lax",
+        samesite=cookie_samesite(),
     )
     return response
 
@@ -603,13 +607,13 @@ def logout():
 @app.route("/dashboard")
 @login_required
 def dashboard(user):
-    return render_template("dashboard.html", user=user)
+    return render_template("dashboard.html", user=user, auth_token=request.args.get(JWT_COOKIE_NAME, ""))
 
 
 @app.route("/modules")
 @login_required
 def modules(user):
-    return render_template("dashboard.html", user=user)
+    return render_template("dashboard.html", user=user, auth_token=request.args.get(JWT_COOKIE_NAME, ""))
 
 
 # ---------------- IMAGE CAPTIONING PAGE ----------------
