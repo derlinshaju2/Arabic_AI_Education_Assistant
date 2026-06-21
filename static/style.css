@@ -4717,56 +4717,6 @@ body.sidebar-collapsed .sidebar-profile-trigger {
     color: #dc2626;
 }
 
-.processing-steps {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px;
-}
-
-.processing-steps[hidden] {
-    display: none;
-}
-
-.processing-steps span {
-    position: relative;
-    min-width: 0;
-    padding: 9px 8px 9px 24px;
-    border: 1px solid rgba(226, 232, 240, 0.92);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.74);
-    color: #64748b;
-    font-size: 11px;
-    font-weight: 780;
-    white-space: nowrap;
-}
-
-.processing-steps span::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 9px;
-    width: 8px;
-    height: 8px;
-    border-radius: 999px;
-    background: #cbd5e1;
-    transform: translateY(-50%);
-}
-
-.processing-steps span.active {
-    border-color: rgba(37, 99, 235, 0.28);
-    background: #eff6ff;
-    color: #1d4ed8;
-}
-
-.processing-steps span.active::before {
-    background: #2563eb;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
-}
-
-.processing-steps span.done::before {
-    background: #22c55e;
-}
-
 .premium-result-grid {
     gap: 12px;
 }
@@ -4934,10 +4884,6 @@ body.sidebar-collapsed .sidebar-profile-trigger {
 }
 
 @media (max-width: 1180px) {
-    .processing-steps {
-        grid-template-columns: 1fr 1fr;
-    }
-
     .evaluation-summary-card {
         align-items: flex-start;
         flex-direction: column;
@@ -4963,9 +4909,6 @@ body.sidebar-collapsed .sidebar-profile-trigger {
         grid-template-columns: 1fr;
     }
 
-    .processing-steps {
-        grid-template-columns: 1fr;
-    }
 }
 
 @media (max-width: 520px) {
@@ -4983,7 +4926,6 @@ body.sidebar-collapsed .sidebar-profile-trigger {
     .ai-ready-badge,
     .upload-meta-card,
     .insight-grid span,
-    .processing-steps span,
     .prompt-chips button,
     .evaluation-summary-card,
     .analytics-card {
@@ -4997,8 +4939,7 @@ body.sidebar-collapsed .sidebar-profile-trigger {
         color: #f8fafc;
     }
 
-    .summary-scoreline span,
-    .processing-steps span.active {
+    .summary-scoreline span {
         background: rgba(37, 99, 235, 0.16);
     }
 }

@@ -1132,7 +1132,6 @@ function setCaptionLoading(loading) {
         if (emptyState) emptyState.style.display = 'none';
         if (resultsPanel) resultsPanel.style.display = 'none';
     }
-    runCaptionProcessingSequence(loading);
 }
 
 function displayCaptionResult(result) {
@@ -1171,50 +1170,6 @@ function showCaptionError(message) {
         errorDiv.hidden = false;
     }
     showToast(message, 'error');
-}
-
-var captionProcessingTimer = null;
-
-function runCaptionProcessingSequence(isRunning) {
-    var steps = ['uploading', 'analyzing', 'generating', 'translating'];
-    var container = document.getElementById('captionProcessingSteps');
-    if (!container) return;
-
-    if (captionProcessingTimer) {
-        clearInterval(captionProcessingTimer);
-        captionProcessingTimer = null;
-    }
-
-    if (!isRunning) {
-        container.hidden = true;
-        container.querySelectorAll('span').forEach(function(step) {
-            step.classList.remove('active', 'done');
-        });
-        return;
-    }
-
-    var index = 0;
-    container.hidden = false;
-    setCaptionProcessingStep(steps[index]);
-    captionProcessingTimer = setInterval(function() {
-        index = Math.min(index + 1, steps.length - 1);
-        setCaptionProcessingStep(steps[index]);
-        if (index === steps.length - 1) {
-            clearInterval(captionProcessingTimer);
-            captionProcessingTimer = null;
-        }
-    }, 800);
-}
-
-function setCaptionProcessingStep(activeStep) {
-    var stepNodes = document.querySelectorAll('#captionProcessingSteps span');
-    var foundActive = false;
-    stepNodes.forEach(function(node) {
-        var isActive = node.getAttribute('data-step') === activeStep;
-        node.classList.toggle('active', isActive);
-        node.classList.toggle('done', !isActive && !foundActive);
-        if (isActive) foundActive = true;
-    });
 }
 
 function setEvaluationLoading(loading) {
