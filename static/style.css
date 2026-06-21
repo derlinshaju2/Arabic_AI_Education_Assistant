@@ -4684,14 +4684,6 @@ body.sidebar-collapsed .sidebar-profile-trigger {
     white-space: nowrap;
 }
 
-.upload-meta-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.upload-meta-grid span,
 .insight-grid span {
     display: grid;
     gap: 3px;
@@ -4702,7 +4694,6 @@ body.sidebar-collapsed .sidebar-profile-trigger {
     background: rgba(248, 250, 252, 0.84);
 }
 
-.upload-meta-grid strong,
 .insight-grid strong {
     color: #64748b;
     font-size: 10px;
@@ -4711,7 +4702,6 @@ body.sidebar-collapsed .sidebar-profile-trigger {
     text-transform: uppercase;
 }
 
-.upload-meta-grid em,
 .insight-grid em {
     min-width: 0;
     overflow: hidden;
@@ -4944,8 +4934,7 @@ body.sidebar-collapsed .sidebar-profile-trigger {
 }
 
 @media (max-width: 1180px) {
-    .processing-steps,
-    .upload-meta-grid {
+    .processing-steps {
         grid-template-columns: 1fr 1fr;
     }
 
@@ -4988,15 +4977,11 @@ body.sidebar-collapsed .sidebar-profile-trigger {
         width: 100%;
     }
 
-    .upload-meta-grid {
-        grid-template-columns: 1fr;
-    }
 }
 
 @media (prefers-color-scheme: dark) {
     .ai-ready-badge,
     .upload-meta-card,
-    .upload-meta-grid span,
     .insight-grid span,
     .processing-steps span,
     .prompt-chips button,
@@ -5007,7 +4992,6 @@ body.sidebar-collapsed .sidebar-profile-trigger {
     }
 
     .upload-meta-header > span,
-    .upload-meta-grid em,
     .insight-grid em,
     .evaluation-summary-card h4 {
         color: #f8fafc;

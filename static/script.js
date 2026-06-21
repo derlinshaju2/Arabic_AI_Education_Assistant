@@ -1095,34 +1095,15 @@ function updateSelectedImagePreview(file) {
 function populateCaptionUploadMeta(file) {
     var metaCard = document.getElementById('captionUploadMeta');
     var inputPreview = document.getElementById('captionInputPreview');
-    var nameEl = document.getElementById('captionMetaName');
-    var sizeEl = document.getElementById('captionMetaSize');
-    var typeEl = document.getElementById('captionMetaType');
-    var dimensionsEl = document.getElementById('captionMetaDimensions');
 
     if (!file || !metaCard) return;
 
     metaCard.hidden = false;
     setText('captionMetaName', file.name);
-    if (sizeEl) sizeEl.textContent = formatBytes(file.size);
-    if (typeEl) typeEl.textContent = file.type.replace('image/', '').toUpperCase();
-    if (dimensionsEl) dimensionsEl.textContent = 'Reading...';
 
     var reader = new FileReader();
     reader.onload = function(e) {
         if (inputPreview) inputPreview.src = e.target.result;
-
-        var img = new Image();
-        img.onload = function() {
-            if (dimensionsEl) dimensionsEl.textContent = img.naturalWidth + ' x ' + img.naturalHeight;
-            window._lastCaptionFileMeta = {
-                name: file.name,
-                size: formatBytes(file.size),
-                type: file.type.replace('image/', '').toUpperCase(),
-                dimensions: img.naturalWidth + ' x ' + img.naturalHeight
-            };
-        };
-        img.src = e.target.result;
     };
     reader.readAsDataURL(file);
 }
@@ -1133,10 +1114,6 @@ function resetCaptionUploadMeta() {
     if (metaCard) metaCard.hidden = true;
     if (inputPreview) inputPreview.removeAttribute('src');
     setText('captionMetaName', 'No image selected');
-    setText('captionMetaSize', '-');
-    setText('captionMetaDimensions', '-');
-    setText('captionMetaType', '-');
-    window._lastCaptionFileMeta = null;
 }
 
 function setCaptionLoading(loading) {
