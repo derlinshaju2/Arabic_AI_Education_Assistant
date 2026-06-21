@@ -1054,6 +1054,13 @@ input:focus, textarea:focus, select:focus {
     font-family: inherit;
 }
 
+.icon-btn svg {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    stroke-width: 1.8;
+}
+
 .icon-btn:hover {
     background: var(--muted);
     color: var(--foreground);
@@ -5551,4 +5558,20 @@ body.sidebar-collapsed .nav-item::after {
         background: var(--ia-active-gradient);
         color: #ffffff;
     }
+}
+
+/* Keep output action icons proportional. */
+.panel-actions .icon-btn {
+    min-height: 36px;
+    padding: 7px 10px;
+    gap: 7px;
+    border-radius: 10px;
+    line-height: 1.15;
+}
+
+.panel-actions .icon-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+    flex: 0 0 16px;
+    display: block;
 }
