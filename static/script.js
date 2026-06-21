@@ -1084,30 +1084,12 @@ function handleCaptionFileSelect(file) {
 
 function updateSelectedImagePreview(file) {
     var emptyState = document.getElementById('captionOutputEmpty');
-    var selectedPreview = document.getElementById('captionSelectedPreview');
-    var selectedImage = document.getElementById('selectedImagePreview');
-    var selectedName = document.getElementById('selectedImageName');
     var resultsPanel = document.getElementById('captionResults');
     var skeleton = document.getElementById('captionSkeleton');
 
     if (resultsPanel) resultsPanel.style.display = 'none';
     if (skeleton) skeleton.hidden = true;
     if (emptyState) emptyState.style.display = 'grid';
-
-    if (!file) {
-        if (selectedPreview) selectedPreview.hidden = true;
-        if (selectedImage) selectedImage.removeAttribute('src');
-        if (selectedName) selectedName.textContent = '';
-        return;
-    }
-
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        if (selectedImage) selectedImage.src = e.target.result;
-        if (selectedName) selectedName.textContent = file.name;
-        if (selectedPreview) selectedPreview.hidden = false;
-    };
-    reader.readAsDataURL(file);
 }
 
 function populateCaptionUploadMeta(file) {
