@@ -336,21 +336,10 @@
         var resultImage = document.getElementById('resultImage');
         var resultArabic = document.getElementById('resultArabic');
         var resultEnglish = document.getElementById('resultEnglish');
-        var confidenceFill = document.getElementById('confidenceFill');
-        var confidenceValue = document.getElementById('confidenceValue');
 
         if (resultImage) resultImage.src = data.image_url;
         if (resultArabic) resultArabic.textContent = data.arabic_caption;
         if (resultEnglish) resultEnglish.textContent = data.english_caption;
-
-        var confidence = data.confidence || 75;
-        if (confidenceFill) {
-            confidenceFill.style.width = '0%';
-            setTimeout(function() {
-                confidenceFill.style.width = confidence + '%';
-            }, 100);
-        }
-        if (confidenceValue) confidenceValue.textContent = confidence + '%';
 
         panel.style.display = 'grid';
         panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -411,8 +400,6 @@
             '',
             'English Translation:',
             window._lastCaption.english_caption,
-            '',
-            'Confidence: ' + (window._lastCaption.confidence || 75) + '%',
             '',
             'Generated: ' + new Date().toLocaleString()
         ].join('\n');
@@ -1135,21 +1122,12 @@ function displayCaptionResult(result) {
     var resultImage = document.getElementById('resultImage');
     var resultArabic = document.getElementById('resultArabic');
     var resultEnglish = document.getElementById('resultEnglish');
-    var confidenceFill = document.getElementById('confidenceFill');
-    var confidenceValue = document.getElementById('confidenceValue');
-    var confidence = Math.max(0, Math.min(100, Number(result.confidence || 75)));
 
     if (emptyState) emptyState.style.display = 'none';
     if (skeleton) skeleton.hidden = true;
     if (resultImage) resultImage.src = result.image_url || '';
     if (resultArabic) resultArabic.textContent = result.arabic_caption || '';
     if (resultEnglish) resultEnglish.textContent = result.english_caption || '';
-    if (confidenceFill) {
-        confidenceFill.classList.remove('low', 'medium', 'high');
-        confidenceFill.classList.add(confidence >= 80 ? 'high' : confidence >= 55 ? 'medium' : 'low');
-        confidenceFill.style.width = confidence + '%';
-    }
-    if (confidenceValue) confidenceValue.textContent = confidence + '%';
 
     resultsPanel.style.display = 'grid';
     window._lastCaption = result;
@@ -1356,8 +1334,7 @@ window.downloadCaptionPdf = function() {
 
     downloadPdfDocument('caption-report-' + Date.now() + '.pdf', 'IntelliArabic Image Captioning Report', [
         'English Caption: ' + (result.english_caption || ''),
-        'Arabic Caption: ' + (result.arabic_caption || ''),
-        'Confidence: ' + (result.confidence || 75) + '%'
+        'Arabic Caption: ' + (result.arabic_caption || '')
     ]);
     showToast('Caption PDF downloaded.', 'success');
 };
