@@ -1434,24 +1434,6 @@ window.clearEvaluationModule = function() {
     showToast('Evaluation form cleared.', 'success');
 };
 
-window.applyEvaluationExample = function(type) {
-    var subject = document.getElementById('subject');
-    if (!subject) return;
-    subject.value = type === 'culture'
-        ? 'Explain the role of Arabic calligraphy in Islamic art.'
-        : 'Identify the correct use of Arabic noun-adjective agreement.';
-    var counter = document.getElementById('questionCounter');
-    if (counter) counter.textContent = subject.value.length;
-};
-
-window.fillSampleReference = function() {
-    var reference = document.getElementById('reference');
-    if (!reference) return;
-    reference.value = 'A strong answer explains the main idea clearly, uses accurate Arabic terminology, and includes relevant supporting details or examples.';
-    updateEvaluationTextStats(reference, document.getElementById('refCounter'), document.getElementById('refWordCounter'));
-    autoExpandTextarea(reference);
-};
-
 function buildEvaluationText() {
     var result = window._lastEvaluation;
     if (!result) return '';

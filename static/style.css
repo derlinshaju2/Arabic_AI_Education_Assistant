@@ -4731,33 +4731,6 @@ body.sidebar-collapsed .sidebar-profile-trigger {
     font-weight: 720;
 }
 
-.prompt-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
-}
-
-.prompt-chips button {
-    min-height: 30px;
-    padding: 0 10px;
-    border: 1px solid rgba(226, 232, 240, 0.95);
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.78);
-    color: #475569;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 760;
-    transition: transform 160ms ease, color 160ms ease, border-color 160ms ease, background-color 160ms ease;
-}
-
-.prompt-chips button:hover {
-    border-color: rgba(37, 99, 235, 0.24);
-    background: #eff6ff;
-    color: #1d4ed8;
-    transform: translateY(-1px);
-}
-
 .form-actions-row {
     align-items: stretch;
 }
@@ -4894,7 +4867,6 @@ body.sidebar-collapsed .sidebar-profile-trigger {
 @media (prefers-color-scheme: dark) {
     .ai-ready-badge,
     .insight-grid span,
-    .prompt-chips button,
     .evaluation-summary-card,
     .analytics-card {
         background: rgba(17, 28, 47, 0.84);
