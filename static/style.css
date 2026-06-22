@@ -3859,9 +3859,14 @@ body.sidebar-collapsed .nav-item::before {
 .result-list {
     display: grid;
     gap: 12px;
+    min-width: 0;
 }
 
 .result-item {
+    min-width: 0;
+    height: auto;
+    min-height: max-content;
+    padding: 14px;
     border: 1px solid rgba(220, 230, 243, 0.9);
     border-radius: 18px;
     background: rgba(255, 255, 255, 0.82);
@@ -3873,7 +3878,23 @@ body.sidebar-collapsed .nav-item::before {
     align-items: center;
     justify-content: space-between;
     gap: 10px;
+    flex-wrap: wrap;
     margin-bottom: 10px;
+}
+
+.result-item p {
+    min-width: 0;
+    margin: 0;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.result-item .arabic-text {
+    direction: rtl;
+    text-align: right;
+    unicode-bidi: plaintext;
 }
 
 .mini-action {
