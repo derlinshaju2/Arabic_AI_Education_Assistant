@@ -930,18 +930,29 @@ window.initializeCaptioningModule = function() {
 
         fetch('/caption', {
             method: 'POST',
+            headers: { 'Accept': 'application/json' },
             body: new FormData(captionForm),
             credentials: 'same-origin'
         })
             .then(function(res) {
-                if (!res.ok) {
-                    return res.json().catch(function() {
-                        return {};
-                    }).then(function(data) {
+                return res.text().then(function(text) {
+                    var data = {};
+                    if (text) {
+                        try {
+                            data = JSON.parse(text);
+                        } catch (parseError) {
+                            var isHtml = text.indexOf('<!DOCTYPE') !== -1 || text.indexOf('<html') !== -1;
+                            if (res.redirected || res.status === 401 || isHtml) {
+                                throw new Error('Your session expired. Please sign in again.');
+                            }
+                            throw new Error('Failed to generate caption.');
+                        }
+                    }
+                    if (!res.ok) {
                         throw new Error(data.message || 'Failed to generate caption.');
-                    });
-                }
-                return res.json();
+                    }
+                    return data;
+                });
             })
             .then(function(result) {
                 console.log('[Captioning] Result:', result);

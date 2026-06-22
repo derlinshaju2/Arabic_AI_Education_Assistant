@@ -705,7 +705,11 @@ def caption(user):
     if not file:
         return jsonify({"status": "error", "message": "Choose an image first."}), 400
 
-    result = caption_image(file)
+    try:
+        result = caption_image(file)
+    except Exception:
+        return jsonify({"status": "error", "message": "Failed to generate caption. Please try again."}), 500
+
     log_activity(user["id"], "caption", details=result.get("english_caption", ""))
     return jsonify(result)
 
