@@ -296,12 +296,31 @@ def decode_token(token):
     return find_user_by_id(payload.get("sub"))
 
 
-def current_user():
+def request_auth_token():
     token = request.cookies.get(JWT_COOKIE_NAME) or request.args.get(JWT_COOKIE_NAME)
     authorization = request.headers.get("Authorization", "")
 
     if not token and authorization.startswith("Bearer "):
         token = authorization.removeprefix("Bearer ").strip()
+
+    if not token:
+        token = (request.headers.get("X-Auth-Token") or "").strip()
+
+    if not token and request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+        try:
+            token = request.form.get(JWT_COOKIE_NAME) or request.form.get("auth_token")
+        except Exception:
+            token = None
+
+    if not token and request.is_json:
+        data = request.get_json(silent=True) or {}
+        token = data.get(JWT_COOKIE_NAME) or data.get("auth_token")
+
+    return token
+
+
+def current_user():
+    token = request_auth_token()
 
     if token:
         user = decode_token(token)

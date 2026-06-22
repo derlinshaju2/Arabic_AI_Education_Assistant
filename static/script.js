@@ -22,6 +22,8 @@
         return window.AUTH_TOKEN || storedAuthToken();
     }
 
+    window.getAuthToken = authToken;
+
     function isSameOrigin(input) {
         var rawUrl = typeof input === 'string' ? input : input && input.url;
         if (!rawUrl) return true;
@@ -42,12 +44,23 @@
             if (!headers.has('Authorization')) {
                 headers.set('Authorization', 'Bearer ' + token);
             }
+            if (!headers.has('X-Auth-Token')) {
+                headers.set('X-Auth-Token', token);
+            }
             options.headers = headers;
         }
 
         return nativeFetch(input, options);
     };
 })();
+
+function addAuthTokenToFormData(formData) {
+    var token = window.getAuthToken ? window.getAuthToken() : (window.AUTH_TOKEN || '');
+    if (token) {
+        formData.set('auth_token', token);
+    }
+    return formData;
+}
 
 (function() {
     'use strict';
@@ -285,11 +298,13 @@
 
             var formData = new FormData();
             formData.append('image', fileInput.files[0]);
+            addAuthTokenToFormData(formData);
 
             console.log('[Dashboard] Sending caption request via AJAX...');
 
             fetch('/caption', {
                 method: 'POST',
+                headers: { 'Accept': 'application/json' },
                 body: formData,
                 credentials: 'same-origin'
             })
@@ -297,20 +312,20 @@
                 console.log('[Dashboard] Caption response status:', res.status);
                 if (!res.ok) {
                     return res.text().then(function(text) {
-                        // If server returned HTML (redirect), fall back to POST
                         if (text.indexOf('<!DOCTYPE') !== -1 || text.indexOf('<html') !== -1) {
-                            console.log('[Dashboard] Got HTML response, falling back to POST');
-                            captionForm.submit();
-                            return null;
+                            throw new Error('Caption request returned an unexpected page. Please refresh and try again.');
                         }
-                        try { var data = JSON.parse(text); throw new Error(data.message || 'Server error'); }
-                        catch(parseErr) { throw new Error('Server error: ' + res.status); }
+                        var errorData = {};
+                        try {
+                            errorData = JSON.parse(text);
+                        } catch(parseErr) {}
+                        throw new Error(errorData.message || 'Server error: ' + res.status);
                     });
                 }
                 return res.json();
             })
             .then(function(data) {
-                if (!data) return; // Redirected to POST fallback
+                if (!data) return;
                 console.log('[Dashboard] Caption result:', data);
                 setCaptionLoading(false);
                 if (data && data.image_url) {
@@ -934,10 +949,12 @@ window.initializeCaptioningModule = function() {
 
         setCaptionLoading(true);
 
+        var captionFormData = addAuthTokenToFormData(new FormData(captionForm));
+
         fetch('/caption', {
             method: 'POST',
             headers: { 'Accept': 'application/json' },
-            body: new FormData(captionForm),
+            body: captionFormData,
             credentials: 'same-origin'
         })
             .then(function(res) {
@@ -948,10 +965,11 @@ window.initializeCaptioningModule = function() {
                             data = JSON.parse(text);
                         } catch (parseError) {
                             var isHtml = text.indexOf('<!DOCTYPE') !== -1 || text.indexOf('<html') !== -1;
-                            if (res.redirected || res.status === 401 || isHtml) {
+                            var isLoginPage = isHtml && (text.indexOf('loginForm') !== -1 || text.indexOf('/login') !== -1);
+                            if (res.redirected || res.status === 401 || isLoginPage) {
                                 throw new Error('Your session expired. Please sign in again.');
                             }
-                            throw new Error('Failed to generate caption.');
+                            throw new Error('Caption request returned an unexpected page. Please refresh and try again.');
                         }
                     }
                     if (!res.ok) {
@@ -1046,7 +1064,8 @@ window.initializeEvaluationModule = function() {
             body: JSON.stringify({
                 subject: subject,
                 reference_answer: reference,
-                student_answer: student
+                student_answer: student,
+                auth_token: window.getAuthToken ? window.getAuthToken() : (window.AUTH_TOKEN || '')
             }),
             credentials: 'same-origin'
         })
