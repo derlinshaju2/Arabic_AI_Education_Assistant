@@ -788,7 +788,14 @@ window.switchModule = function(event, moduleName) {
 window.logout = function() {
     sessionStorage.removeItem('authToken');
     window.AUTH_TOKEN = '';
-    window.location.href = '/logout';
+    fetch('/logout', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
+    })
+        .finally(function() {
+            window.location.replace('/');
+        });
 };
 
 // Sidebar toggle for mobile
