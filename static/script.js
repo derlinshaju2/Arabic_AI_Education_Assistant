@@ -217,7 +217,7 @@
 
         hideCaptionError();
         if (captionFileTitle) {
-            captionFileTitle.textContent = file.name;
+            captionFileTitle.textContent = 'Image selected';
         }
 
         // Show preview
@@ -1092,7 +1092,7 @@ function handleCaptionFileSelect(file) {
         return;
     }
 
-    if (captionFileTitle) captionFileTitle.textContent = file.name;
+    if (captionFileTitle) captionFileTitle.textContent = 'Image selected';
     if (captionDropZone) captionDropZone.classList.add('has-file');
     if (captionSubmit) captionSubmit.disabled = false;
     updateSelectedImagePreview(file);
