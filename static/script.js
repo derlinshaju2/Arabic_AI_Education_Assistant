@@ -985,7 +985,6 @@ window.initializeCaptioningModule = function() {
         if (captionDropZone) captionDropZone.classList.remove('has-file');
         setCaptionButtonReady(false);
         updateSelectedImagePreview(null);
-        resetCaptionUploadMeta();
     }
 };
 
@@ -1096,7 +1095,6 @@ function handleCaptionFileSelect(file) {
     if (captionDropZone) captionDropZone.classList.add('has-file');
     if (captionSubmit) captionSubmit.disabled = false;
     updateSelectedImagePreview(file);
-    populateCaptionUploadMeta(file);
     showToast('Image ready for captioning.', 'success');
 }
 
@@ -1108,30 +1106,6 @@ function updateSelectedImagePreview(file) {
     if (resultsPanel) resultsPanel.style.display = 'none';
     if (skeleton) skeleton.hidden = true;
     if (emptyState) emptyState.style.display = 'grid';
-}
-
-function populateCaptionUploadMeta(file) {
-    var metaCard = document.getElementById('captionUploadMeta');
-    var inputPreview = document.getElementById('captionInputPreview');
-
-    if (!file || !metaCard) return;
-
-    metaCard.hidden = false;
-    setText('captionMetaName', file.name);
-
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        if (inputPreview) inputPreview.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-}
-
-function resetCaptionUploadMeta() {
-    var metaCard = document.getElementById('captionUploadMeta');
-    var inputPreview = document.getElementById('captionInputPreview');
-    if (metaCard) metaCard.hidden = true;
-    if (inputPreview) inputPreview.removeAttribute('src');
-    setText('captionMetaName', 'No image selected');
 }
 
 function setCaptionLoading(loading) {
@@ -1411,7 +1385,6 @@ window.removeCaptionImage = function() {
     if (submit) submit.disabled = true;
     setText('captionFileTitle', 'Drag & drop or click to upload');
     updateSelectedImagePreview(null);
-    resetCaptionUploadMeta();
     if (resultsPanel) resultsPanel.style.display = 'none';
     if (skeleton) skeleton.hidden = true;
     if (emptyState) emptyState.style.display = 'grid';
