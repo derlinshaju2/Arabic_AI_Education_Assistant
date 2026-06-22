@@ -783,13 +783,20 @@ def evaluate(user):
 
     from src.answer_evaluation.evaluator import evaluate_answer
 
-    result = evaluate_answer(reference, student)
+    result = evaluate_answer(subject, reference, student)
 
     # Generate enhanced feedback based on score
     score_val = result.get("score", 0)
     similarity_val = result.get("similarity", 0)
+    relevance_val = result.get("question_relevance", 1.0)
 
-    if score_val >= 8:
+    if relevance_val < 0.35:
+        feedback = {
+            "correct_concepts": ["The response was checked against the reference answer"],
+            "missing_concepts": ["The answer does not clearly address the question", "Important question-specific ideas are missing"],
+            "suggestions": ["Rewrite the response so it directly answers the question", "Use key terms from the question and connect them to the reference answer"],
+        }
+    elif score_val >= 8:
         feedback = {
             "correct_concepts": ["Core concepts understood", "Good knowledge demonstration"],
             "missing_concepts": ["Minor details could be added"],
@@ -807,6 +814,10 @@ def evaluate(user):
             "missing_concepts": ["Most key concepts are missing", "Significant gaps in understanding"],
             "suggestions": ["Study the reference answer thoroughly", "Break down the topic into smaller parts", "Seek additional resources or ask for help"],
         }
+
+    if relevance_val < 0.6 and relevance_val >= 0.35:
+        feedback["missing_concepts"].insert(0, "The answer is only partly relevant to the question")
+        feedback["suggestions"].insert(0, "Tie the answer more directly to the question prompt")
 
     result["feedback"] = feedback
     result["subject"] = subject
