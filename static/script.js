@@ -1200,25 +1200,18 @@ function displayEvaluationResult(result) {
     var score = Number(result.score || 0);
     var finalPct = Math.max(0, Math.min(100, score * 10));
     var similarityPct = normalizePercent(result.similarity);
-    var relevancePct = normalizePercent(
-        result.question_relevance !== undefined ? result.question_relevance : result.coverage
-    );
 
     if (emptyState) emptyState.style.display = 'none';
     if (skeleton) skeleton.hidden = true;
 
     setText('finalScoreValue', formatScore(score));
     setText('similarityValue', Math.round(similarityPct) + '%');
-    setText('coverageValue', Math.round(relevancePct) + '%');
     setText('summarySimilarity', Math.round(similarityPct) + '%');
-    setText('summaryRelevance', Math.round(relevancePct) + '%');
     setText('summaryFinalScore', formatScore(score));
     updateMetricCircle('finalScoreCircle', finalPct);
     updateMetricCircle('similarityCircle', similarityPct);
-    updateMetricCircle('coverageCircle', relevancePct);
     updateProgressBar('similarityProgress', similarityPct);
     updateProgressBar('scoreProgress', finalPct);
-    updateProgressBar('coverageProgress', relevancePct);
 
     var feedback = result.feedback || {};
     renderList('correctList', feedback.correct_concepts, 'A clear attempt was made to address the prompt.');
