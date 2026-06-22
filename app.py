@@ -17,6 +17,7 @@ import jwt
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token as google_id_token
+from werkzeug.exceptions import HTTPException
 from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.security import check_password_hash as check_werkzeug_password_hash
 
@@ -69,6 +70,28 @@ def prevent_auth_page_cache(response):
         response.headers["Pragma"] = "no-cache"
         response.headers["Expires"] = "0"
     return response
+
+
+def should_return_json_error():
+    return wants_json_response() or request.path.startswith("/api/") or request.path in {"/caption", "/evaluate"}
+
+
+@app.errorhandler(HTTPException)
+def handle_http_exception(error):
+    if should_return_json_error():
+        return jsonify({"status": "error", "message": error.description or error.name}), error.code
+
+    return error.get_response()
+
+
+@app.errorhandler(Exception)
+def handle_unexpected_exception(error):
+    app.logger.exception("Unhandled request error")
+
+    if should_return_json_error():
+        return jsonify({"status": "error", "message": "Server error. Please try again."}), 500
+
+    raise error
 
 
 # ---------------- DATABASE ----------------

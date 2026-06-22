@@ -1,12 +1,12 @@
 from transformers import BlipProcessor, BlipForConditionalGeneration
 from PIL import Image
 import torch
+import os
 
 # Load model once (important)
-processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-large")
-model = BlipForConditionalGeneration.from_pretrained(
-    "Salesforce/blip-image-captioning-large"
-)
+CAPTION_MODEL = os.environ.get("CAPTION_MODEL", "Salesforce/blip-image-captioning-base")
+processor = BlipProcessor.from_pretrained(CAPTION_MODEL)
+model = BlipForConditionalGeneration.from_pretrained(CAPTION_MODEL)
 
 model.eval()
 
@@ -25,7 +25,7 @@ def generate_caption(image_path):
         output = model.generate(
             **inputs,
             max_length=25,
-            num_beams=7,
+            num_beams=3,
             repetition_penalty=1.5,
             early_stopping=True
         )
