@@ -140,10 +140,18 @@
         window.USER_DATA = {{ user | tojson }};
         window.AUTH_TOKEN = {{ auth_token|default('')|tojson }};
         if (window.AUTH_TOKEN) {
-            sessionStorage.setItem('authToken', window.AUTH_TOKEN);
-            window.history.replaceState({}, document.title, window.location.pathname);
+            try {
+                sessionStorage.setItem('authToken', window.AUTH_TOKEN);
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } catch (err) {
+                // Keep using window.AUTH_TOKEN when embedded storage is blocked.
+            }
         } else {
-            window.AUTH_TOKEN = sessionStorage.getItem('authToken') || '';
+            try {
+                window.AUTH_TOKEN = sessionStorage.getItem('authToken') || '';
+            } catch (err) {
+                window.AUTH_TOKEN = '';
+            }
         }
         // Initialize dashboard with first module
         document.addEventListener('DOMContentLoaded', function() {

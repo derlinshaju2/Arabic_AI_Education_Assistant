@@ -602,7 +602,11 @@
       .then(result => {
         if (result.ok && result.data.status === 'success') {
           if (result.data.token) {
-            sessionStorage.setItem('authToken', result.data.token);
+            try {
+              sessionStorage.setItem('authToken', result.data.token);
+            } catch (err) {
+              // Continue with token URL fallback when embedded storage is blocked.
+            }
           }
           const tokenParam = result.data.token ? ('?auth_token=' + encodeURIComponent(result.data.token)) : '';
           window.location.href = '/modules' + tokenParam;

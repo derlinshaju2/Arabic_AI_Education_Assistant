@@ -227,6 +227,20 @@
 
     <script>
         window.USER_DATA = {{ user | tojson }};
+        window.AUTH_TOKEN = {{ auth_token|default('')|tojson }};
+        if (window.AUTH_TOKEN) {
+            try {
+                sessionStorage.setItem('authToken', window.AUTH_TOKEN);
+            } catch (err) {
+                // Keep using window.AUTH_TOKEN when embedded storage is blocked.
+            }
+        } else {
+            try {
+                window.AUTH_TOKEN = sessionStorage.getItem('authToken') || '';
+            } catch (err) {
+                window.AUTH_TOKEN = '';
+            }
+        }
         {% if evaluation_result %}
         window._lastEval = {{ evaluation_result | tojson }};
         {% endif %}

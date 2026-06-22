@@ -303,10 +303,20 @@ def current_user():
     if not token and authorization.startswith("Bearer "):
         token = authorization.removeprefix("Bearer ").strip()
 
-    if not token:
-        return None
+    if token:
+        user = decode_token(token)
+        if user:
+            return user
 
-    return decode_token(token)
+    session_email = normalize_email(session.get("user"))
+    if session_email:
+        return row_to_user(find_user_by_email(session_email))
+
+    return None
+
+
+def page_auth_token(user):
+    return create_token(user)
 
 
 def cookie_secure():
@@ -658,27 +668,27 @@ def logout():
 @app.route("/dashboard")
 @login_required
 def dashboard(user):
-    return render_template("dashboard.html", user=user, auth_token=request.args.get(JWT_COOKIE_NAME, ""))
+    return render_template("dashboard.html", user=user, auth_token=page_auth_token(user))
 
 
 @app.route("/modules")
 @login_required
 def modules(user):
-    return render_template("dashboard.html", user=user, auth_token=request.args.get(JWT_COOKIE_NAME, ""))
+    return render_template("dashboard.html", user=user, auth_token=page_auth_token(user))
 
 
 # ---------------- IMAGE CAPTIONING PAGE ----------------
 @app.route("/captioning", methods=["GET"])
 @login_required
 def captioning_page(user):
-    return render_template("captioning.html", user=user)
+    return render_template("captioning.html", user=user, auth_token=page_auth_token(user))
 
 
 # ---------------- ANSWER EVALUATION PAGE ----------------
 @app.route("/evaluation", methods=["GET"])
 @login_required
 def evaluation_page(user):
-    return render_template("evaluation.html", user=user)
+    return render_template("evaluation.html", user=user, auth_token=page_auth_token(user))
 
 
 # ---------------- IMAGE CAPTIONING ----------------
@@ -690,12 +700,13 @@ def upload(user):
         return render_template(
             "captioning.html",
             user=user,
+            auth_token=page_auth_token(user),
             caption_error="Choose an image first.",
         ), 400
 
     result = caption_image(file)
     log_activity(user["id"], "caption", details=result.get("english_caption", ""))
-    return render_template("captioning.html", user=user, caption_result=result)
+    return render_template("captioning.html", user=user, auth_token=page_auth_token(user), caption_result=result)
 
 
 @app.route("/caption", methods=["POST"])
@@ -767,6 +778,7 @@ def evaluate(user):
     return render_template(
         "evaluation.html",
         user=user,
+        auth_token=page_auth_token(user),
         evaluation_result=result,
         reference_answer=reference,
         student_answer=student,

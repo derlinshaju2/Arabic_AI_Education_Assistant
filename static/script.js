@@ -10,8 +10,16 @@
     var nativeFetch = window.fetch.bind(window);
     window.__INTELLI_ARABIC_AUTH_FETCH__ = true;
 
+    function storedAuthToken() {
+        try {
+            return sessionStorage.getItem('authToken') || '';
+        } catch (err) {
+            return '';
+        }
+    }
+
     function authToken() {
-        return window.AUTH_TOKEN || sessionStorage.getItem('authToken') || '';
+        return window.AUTH_TOKEN || storedAuthToken();
     }
 
     function isSameOrigin(input) {
@@ -773,7 +781,11 @@ window.switchModule = function(event, moduleName) {
 };
 
 window.logout = function() {
-    sessionStorage.removeItem('authToken');
+    try {
+        sessionStorage.removeItem('authToken');
+    } catch (err) {
+        // Embedded browsers may block storage access.
+    }
     window.AUTH_TOKEN = '';
     fetch('/logout', {
         method: 'POST',
