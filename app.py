@@ -326,62 +326,6 @@ def create_token(user):
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
-def _format_feedback_terms(items, limit=3):
-    terms = [str(item).replace("_", " ").strip() for item in (items or []) if str(item).strip()]
-    if not terms:
-        return ""
-    return ", ".join(terms[:limit])
-
-
-def build_ai_feedback(result):
-    score_val = int(result.get("score", 0) or 0)
-    relevance_val = float(result.get("question_relevance", 0.0) or 0.0)
-    concept_val = float(result.get("concept_match", result.get("coverage", 0.0)) or 0.0)
-    matched = result.get("matched_concepts", []) or []
-    missing = result.get("missing_reference_concepts", []) or []
-    extra = result.get("extra_student_concepts", []) or []
-
-    if relevance_val < 0.35:
-        first = "The response is mostly off-topic and does not address the question in a clear way."
-    elif score_val >= 8:
-        first = "The response is on-topic and shows a strong understanding of the main ideas in the reference answer."
-    elif score_val >= 5:
-        first = "The response is on-topic and shows partial understanding, but its coverage of the reference answer is incomplete."
-    else:
-        first = "The response shows limited understanding of the reference answer and only weakly supports the question."
-
-    strengths = _format_feedback_terms(matched, limit=2)
-    missing_terms = _format_feedback_terms(missing, limit=3)
-    extra_terms = _format_feedback_terms(extra, limit=2)
-
-    if strengths and missing_terms:
-        second = (
-            f"It correctly touches on {strengths}, but key concepts such as {missing_terms} are missing or not clearly explained"
-        )
-    elif strengths:
-        second = f"It correctly addresses concepts such as {strengths}"
-    elif missing_terms:
-        second = f"Key concepts such as {missing_terms} are missing or not clearly explained"
-    else:
-        second = "The response shows limited evidence of the key concepts expected in the reference answer"
-
-    if extra_terms and (relevance_val < 0.6 or concept_val < 0.45):
-        second += ", and it includes off-target content that is not supported by the reference answer."
-    else:
-        second += "."
-
-    if relevance_val < 0.35:
-        third = "To improve, answer the question directly first and then include the main reference concepts."
-    elif concept_val < 0.25:
-        third = "To improve, focus on the main reference concepts and explain them more directly."
-    elif concept_val < 0.55:
-        third = "To improve, add the missing key concepts and support them with clearer detail."
-    else:
-        third = "To improve, make the explanation slightly more complete and precise."
-
-    return " ".join([first, second, third])
-
-
 def decode_token(token):
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
@@ -905,7 +849,6 @@ def evaluate(user):
         feedback["suggestions"].insert(0, "Cover more of the key concepts from the reference answer")
 
     result["feedback"] = feedback
-    result["ai_feedback"] = build_ai_feedback(result)
     result["subject"] = subject
     result["score_percentage"] = score_val * 10
 

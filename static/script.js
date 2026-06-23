@@ -1208,7 +1208,6 @@ function displayEvaluationResult(result) {
     setText('similarityValue', Math.round(similarityPct) + '%');
     setText('summarySimilarity', Math.round(similarityPct) + '%');
     setText('summaryFinalScore', formatScore(score));
-    setText('evaluationFeedbackSummary', result.ai_feedback || 'The answer was evaluated against the question and reference answer.');
     updateMetricCircle('finalScoreCircle', finalPct);
     updateMetricCircle('similarityCircle', similarityPct);
 
@@ -1466,7 +1465,6 @@ function buildEvaluationText() {
         'Question Relevance: ' + Math.round(normalizePercent(
             result.question_relevance !== undefined ? result.question_relevance : result.coverage
         )) + '%',
-        'AI Feedback: ' + (result.ai_feedback || 'The answer was evaluated against the question and reference answer.'),
         '',
         'Strengths:',
         listToText(feedback.correct_concepts),
