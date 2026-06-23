@@ -830,7 +830,19 @@ def evaluate(user):
         feedback["missing_concepts"].insert(0, "Several reference-answer concepts are missing")
         feedback["suggestions"].insert(0, "Cover more of the key concepts from the reference answer")
 
+    if relevance_val < 0.35:
+        ai_feedback = "This answer is mostly off-topic and should be rewritten to address the question directly."
+    elif concept_val < 0.25:
+        ai_feedback = "This answer touches the topic but misses most of the key concepts from the reference answer."
+    elif score_val >= 8:
+        ai_feedback = "This answer is strong, relevant, and covers the main reference concepts clearly."
+    elif score_val >= 5:
+        ai_feedback = "This answer is partly correct but needs more key concepts and supporting detail."
+    else:
+        ai_feedback = "This answer shows limited understanding and needs a clearer link to the core ideas."
+
     result["feedback"] = feedback
+    result["ai_feedback"] = ai_feedback
     result["subject"] = subject
     result["score_percentage"] = score_val * 10
 

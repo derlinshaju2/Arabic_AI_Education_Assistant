@@ -4872,6 +4872,25 @@ body.sidebar-collapsed .sidebar-profile-trigger {
     line-height: 1.3;
 }
 
+.evaluation-feedback-note {
+    display: grid;
+    gap: 4px;
+    padding: 9px 12px;
+    border: 1px solid var(--ia-card-border);
+    border-radius: 13px;
+    background:
+        linear-gradient(135deg, rgba(239, 246, 255, 0.92), rgba(255, 255, 255, 0.88)),
+        rgba(255, 255, 255, 0.9);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.05);
+}
+
+.evaluation-feedback-note p {
+    margin: 0;
+    color: #334155;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
 .analytics-bars {
     display: grid;
     gap: 12px;
@@ -4963,6 +4982,15 @@ body.sidebar-collapsed .sidebar-profile-trigger {
     .evaluation-summary-card h4,
     .premium-evaluation-report .detail-label {
         color: #f8fafc;
+    }
+
+    .evaluation-feedback-note {
+        background: rgba(17, 28, 47, 0.84);
+        border-color: rgba(51, 65, 85, 0.95);
+    }
+
+    .evaluation-feedback-note p {
+        color: #cbd5e1;
     }
 
     .summary-scoreline span {
