@@ -1210,13 +1210,6 @@ function displayEvaluationResult(result) {
     setText('summaryFinalScore', formatScore(score));
     updateMetricCircle('finalScoreCircle', finalPct);
     updateMetricCircle('similarityCircle', similarityPct);
-    updateProgressBar('similarityProgress', similarityPct);
-    updateProgressBar('scoreProgress', finalPct);
-
-    var feedback = result.feedback || {};
-    renderList('correctList', feedback.correct_concepts, 'A clear attempt was made to address the prompt.');
-    renderList('missingList', feedback.missing_concepts, 'No major gaps detected.');
-    renderList('suggestionsList', feedback.suggestions, 'Review the answer against the reference and add precise supporting details.');
 
     setText('comparisonReference', result.reference_answer || '');
     setText('comparisonStudent', result.student_answer || '');
