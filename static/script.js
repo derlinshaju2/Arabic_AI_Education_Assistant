@@ -1211,9 +1211,6 @@ function displayEvaluationResult(result) {
     updateMetricCircle('finalScoreCircle', finalPct);
     updateMetricCircle('similarityCircle', similarityPct);
 
-    setText('comparisonReference', result.reference_answer || '');
-    setText('comparisonStudent', result.student_answer || '');
-
     resultsPanel.style.display = 'grid';
     window._lastEvaluation = result;
 }
