@@ -1211,11 +1211,6 @@ function displayEvaluationResult(result) {
     updateMetricCircle('finalScoreCircle', finalPct);
     updateMetricCircle('similarityCircle', similarityPct);
 
-    var feedback = result.feedback || {};
-    renderList('correctList', feedback.correct_concepts, 'Core answer points identified.');
-    renderList('missingList', feedback.missing_concepts, 'No major missing points detected.');
-    renderList('suggestionsList', feedback.suggestions, 'Review the answer against the reference and add precise supporting details.');
-
     resultsPanel.style.display = 'grid';
     window._lastEvaluation = result;
 }

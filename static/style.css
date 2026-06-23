@@ -4835,58 +4835,6 @@ body.sidebar-collapsed .sidebar-profile-trigger {
     font-size: 12px;
 }
 
-.compact-feedback-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-}
-
-.compact-feedback-card {
-    min-width: 0;
-    padding: 12px;
-    border: 1px solid var(--ia-card-border);
-    border-left-width: 4px;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.88);
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.045);
-}
-
-.compact-feedback-card.strengths {
-    border-left-color: #16a34a;
-    background: linear-gradient(180deg, rgba(240, 253, 244, 0.88), rgba(255, 255, 255, 0.92));
-}
-
-.compact-feedback-card.missing {
-    border-left-color: #f59e0b;
-    background: linear-gradient(180deg, rgba(255, 251, 235, 0.9), rgba(255, 255, 255, 0.92));
-}
-
-.compact-feedback-card.suggestions {
-    border-left-color: #2563eb;
-    background: linear-gradient(180deg, rgba(239, 246, 255, 0.9), rgba(255, 255, 255, 0.92));
-}
-
-.compact-feedback-card h4 {
-    margin: 0 0 8px;
-    color: #0f172a;
-    font-size: 13px;
-    font-weight: 850;
-}
-
-.compact-feedback-card ul {
-    display: grid;
-    gap: 6px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.compact-feedback-card li {
-    color: #334155;
-    font-size: 12px;
-    line-height: 1.45;
-}
-
 .analytics-bars {
     display: grid;
     gap: 12px;
@@ -4930,9 +4878,6 @@ body.sidebar-collapsed .sidebar-profile-trigger {
         justify-content: flex-start;
     }
 
-    .compact-feedback-grid {
-        grid-template-columns: 1fr;
-    }
 }
 
 @media (max-width: 900px) {
@@ -4970,7 +4915,6 @@ body.sidebar-collapsed .sidebar-profile-trigger {
     .ai-ready-badge,
     .insight-grid span,
     .evaluation-summary-card,
-    .compact-feedback-card,
     .analytics-card {
         background: rgba(17, 28, 47, 0.84);
         border-color: rgba(51, 65, 85, 0.95);
@@ -4978,13 +4922,8 @@ body.sidebar-collapsed .sidebar-profile-trigger {
 
     .insight-grid em,
     .evaluation-summary-card h4,
-    .premium-evaluation-report .detail-label,
-    .compact-feedback-card h4 {
+    .premium-evaluation-report .detail-label {
         color: #f8fafc;
-    }
-
-    .compact-feedback-card li {
-        color: #cbd5e1;
     }
 
     .summary-scoreline span {
