@@ -92,13 +92,13 @@
 
             <div class="evaluation-results premium-evaluation-report" id="evaluationResults" style="display:none;">
                 <article class="evaluation-summary-card">
-                    <div>
+                    <div class="evaluation-summary-content">
                         <span class="result-tag insight-tag">Evaluation Summary</span>
                         <h4>Professional AI Evaluation Report</h4>
-                    </div>
-                    <div class="summary-scoreline">
-                        <span>Similarity: <strong id="summarySimilarity">0%</strong></span>
-                        <span>Score: <strong><span id="summaryFinalScore">0</span>/10</strong></span>
+                        <div class="summary-scoreline">
+                            <span>Score: <strong><span id="summaryFinalScore">0</span>/10</strong></span>
+                            <span>Similarity: <strong id="summarySimilarity">0%</strong></span>
+                        </div>
                     </div>
                 </article>
 
@@ -120,6 +120,21 @@
                             <span class="detail-label">Similarity Score</span>
                             <p>Match against reference</p>
                         </div>
+                    </article>
+                </div>
+
+                <div class="compact-feedback-grid">
+                    <article class="compact-feedback-card strengths">
+                        <h4>Strengths</h4>
+                        <ul id="correctList"></ul>
+                    </article>
+                    <article class="compact-feedback-card missing">
+                        <h4>Missing Points</h4>
+                        <ul id="missingList"></ul>
+                    </article>
+                    <article class="compact-feedback-card suggestions">
+                        <h4>Suggestions</h4>
+                        <ul id="suggestionsList"></ul>
                     </article>
                 </div>
             </div>
