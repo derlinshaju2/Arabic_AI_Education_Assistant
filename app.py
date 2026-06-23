@@ -321,50 +321,36 @@ def build_ai_feedback(result):
     score_val = int(result.get("score", 0) or 0)
     relevance_val = float(result.get("question_relevance", 0.0) or 0.0)
     concept_val = float(result.get("concept_match", result.get("coverage", 0.0)) or 0.0)
-    similarity_val = float(result.get("similarity", 0.0) or 0.0)
     matched = result.get("matched_concepts", []) or []
     missing = result.get("missing_reference_concepts", []) or []
     extra = result.get("extra_student_concepts", []) or []
 
     if relevance_val < 0.35:
-        first = (
-            f"This answer received {score_val}/10 because it is mostly off-topic and shows low alignment "
-            f"with the question and reference answer ({round(similarity_val * 100)}% similarity)."
-        )
+        first = "The response is mostly off-topic and does not address the question in a clear way."
     elif score_val >= 8:
-        first = (
-            f"This answer received {score_val}/10 because it is on-topic and closely matches the main ideas "
-            f"from the reference answer ({round(similarity_val * 100)}% similarity)."
-        )
+        first = "The response is on-topic and shows a strong understanding of the main ideas in the reference answer."
     elif score_val >= 5:
-        first = (
-            f"This answer received {score_val}/10 because it is on-topic but only partially covers the key "
-            f"ideas from the reference answer ({round(similarity_val * 100)}% similarity)."
-        )
+        first = "The response is on-topic and shows partial understanding, but its coverage of the reference answer is incomplete."
     else:
-        first = (
-            f"This answer received {score_val}/10 because it has limited coverage of the reference answer and "
-            f"only partial alignment with the question ({round(similarity_val * 100)}% similarity)."
-        )
+        first = "The response shows limited understanding of the reference answer and only weakly supports the question."
 
-    strengths = _format_feedback_terms(matched)
-    missing_terms = _format_feedback_terms(missing)
+    strengths = _format_feedback_terms(matched, limit=2)
+    missing_terms = _format_feedback_terms(missing, limit=3)
     extra_terms = _format_feedback_terms(extra, limit=2)
 
     if strengths and missing_terms:
         second = (
-            f"It shows strength in concepts such as {strengths}, but key concepts like {missing_terms} "
-            f"are missing or not clearly explained"
+            f"It correctly touches on {strengths}, but key concepts such as {missing_terms} are missing or not clearly explained"
         )
     elif strengths:
-        second = f"It shows strength in concepts such as {strengths}"
+        second = f"It correctly addresses concepts such as {strengths}"
     elif missing_terms:
         second = f"Key concepts such as {missing_terms} are missing or not clearly explained"
     else:
         second = "The response shows limited evidence of the key concepts expected in the reference answer"
 
     if extra_terms and (relevance_val < 0.6 or concept_val < 0.45):
-        second += ", and it introduces some ideas that are not well supported by the reference answer."
+        second += ", and it includes off-target content that is not supported by the reference answer."
     else:
         second += "."
 
