@@ -31,16 +31,27 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 LEGACY_DATABASE_PATH = os.path.join(os.getcwd(), "users.db")
 
 
+def _normalized_database_path(path):
+    return os.path.abspath(os.path.expanduser(path))
+
+
 def default_database_path():
     configured_path = os.environ.get("DATABASE_PATH")
     if configured_path:
-        return configured_path
+        return _normalized_database_path(configured_path)
 
-    persistent_dir = os.environ.get("PERSISTENT_STORAGE_DIR", "/data")
-    if os.path.isdir(persistent_dir) and os.access(persistent_dir, os.W_OK):
-        return os.path.join(persistent_dir, "users.db")
+    persistent_dir = os.environ.get("PERSISTENT_STORAGE_DIR")
+    if persistent_dir:
+        persistent_dir = _normalized_database_path(persistent_dir)
+        if os.path.isdir(persistent_dir) and os.access(persistent_dir, os.W_OK):
+            return os.path.join(persistent_dir, "users.db")
 
-    return LEGACY_DATABASE_PATH
+    if os.name != "nt":
+        default_persistent_dir = "/data"
+        if os.path.isdir(default_persistent_dir) and os.access(default_persistent_dir, os.W_OK):
+            return os.path.join(default_persistent_dir, "users.db")
+
+    return _normalized_database_path(LEGACY_DATABASE_PATH)
 
 
 DATABASE_PATH = default_database_path()
@@ -95,6 +106,10 @@ def handle_unexpected_exception(error):
 
 
 # ---------------- DATABASE ----------------
+def log_active_database(context):
+    app.logger.info("Database path [%s]: %s", context, DATABASE_PATH)
+
+
 def ensure_database_location():
     database_dir = os.path.dirname(os.path.abspath(DATABASE_PATH))
     if database_dir:
@@ -123,6 +138,7 @@ def get_db():
 
 
 def init_db():
+    log_active_database("init")
     ensure_database_location()
 
     with get_db() as db:
@@ -616,6 +632,7 @@ def register():
             google_nonce=google_signin_nonce(),
         ), 400
 
+    log_active_database("register")
     user = create_user(name, email, hash_password(password))
     return auth_success_response(user, "Account created successfully.")
 
@@ -639,6 +656,7 @@ def login():
     data = request_data()
     email = normalize_email(data.get("email"))
     password = data.get("password") or ""
+    log_active_database("login")
     row = find_user_by_email(email)
 
     if row and not row["password"] and row["googleId"]:
