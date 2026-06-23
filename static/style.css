@@ -4747,7 +4747,7 @@ body.sidebar-collapsed .sidebar-profile-trigger {
 
 .premium-evaluation-report {
     align-content: start;
-    gap: 8px;
+    gap: 5px;
 }
 
 .evaluation-summary-card,
@@ -4760,16 +4760,16 @@ body.sidebar-collapsed .sidebar-profile-trigger {
 }
 
 .evaluation-summary-card {
-    padding: 10px 12px;
-    border-radius: 14px;
-    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.055);
+    padding: 8px 10px;
+    border-radius: 13px;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.05);
 }
 
 .evaluation-summary-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px 14px;
+    gap: 8px 12px;
     min-width: 0;
 }
 
@@ -4782,15 +4782,15 @@ body.sidebar-collapsed .sidebar-profile-trigger {
 .evaluation-summary-card h4 {
     margin: 0;
     color: #0f172a;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 850;
     line-height: 1.2;
 }
 
 .premium-evaluation-report .insight-tag {
     width: max-content;
-    padding: 5px 10px;
-    font-size: 11px;
+    padding: 4px 9px;
+    font-size: 10px;
 }
 
 .summary-scoreline {
@@ -4804,8 +4804,8 @@ body.sidebar-collapsed .sidebar-profile-trigger {
 .summary-scoreline span {
     display: inline-flex;
     align-items: center;
-    min-height: 30px;
-    padding: 5px 9px;
+    min-height: 26px;
+    padding: 4px 8px;
     border: 1px solid rgba(37, 99, 235, 0.15);
     border-radius: 999px;
     background: #eff6ff;
@@ -4821,33 +4821,41 @@ body.sidebar-collapsed .sidebar-profile-trigger {
 .premium-evaluation-report .metric-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: stretch;
-    gap: 8px;
+    gap: 5px;
 }
 
 .premium-evaluation-report .metric-card {
-    height: 124px;
-    min-height: 124px;
-    padding: 12px 14px;
-    gap: 12px;
+    grid-template-columns: 82px minmax(0, 1fr);
+    height: 106px;
+    min-height: 106px;
+    padding: 9px 12px;
+    gap: 10px;
+    align-items: center;
     border-color: var(--ia-card-border);
-    border-radius: 14px;
+    border-radius: 13px;
     background:
         linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(239, 246, 255, 0.78)),
         rgba(255, 255, 255, 0.9);
-    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.055);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.05);
+}
+
+.premium-evaluation-report .metric-card > div:last-child {
+    display: grid;
+    align-content: center;
+    min-width: 0;
 }
 
 .premium-evaluation-report .metric-circle {
-    width: 94px;
-    height: 94px;
+    width: 82px;
+    height: 82px;
 }
 
 .premium-evaluation-report .metric-circle::before {
-    inset: 10px;
+    inset: 8px;
 }
 
 .premium-evaluation-report .metric-number {
-    font-size: 16px;
+    font-size: 15px;
 }
 
 .premium-evaluation-report .detail-label {
@@ -4859,8 +4867,9 @@ body.sidebar-collapsed .sidebar-profile-trigger {
 }
 
 .premium-evaluation-report .metric-card p {
-    margin-top: 4px;
-    font-size: 12px;
+    margin-top: 2px;
+    font-size: 11px;
+    line-height: 1.3;
 }
 
 .analytics-bars {
@@ -4923,8 +4932,9 @@ body.sidebar-collapsed .sidebar-profile-trigger {
     }
 
     .premium-evaluation-report .metric-card {
+        grid-template-columns: 82px minmax(0, 1fr);
         height: auto;
-        min-height: 118px;
+        min-height: 104px;
     }
 
 }
