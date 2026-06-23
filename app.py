@@ -789,12 +789,19 @@ def evaluate(user):
     score_val = result.get("score", 0)
     similarity_val = result.get("similarity", 0)
     relevance_val = result.get("question_relevance", 1.0)
+    concept_val = result.get("concept_match", result.get("coverage", 0))
 
     if relevance_val < 0.35:
         feedback = {
             "correct_concepts": ["The response was checked against the reference answer"],
             "missing_concepts": ["The answer does not clearly address the question", "Important question-specific ideas are missing"],
             "suggestions": ["Rewrite the response so it directly answers the question", "Use key terms from the question and connect them to the reference answer"],
+        }
+    elif concept_val < 0.25:
+        feedback = {
+            "correct_concepts": ["The response attempts the topic"],
+            "missing_concepts": ["Most key concepts from the reference answer are missing", "The answer needs stronger concept coverage"],
+            "suggestions": ["Use the main ideas from the reference answer", "Include the essential terms and explain them directly"],
         }
     elif score_val >= 8:
         feedback = {
@@ -818,6 +825,10 @@ def evaluate(user):
     if relevance_val < 0.6 and relevance_val >= 0.35:
         feedback["missing_concepts"].insert(0, "The answer is only partly relevant to the question")
         feedback["suggestions"].insert(0, "Tie the answer more directly to the question prompt")
+
+    if concept_val < 0.45 and relevance_val >= 0.35:
+        feedback["missing_concepts"].insert(0, "Several reference-answer concepts are missing")
+        feedback["suggestions"].insert(0, "Cover more of the key concepts from the reference answer")
 
     result["feedback"] = feedback
     result["subject"] = subject

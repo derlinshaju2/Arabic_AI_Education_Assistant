@@ -19,5 +19,7 @@ def generate_score(similarity):
         return 3
     elif similarity >= 0.15:
         return 2
+    elif similarity > 0:
+        return 1
     else:
         return 0
