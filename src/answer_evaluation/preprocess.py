@@ -1,12 +1,13 @@
 import re
 import string
 
-arabic_stopwords = {
+
+BASE_ARABIC_STOPWORDS = {
     "في", "من", "على", "إلى", "عن",
     "و", "يا", "أن", "إن", "كان",
     "ما", "هذا", "هذه", "هو", "هي",
     "هم", "هن", "كما", "قد", "لا",
-    "لم", "لن"
+    "لم", "لن",
 }
 
 
@@ -16,7 +17,7 @@ def normalize_arabic(text):
 
     text = str(text)
 
-    text = re.sub(r'[\u0617-\u061A\u064B-\u0652]', '', text)
+    text = re.sub(r"[\u0617-\u061A\u064B-\u0652]", "", text)
 
     text = re.sub(r"[إأآا]", "ا", text)
     text = re.sub(r"ى", "ي", text)
@@ -28,10 +29,13 @@ def normalize_arabic(text):
     return text
 
 
+arabic_stopwords = {normalize_arabic(word) for word in BASE_ARABIC_STOPWORDS}
+
+
 def remove_punctuation(text):
     arabic_punct = "؟،؛«»"
     all_punct = string.punctuation + arabic_punct
-    return text.translate(str.maketrans('', '', all_punct))
+    return text.translate(str.maketrans("", "", all_punct))
 
 
 def tokenize(text):
@@ -39,7 +43,7 @@ def tokenize(text):
 
 
 def remove_stopwords(tokens):
-    return [w for w in tokens if w not in arabic_stopwords]
+    return [word for word in tokens if word not in arabic_stopwords]
 
 
 def preprocess_text(text):

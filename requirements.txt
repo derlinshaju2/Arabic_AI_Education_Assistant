@@ -17,6 +17,7 @@ opencv-python-headless
 
 transformers
 sentencepiece
+sacremoses
 huggingface-hub
 
 torch
