@@ -310,6 +310,76 @@ def create_token(user):
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
+def _format_feedback_terms(items, limit=3):
+    terms = [str(item).replace("_", " ").strip() for item in (items or []) if str(item).strip()]
+    if not terms:
+        return ""
+    return ", ".join(terms[:limit])
+
+
+def build_ai_feedback(result):
+    score_val = int(result.get("score", 0) or 0)
+    relevance_val = float(result.get("question_relevance", 0.0) or 0.0)
+    concept_val = float(result.get("concept_match", result.get("coverage", 0.0)) or 0.0)
+    similarity_val = float(result.get("similarity", 0.0) or 0.0)
+    matched = result.get("matched_concepts", []) or []
+    missing = result.get("missing_reference_concepts", []) or []
+    extra = result.get("extra_student_concepts", []) or []
+
+    if relevance_val < 0.35:
+        first = (
+            f"This answer received {score_val}/10 because it is mostly off-topic and shows low alignment "
+            f"with the question and reference answer ({round(similarity_val * 100)}% similarity)."
+        )
+    elif score_val >= 8:
+        first = (
+            f"This answer received {score_val}/10 because it is on-topic and closely matches the main ideas "
+            f"from the reference answer ({round(similarity_val * 100)}% similarity)."
+        )
+    elif score_val >= 5:
+        first = (
+            f"This answer received {score_val}/10 because it is on-topic but only partially covers the key "
+            f"ideas from the reference answer ({round(similarity_val * 100)}% similarity)."
+        )
+    else:
+        first = (
+            f"This answer received {score_val}/10 because it has limited coverage of the reference answer and "
+            f"only partial alignment with the question ({round(similarity_val * 100)}% similarity)."
+        )
+
+    strengths = _format_feedback_terms(matched)
+    missing_terms = _format_feedback_terms(missing)
+    extra_terms = _format_feedback_terms(extra, limit=2)
+
+    if strengths and missing_terms:
+        second = (
+            f"It shows strength in concepts such as {strengths}, but key concepts like {missing_terms} "
+            f"are missing or not clearly explained"
+        )
+    elif strengths:
+        second = f"It shows strength in concepts such as {strengths}"
+    elif missing_terms:
+        second = f"Key concepts such as {missing_terms} are missing or not clearly explained"
+    else:
+        second = "The response shows limited evidence of the key concepts expected in the reference answer"
+
+    if extra_terms and (relevance_val < 0.6 or concept_val < 0.45):
+        second += ", and it introduces some ideas that are not well supported by the reference answer."
+    else:
+        second += "."
+
+    if relevance_val < 0.35:
+        third = "To improve, answer the question directly first and then include the main reference concepts."
+    elif concept_val < 0.25:
+        third = "To improve, focus on the main reference concepts and explain them more directly."
+    elif concept_val < 0.55:
+        third = "To improve, add the missing key concepts and support them with clearer detail."
+    else:
+        third = "To improve, make the explanation slightly more complete and precise."
+
+    return " ".join([first, second, third])
+
+
 def decode_token(token):
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
@@ -830,19 +900,8 @@ def evaluate(user):
         feedback["missing_concepts"].insert(0, "Several reference-answer concepts are missing")
         feedback["suggestions"].insert(0, "Cover more of the key concepts from the reference answer")
 
-    if relevance_val < 0.35:
-        ai_feedback = "This answer is mostly off-topic and should be rewritten to address the question directly."
-    elif concept_val < 0.25:
-        ai_feedback = "This answer touches the topic but misses most of the key concepts from the reference answer."
-    elif score_val >= 8:
-        ai_feedback = "This answer is strong, relevant, and covers the main reference concepts clearly."
-    elif score_val >= 5:
-        ai_feedback = "This answer is partly correct but needs more key concepts and supporting detail."
-    else:
-        ai_feedback = "This answer shows limited understanding and needs a clearer link to the core ideas."
-
     result["feedback"] = feedback
-    result["ai_feedback"] = ai_feedback
+    result["ai_feedback"] = build_ai_feedback(result)
     result["subject"] = subject
     result["score_percentage"] = score_val * 10
 
