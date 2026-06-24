@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Arabic AI Education Assistant</title>
-    <link rel="stylesheet" href="/static/style.css?v=evaluation-ai-feedback-removed-20260623">
+    <link rel="stylesheet" href="/static/style.css?v=mobile-responsive-20260623">
 </head>
 <body>
     <div class="dashboard-container">
@@ -71,7 +71,7 @@
                     </button>
 
                     <div class="profile-dropdown sidebar-profile-menu" id="profileDropdown" role="menu" aria-hidden="true">
-                        <a href="/logout" class="dropdown-item danger" role="menuitem" onclick="logout(); return false;">
+                        <a href="/logout" class="dropdown-item danger" role="menuitem" data-logout-link>
                             <svg class="profile-menu-icon" viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
@@ -158,6 +158,6 @@
             switchModule(null, 'captioning');
         });
     </script>
-    <script src="/static/script.js?v=evaluation-ai-feedback-removed-20260623"></script>
+    <script src="/static/script.js?v=logout-fix-20260624"></script>
 </body>
 </html>

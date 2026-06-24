@@ -62,6 +62,17 @@ function addAuthTokenToFormData(formData) {
     return formData;
 }
 
+function clearClientAuthToken() {
+    try {
+        sessionStorage.removeItem('authToken');
+    } catch (err) {
+        // Embedded browsers may block storage access.
+    }
+    window.AUTH_TOKEN = '';
+}
+
+window.clearClientAuthToken = clearClientAuthToken;
+
 (function() {
     'use strict';
 
@@ -795,22 +806,40 @@ window.switchModule = function(event, moduleName) {
         });
 };
 
-window.logout = function() {
-    try {
-        sessionStorage.removeItem('authToken');
-    } catch (err) {
-        // Embedded browsers may block storage access.
+window.logout = function(event) {
+    if (event && typeof event.preventDefault === 'function') {
+        event.preventDefault();
     }
-    window.AUTH_TOKEN = '';
+
+    clearClientAuthToken();
+
+    if (!window.fetch) {
+        window.location.assign('/logout');
+        return false;
+    }
+
     fetch('/logout', {
         method: 'POST',
         headers: { 'Accept': 'application/json' },
         credentials: 'same-origin'
     })
-        .finally(function() {
+        .then(function(res) {
+            if (!res.ok) throw new Error('Logout failed: ' + res.status);
             window.location.replace('/');
+        })
+        .catch(function() {
+            window.location.assign('/logout');
         });
+
+    return false;
 };
+
+document.addEventListener('click', function(event) {
+    var target = event.target;
+    var logoutLink = target && target.closest ? target.closest('[data-logout-link]') : null;
+    if (!logoutLink) return;
+    window.logout(event);
+});
 
 // Sidebar toggle for mobile
 document.addEventListener('DOMContentLoaded', function() {

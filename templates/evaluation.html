@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Answer Evaluation - Arabic AI Education Assistant</title>
-    <link rel="stylesheet" href="/static/style.css?v=evaluation-ai-feedback-removed-20260623">
+    <link rel="stylesheet" href="/static/style.css?v=mobile-responsive-20260623">
 </head>
 <body>
     <!-- TOP NAVIGATION -->
@@ -41,7 +41,7 @@
                         <span class="dropdown-user-email">{{ user.email }}</span>
                     </div>
                     <div class="dropdown-divider"></div>
-                    <a href="/logout" class="dropdown-item danger">
+                    <a href="/logout" class="dropdown-item danger" data-logout-link>
                         <svg viewBox="0 0 24 24" width="16" height="16"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         Logout
                     </a>
@@ -245,6 +245,6 @@
         window._lastEval = {{ evaluation_result | tojson }};
         {% endif %}
     </script>
-    <script src="/static/script.js?v=evaluation-ai-feedback-removed-20260623"></script>
+    <script src="/static/script.js?v=logout-fix-20260624"></script>
 </body>
 </html>

@@ -72,11 +72,24 @@ AUTH_ERROR_MESSAGES = {
     "google_button_required": "Open the login page and use the Google sign-in button.",
     "google_failed": "Google sign-in failed. Please try again.",
 }
+NO_STORE_PATHS = {
+    "/login",
+    "/signup",
+    "/register",
+    "/reset-password",
+    "/google-login",
+    "/google-callback",
+    "/dashboard",
+    "/modules",
+    "/captioning",
+    "/evaluation",
+    "/static/google-auth.js",
+}
 
 
 @app.after_request
 def prevent_auth_page_cache(response):
-    if request.path in {"/login", "/signup", "/register", "/google-login", "/google-callback", "/static/google-auth.js"}:
+    if request.path in NO_STORE_PATHS:
         response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
         response.headers["Pragma"] = "no-cache"
         response.headers["Expires"] = "0"

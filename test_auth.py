@@ -72,11 +72,58 @@ class LoginMigrationTests(unittest.TestCase):
 
 
 class LogoutTests(unittest.TestCase):
+    def setUp(self):
+        with get_db() as db:
+            db.execute("DELETE FROM activity_history")
+            db.execute("DELETE FROM users")
+            db.execute(
+                """
+                INSERT INTO users (name, email, password, googleId, profileImage, createdAt)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    "Logout User",
+                    "logout@example.com",
+                    hash_password("LogoutPass123!"),
+                    None,
+                    None,
+                    datetime.now(timezone.utc).isoformat(),
+                ),
+            )
+
     def test_browser_logout_redirects_to_hero_page(self):
         response = app.test_client().get("/logout", follow_redirects=False)
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], "/")
+
+    def test_json_logout_clears_auth_cookie(self):
+        client = app.test_client()
+        client.post(
+            "/login",
+            json={"email": "logout@example.com", "password": "LogoutPass123!"},
+            headers={"Accept": "application/json"},
+        )
+
+        response = client.post("/logout", headers={"Accept": "application/json"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["status"], "success")
+        self.assertTrue(
+            any(cookie.startswith("auth_token=;") for cookie in response.headers.getlist("Set-Cookie"))
+        )
+
+    def test_protected_pages_are_not_cached_after_logout(self):
+        client = app.test_client()
+        with client.session_transaction() as session_data:
+            session_data["user"] = "logout@example.com"
+
+        for path in ("/modules", "/dashboard", "/captioning", "/evaluation"):
+            with self.subTest(path=path):
+                response = client.get(path)
+
+                self.assertEqual(response.status_code, 200)
+                self.assertIn("no-store", response.headers["Cache-Control"])
 
 
 if __name__ == "__main__":
