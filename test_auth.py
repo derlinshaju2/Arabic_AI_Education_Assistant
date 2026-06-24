@@ -92,10 +92,21 @@ class LogoutTests(unittest.TestCase):
             )
 
     def test_browser_logout_redirects_to_hero_page(self):
-        response = app.test_client().get("/logout", follow_redirects=False)
+        client = app.test_client()
+        client.post(
+            "/login",
+            json={"email": "logout@example.com", "password": "LogoutPass123!"},
+            headers={"Accept": "application/json"},
+        )
+
+        response = client.get("/logout", follow_redirects=False)
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], "/")
+        self.assertEqual(response.headers["Location"], "/#home")
+        self.assertIn("no-store", response.headers["Cache-Control"])
+        self.assertTrue(
+            any(cookie.startswith("auth_token=;") for cookie in response.headers.getlist("Set-Cookie"))
+        )
 
     def test_json_logout_clears_auth_cookie(self):
         client = app.test_client()

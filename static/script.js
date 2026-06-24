@@ -825,9 +825,11 @@ window.logout = function(event) {
     })
         .then(function(res) {
             if (!res.ok) throw new Error('Logout failed: ' + res.status);
-            window.location.replace('/');
+            clearClientAuthToken();
+            window.location.replace('/#home');
         })
         .catch(function() {
+            clearClientAuthToken();
             window.location.assign('/logout');
         });
 
@@ -835,6 +837,7 @@ window.logout = function(event) {
 };
 
 document.addEventListener('click', function(event) {
+    if (event.defaultPrevented) return;
     var target = event.target;
     var logoutLink = target && target.closest ? target.closest('[data-logout-link]') : null;
     if (!logoutLink) return;

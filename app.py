@@ -79,6 +79,7 @@ NO_STORE_PATHS = {
     "/reset-password",
     "/google-login",
     "/google-callback",
+    "/logout",
     "/dashboard",
     "/modules",
     "/captioning",
@@ -413,7 +414,11 @@ def set_auth_cookie(response, token):
 
 
 def clear_auth_cookie(response):
-    response.delete_cookie(JWT_COOKIE_NAME)
+    response.delete_cookie(
+        JWT_COOKIE_NAME,
+        secure=cookie_secure(),
+        samesite=cookie_samesite(),
+    )
     return response
 
 
@@ -732,7 +737,7 @@ def logout():
     if wants_json_response():
         response = jsonify({"status": "success", "message": "Signed out."})
     else:
-        response = redirect(url_for("home"))
+        response = redirect(url_for("home") + "#home")
 
     return clear_auth_cookie(response)
 
