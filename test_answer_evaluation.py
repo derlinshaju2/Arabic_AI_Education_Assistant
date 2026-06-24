@@ -13,6 +13,28 @@ class ArabicPreprocessTests(unittest.TestCase):
 
 
 class AnswerEvaluationTests(unittest.TestCase):
+    def test_short_correct_answer_gets_semantic_credit(self):
+        with patch("src.answer_evaluation.evaluator.calculate_similarity", return_value=0.88):
+            result = evaluate_answer(
+                "General",
+                "Photosynthesis is the process by which plants use sunlight, carbon dioxide, and water to produce glucose and oxygen.",
+                "Plants use sunlight to make food.",
+            )
+
+        self.assertGreaterEqual(result["similarity"], 0.75)
+        self.assertGreaterEqual(result["score"], 7)
+
+    def test_long_correct_answer_accepts_extra_detail(self):
+        with patch("src.answer_evaluation.evaluator.calculate_similarity", return_value=0.92):
+            result = evaluate_answer(
+                "General",
+                "Photosynthesis is the process by which plants use sunlight, carbon dioxide, and water to produce glucose and oxygen.",
+                "Photosynthesis happens in plants when they capture sunlight and use carbon dioxide and water to make glucose, which stores energy, and oxygen is released.",
+            )
+
+        self.assertGreaterEqual(result["similarity"], 0.85)
+        self.assertGreaterEqual(result["score"], 8)
+
     def test_off_topic_answer_is_capped_even_with_semantic_similarity(self):
         with patch("src.answer_evaluation.evaluator.calculate_similarity", return_value=0.5):
             result = evaluate_answer(

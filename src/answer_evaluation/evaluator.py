@@ -3,6 +3,12 @@ from src.answer_evaluation.scoring import generate_score
 from src.answer_evaluation.similarity import calculate_similarity
 
 
+EVALUATION_GUIDELINES = (
+    "Evaluate the student's answer based on meaning, correctness, and completeness. "
+    "Focus on semantic similarity rather than exact wording. Give a score (0-10) "
+    "and similarity percentage. Accept both short and long correct answers."
+)
+
 QUESTION_STOPWORDS = {
     "a", "an", "and", "are", "as", "be", "briefly", "define", "describe",
     "answer", "because", "did", "do", "does", "explain", "for", "from", "give", "help",
@@ -84,7 +90,7 @@ def calculate_concept_match(reference_answer, student_answer):
     reference_clean = preprocess_text(reference_answer)
     student_clean = preprocess_text(student_answer)
     overlap = _token_overlap(reference_clean, student_clean)
-    concept_match = _clamp((overlap["recall"] * 0.7) + (overlap["precision"] * 0.3))
+    concept_match = _clamp((overlap["recall"] * 0.85) + (overlap["precision"] * 0.15))
     return concept_match, overlap
 
 
@@ -112,36 +118,40 @@ def calculate_question_relevance(question, student_answer):
 
 def combine_similarity_metrics(reference_similarity, concept_match):
     adjusted_semantic = _clamp(reference_similarity)
+    concept_match = _clamp(concept_match)
+
+    if adjusted_semantic >= 0.82:
+        return _clamp((adjusted_semantic * 0.85) + (concept_match * 0.15))
 
     if concept_match < 0.12:
         adjusted_semantic *= 0.35
     elif concept_match < 0.25:
-        adjusted_semantic *= 0.6
+        adjusted_semantic *= 0.75
     elif concept_match < 0.4:
-        adjusted_semantic *= 0.8
+        adjusted_semantic *= 0.9
 
-    combined = (adjusted_semantic * 0.55) + (concept_match * 0.45)
+    combined = (adjusted_semantic * 0.75) + (concept_match * 0.25)
     return _clamp(combined)
 
 
 def combine_evaluation_score(answer_similarity, concept_match, question_relevance):
     combined = (
-        (answer_similarity * 0.5) +
-        (concept_match * 0.3) +
-        (question_relevance * 0.2)
+        (answer_similarity * 0.75) +
+        (concept_match * 0.15) +
+        (question_relevance * 0.1)
     )
 
-    if question_relevance < 0.2:
+    if question_relevance < 0.2 and answer_similarity < 0.5:
         combined = min(combined, 0.18)
-    elif question_relevance < 0.35:
+    elif question_relevance < 0.35 and answer_similarity < 0.6:
         combined = min(combined, 0.32)
 
-    if concept_match < 0.12:
+    if concept_match < 0.12 and answer_similarity < 0.65:
         combined = min(combined, 0.22)
-    elif concept_match < 0.25:
+    elif concept_match < 0.25 and answer_similarity < 0.7:
         combined = min(combined, 0.35)
 
-    if question_relevance < 0.35 and concept_match < 0.25:
+    if question_relevance < 0.35 and concept_match < 0.25 and answer_similarity < 0.6:
         combined = min(combined, 0.18)
 
     return _clamp(combined)
