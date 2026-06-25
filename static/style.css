@@ -6329,3 +6329,269 @@ canvas {
         min-height: 30px;
     }
 }
+
+/* Final mobile viewport compaction */
+@media (max-width: 768px) {
+    html,
+    body {
+        min-height: 100%;
+        overflow-x: hidden;
+    }
+
+    .dashboard-container,
+    body.sidebar-collapsed .dashboard-container {
+        height: auto !important;
+        min-height: 100svh !important;
+        overflow: visible !important;
+    }
+
+    .main-content,
+    .content-area {
+        min-height: 0 !important;
+        overflow: visible !important;
+    }
+
+    .topbar {
+        position: relative !important;
+        min-height: 52px !important;
+        padding: 8px 10px !important;
+    }
+
+    .topbar-left,
+    .brand-row {
+        min-height: 0;
+    }
+
+    .page-title {
+        font-size: 17px !important;
+    }
+
+    .page-shell,
+    .module-content-wrapper,
+    .sider-workspace {
+        width: 100% !important;
+        min-height: 0 !important;
+        padding: 8px 10px 18px !important;
+    }
+
+    .module-page-header,
+    .workspace-heading {
+        margin-bottom: 8px !important;
+        padding: 0 !important;
+    }
+
+    .workspace-heading {
+        gap: 8px !important;
+    }
+
+    .workspace-title-group {
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    .workspace-heading-icon,
+    .module-page-title .module-icon {
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 12px !important;
+    }
+
+    .workspace-heading-icon svg,
+    .module-page-title .module-icon svg {
+        width: 18px !important;
+        height: 18px !important;
+    }
+
+    .workspace-kicker {
+        font-size: 9px !important;
+        line-height: 1.2 !important;
+    }
+
+    .split-workspace,
+    .module-single-grid,
+    .module-grid,
+    .premium-result-grid,
+    .premium-evaluation-report,
+    .answer-comparison,
+    .feedback-sections {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 10px !important;
+    }
+
+    .workspace-panel,
+    .module-card,
+    .module-card-full,
+    .result-panel,
+    .evaluation-results,
+    .feedback-section,
+    .result-item,
+    .evaluation-summary-card,
+    .metric-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: 0 !important;
+        padding: 10px !important;
+        border-radius: 12px !important;
+        overflow: hidden;
+    }
+
+    .workspace-panel,
+    .module-card,
+    .module-card-full {
+        gap: 10px !important;
+        overflow: visible !important;
+    }
+
+    .workspace-panel .stack,
+    .module-card-full .stack,
+    form.stack {
+        gap: 10px !important;
+    }
+
+    .file-drop,
+    .workspace-panel .file-drop,
+    .sider-workspace[data-module-view="captioning"] .file-drop,
+    .page-shell .module-card-full .file-drop {
+        min-height: 132px !important;
+        padding: 14px !important;
+        border-radius: 12px !important;
+    }
+
+    .drop-content {
+        gap: 6px !important;
+    }
+
+    .drop-icon,
+    .sider-workspace[data-module-view="captioning"] .drop-icon {
+        width: 38px !important;
+        height: 38px !important;
+        padding: 8px !important;
+        border-radius: 12px !important;
+    }
+
+    .file-title {
+        font-size: 14px !important;
+        line-height: 1.25 !important;
+    }
+
+    .file-formats {
+        font-size: 11px !important;
+    }
+
+    .button.primary,
+    .button.full,
+    .sider-workspace[data-module-view="captioning"] .button.primary,
+    .page-shell .module-card-full .button.primary {
+        min-height: 40px !important;
+        padding: 9px 12px !important;
+        border-radius: 11px !important;
+        font-size: 13px !important;
+    }
+
+    .panel-header,
+    .result-header,
+    .result-item-header {
+        gap: 7px !important;
+        margin-bottom: 6px !important;
+        padding-bottom: 6px !important;
+    }
+
+    .panel-actions,
+    .result-actions,
+    .form-actions-row {
+        gap: 6px !important;
+    }
+
+    .icon-btn,
+    .mini-action,
+    .sider-workspace[data-module-view="captioning"] .icon-btn,
+    .sider-workspace[data-module-view="captioning"] .mini-action {
+        min-height: 30px !important;
+        padding: 5px 8px !important;
+        border-radius: 9px !important;
+        font-size: 11px !important;
+    }
+
+    .output-empty-state,
+    .sider-workspace[data-module-view="captioning"] .output-empty-state {
+        min-height: 76px !important;
+        padding: 12px !important;
+        gap: 5px !important;
+    }
+
+    .output-empty-icon,
+    .sider-workspace[data-module-view="captioning"] .output-empty-icon {
+        width: 34px !important;
+        height: 34px !important;
+        border-radius: 11px !important;
+    }
+
+    .output-empty-state h4 {
+        font-size: 13px !important;
+    }
+
+    .output-empty-state p {
+        font-size: 11px !important;
+        line-height: 1.35 !important;
+    }
+
+    .preview-image,
+    .output-panel .preview-image,
+    .sider-workspace[data-module-view="captioning"] .output-panel .preview-image {
+        max-height: 170px !important;
+        object-fit: contain !important;
+        border-radius: 10px !important;
+    }
+
+    .result-list {
+        gap: 8px !important;
+    }
+
+    .result-tag {
+        padding: 3px 7px !important;
+        font-size: 9px !important;
+        letter-spacing: 0.06em !important;
+    }
+
+    .result-item p,
+    .sider-workspace[data-module-view="captioning"] .result-item p {
+        font-size: 13px !important;
+        line-height: 1.45 !important;
+    }
+
+    .result-item .arabic-text,
+    .sider-workspace[data-module-view="captioning"] .result-item .arabic-text {
+        font-size: 15px !important;
+        line-height: 1.55 !important;
+    }
+}
+
+@media (max-width: 420px) {
+    .topbar {
+        padding: 7px 8px !important;
+    }
+
+    .page-shell,
+    .module-content-wrapper,
+    .sider-workspace {
+        padding: 6px 8px 14px !important;
+    }
+
+    .workspace-panel,
+    .module-card,
+    .module-card-full,
+    .result-panel,
+    .evaluation-results,
+    .feedback-section,
+    .result-item {
+        padding: 8px !important;
+    }
+
+    .file-drop,
+    .workspace-panel .file-drop,
+    .sider-workspace[data-module-view="captioning"] .file-drop,
+    .page-shell .module-card-full .file-drop {
+        min-height: 118px !important;
+        padding: 12px !important;
+    }
+}
