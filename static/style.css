@@ -6072,3 +6072,260 @@ canvas {
         font-size: 18px;
     }
 }
+
+/* Compact image captioning workflow */
+.sider-workspace[data-module-view="captioning"] {
+    gap: 10px;
+    min-height: auto;
+    padding: 10px 18px 24px;
+}
+
+.sider-workspace[data-module-view="captioning"] .workspace-heading {
+    padding: 0;
+}
+
+.sider-workspace[data-module-view="captioning"] .workspace-heading-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 13px;
+}
+
+.sider-workspace[data-module-view="captioning"] .workspace-heading-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.sider-workspace[data-module-view="captioning"] .workspace-kicker {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+}
+
+.sider-workspace[data-module-view="captioning"] .split-workspace {
+    grid-template-columns: minmax(0, 760px);
+    justify-content: center;
+    gap: 10px;
+    flex: 0 0 auto;
+}
+
+.sider-workspace[data-module-view="captioning"] .workspace-panel {
+    min-height: 0;
+    padding: 12px;
+    overflow: visible;
+    border-radius: 16px;
+}
+
+.sider-workspace[data-module-view="captioning"] .input-panel {
+    gap: 0;
+}
+
+.sider-workspace[data-module-view="captioning"] .workspace-panel .stack {
+    flex: 0 0 auto;
+    gap: 12px;
+}
+
+.sider-workspace[data-module-view="captioning"] .file-drop {
+    flex: 0 0 auto;
+    min-height: 170px;
+    padding: 20px;
+    border-radius: 16px;
+}
+
+.sider-workspace[data-module-view="captioning"] .drop-content {
+    gap: 7px;
+}
+
+.sider-workspace[data-module-view="captioning"] .drop-icon {
+    width: 42px;
+    height: 42px;
+    padding: 9px;
+    border-radius: 14px;
+}
+
+.sider-workspace[data-module-view="captioning"] .file-title {
+    font-size: 15px;
+}
+
+.sider-workspace[data-module-view="captioning"] .file-formats {
+    font-size: 12px;
+}
+
+.sider-workspace[data-module-view="captioning"] .button.primary {
+    min-height: 44px;
+    border-radius: 12px;
+    font-size: 14px;
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.18);
+}
+
+.sider-workspace[data-module-view="captioning"] .output-panel {
+    gap: 12px;
+}
+
+.sider-workspace[data-module-view="captioning"] .output-panel .panel-header {
+    padding-bottom: 8px;
+}
+
+.sider-workspace[data-module-view="captioning"] .panel-actions {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.sider-workspace[data-module-view="captioning"] .icon-btn,
+.sider-workspace[data-module-view="captioning"] .mini-action {
+    min-height: 30px;
+    padding: 5px 9px;
+    border-radius: 10px;
+    font-size: 11px;
+}
+
+.sider-workspace[data-module-view="captioning"] .icon-btn svg,
+.sider-workspace[data-module-view="captioning"] .mini-action svg {
+    width: 14px;
+    height: 14px;
+}
+
+.sider-workspace[data-module-view="captioning"] .output-empty-state {
+    min-height: 96px;
+    padding: 16px;
+    gap: 6px;
+}
+
+.sider-workspace[data-module-view="captioning"] .output-empty-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+}
+
+.sider-workspace[data-module-view="captioning"] .output-empty-icon svg {
+    width: 21px;
+    height: 21px;
+}
+
+.sider-workspace[data-module-view="captioning"] .output-empty-state h4 {
+    font-size: 14px;
+}
+
+.sider-workspace[data-module-view="captioning"] .output-empty-state p {
+    max-width: 430px;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.sider-workspace[data-module-view="captioning"] .result-panel {
+    gap: 10px;
+    padding: 12px;
+    border-radius: 14px;
+}
+
+.sider-workspace[data-module-view="captioning"] .premium-result-grid {
+    grid-template-columns: minmax(180px, 0.75fr) minmax(0, 1.25fr);
+    align-items: stretch;
+}
+
+.sider-workspace[data-module-view="captioning"] .image-preview-card,
+.sider-workspace[data-module-view="captioning"] .result-item {
+    padding: 11px;
+    border-radius: 14px;
+}
+
+.sider-workspace[data-module-view="captioning"] .output-panel .preview-image {
+    max-height: 190px;
+    border-radius: 12px;
+}
+
+.sider-workspace[data-module-view="captioning"] .result-list {
+    gap: 10px;
+}
+
+.sider-workspace[data-module-view="captioning"] .result-item-header {
+    margin-bottom: 7px;
+}
+
+.sider-workspace[data-module-view="captioning"] .result-tag {
+    padding: 3px 8px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+}
+
+.sider-workspace[data-module-view="captioning"] .result-item p {
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.sider-workspace[data-module-view="captioning"] .result-item .arabic-text {
+    font-size: 16px;
+    line-height: 1.65;
+}
+
+.page-shell {
+    padding-top: 20px;
+}
+
+.page-shell .module-page-header {
+    margin-bottom: 16px;
+}
+
+.page-shell .module-card-full {
+    padding: 18px;
+}
+
+.page-shell .module-card-full .stack {
+    gap: 12px;
+}
+
+.page-shell .module-card-full .file-drop {
+    min-height: 175px;
+    padding: 20px;
+}
+
+.page-shell .module-card-full .button.primary {
+    min-height: 44px;
+    border-radius: 12px;
+}
+
+.page-shell #captionResults {
+    margin-top: 12px;
+}
+
+@media (max-width: 900px) {
+    .sider-workspace[data-module-view="captioning"] {
+        padding: 10px 12px 20px;
+    }
+
+    .sider-workspace[data-module-view="captioning"] .split-workspace,
+    .sider-workspace[data-module-view="captioning"] .premium-result-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}
+
+@media (max-width: 560px) {
+    .sider-workspace[data-module-view="captioning"] {
+        padding: 8px 10px 18px;
+    }
+
+    .sider-workspace[data-module-view="captioning"] .workspace-title-group {
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: center;
+    }
+
+    .sider-workspace[data-module-view="captioning"] .file-drop,
+    .page-shell .module-card-full .file-drop {
+        min-height: 150px;
+        padding: 16px;
+    }
+
+    .sider-workspace[data-module-view="captioning"] .panel-actions {
+        justify-content: stretch;
+    }
+
+    .sider-workspace[data-module-view="captioning"] .panel-actions .icon-btn {
+        flex: 1 1 0;
+        justify-content: center;
+        min-height: 34px;
+    }
+
+    .sider-workspace[data-module-view="captioning"] .result-item-header .mini-action {
+        width: auto;
+        min-height: 30px;
+    }
+}
