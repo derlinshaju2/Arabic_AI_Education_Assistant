@@ -179,13 +179,15 @@ svg {
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 0.92fr 1.08fr;
-  gap: 64px;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
 }
 
 .hero-copy {
   display: grid;
+  width: 100%;
+  max-width: 1040px;
   gap: 24px;
 }
 
@@ -218,9 +220,9 @@ svg {
 }
 
 .hero-copy h1 {
-  max-width: 690px;
-  font-size: clamp(42px, 5vw, 64px);
-  line-height: 0.98;
+  max-width: 1040px;
+  font-size: clamp(44px, 5.5vw, 68px);
+  line-height: 1;
 }
 
 .hero-text,
@@ -236,7 +238,7 @@ svg {
 }
 
 .hero-text {
-  max-width: 590px;
+  max-width: 760px;
   margin: 0;
   font-size: 18px;
 }
@@ -245,6 +247,7 @@ svg {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
+  margin-top: 4px;
 }
 
 .primary-action,
