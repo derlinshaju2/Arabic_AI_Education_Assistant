@@ -28,6 +28,14 @@
         alert.style.display = "block";
     }
 
+    function isEmbeddedFrame() {
+        try {
+            return window.self !== window.top;
+        } catch (err) {
+            return true;
+        }
+    }
+
     function createButton(config) {
         var button = document.createElement("a");
         button.className = "google-button";
@@ -41,7 +49,11 @@
         }
 
         button.href = config.loginUrl || "/google-login";
-        button.target = "_top";
+
+        if (isEmbeddedFrame()) {
+            button.target = "_blank";
+            button.rel = "noopener noreferrer";
+        }
 
         button.addEventListener("click", function () {
             button.classList.add("is-loading");
