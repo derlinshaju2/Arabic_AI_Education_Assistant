@@ -41,6 +41,7 @@
         }
 
         button.href = config.loginUrl || "/google-login";
+        button.target = "_top";
 
         button.addEventListener("click", function () {
             button.classList.add("is-loading");
