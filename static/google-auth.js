@@ -41,8 +41,6 @@
         }
 
         button.href = config.loginUrl || "/google-login";
-        button.target = "_blank";
-        button.rel = "noopener noreferrer";
 
         button.addEventListener("click", function () {
             button.classList.add("is-loading");

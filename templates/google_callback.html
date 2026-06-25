@@ -54,20 +54,38 @@
             // POST the token to our server
             fetch('/google-login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
                 credentials: 'same-origin',
                 body: JSON.stringify({ credential: idToken, state: state })
             })
             .then(function(res) {
-                if (res.ok || res.redirected) {
-                    window.location.href = '/modules';
-                } else {
-                    return res.json().then(function(data) {
-                        document.getElementById('title').textContent = 'Sign-In Failed';
-                        document.getElementById('message').textContent = data.message || 'Could not sign in with Google.';
-                        document.getElementById('spinner').style.display = 'none';
-                    });
+                return res.json().then(function(data) {
+                    return { ok: res.ok, data: data };
+                }).catch(function() {
+                    return { ok: res.ok, data: {} };
+                });
+            })
+            .then(function(result) {
+                if (result.ok && result.data.status === 'success') {
+                    if (result.data.token) {
+                        try {
+                            sessionStorage.setItem('authToken', result.data.token);
+                        } catch (err) {
+                            // Continue with the token URL fallback when browser storage is blocked.
+                        }
+                    }
+
+                    var tokenParam = result.data.token ? ('?auth_token=' + encodeURIComponent(result.data.token)) : '';
+                    window.location.replace('/modules' + tokenParam);
+                    return;
                 }
+
+                document.getElementById('title').textContent = 'Sign-In Failed';
+                document.getElementById('message').textContent = result.data.message || 'Could not sign in with Google.';
+                document.getElementById('spinner').style.display = 'none';
             })
             .catch(function() {
                 document.getElementById('title').textContent = 'Network Error';
