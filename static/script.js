@@ -1088,6 +1088,7 @@ window.initializeEvaluationModule = function() {
             return;
         }
 
+        hideEvaluationError();
         setEvaluationLoading(true);
 
         fetch('/evaluate', {
@@ -1242,9 +1243,16 @@ function displayEvaluationResult(result) {
     setText('summaryFinalScore', formatScore(score));
     updateMetricCircle('finalScoreCircle', finalPct);
     updateMetricCircle('similarityCircle', similarityPct);
+    renderEvaluationFeedback(result.feedback || {});
 
     resultsPanel.style.display = 'grid';
     window._lastEvaluation = result;
+}
+
+function renderEvaluationFeedback(feedback) {
+    renderList('correctList', feedback.correct_concepts, 'The response was evaluated against the reference answer.');
+    renderList('missingList', feedback.missing_concepts, 'No major missing concepts were detected.');
+    renderList('suggestionsList', feedback.suggestions, 'Keep refining the answer with precise details.');
 }
 
 function showEvaluationError(message) {
@@ -1254,6 +1262,14 @@ function showEvaluationError(message) {
         errorDiv.hidden = false;
     }
     showToast(message, 'error');
+}
+
+function hideEvaluationError() {
+    var errorDiv = document.getElementById('evaluationError');
+    if (errorDiv) {
+        errorDiv.textContent = '';
+        errorDiv.hidden = true;
+    }
 }
 
 function normalizePercent(value) {
@@ -1502,7 +1518,10 @@ function buildEvaluationText() {
         listToText(feedback.correct_concepts),
         '',
         'Areas for Improvement:',
-        listToText(feedback.missing_concepts)
+        listToText(feedback.missing_concepts),
+        '',
+        'Suggestions:',
+        listToText(feedback.suggestions)
     ].join('\n');
 }
 

@@ -36,6 +36,14 @@
         }
     }
 
+    function absoluteAppUrl(path) {
+        try {
+            return new URL(path, window.location.origin).toString();
+        } catch (err) {
+            return path;
+        }
+    }
+
     function createButton(config) {
         var button = document.createElement("a");
         button.className = "google-button";
@@ -51,6 +59,7 @@
         button.href = config.loginUrl || "/google-login";
 
         if (isEmbeddedFrame()) {
+            button.href = absoluteAppUrl(button.getAttribute("href"));
             button.target = "_blank";
             button.rel = "noopener noreferrer";
         }

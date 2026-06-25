@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IntelliArabic - AI-Powered Arabic Learning & Evaluation</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='hero.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='hero.css') }}?v=mobile-responsive-20260624">
 </head>
 <body>
   <div class="site-shell">
@@ -65,66 +65,79 @@
             </div>
 
             <div class="preview-content">
-              <section class="preview-output-block" aria-label="Image Captioning output preview">
-                <div class="preview-section-header">
-                  <span class="preview-module-chip blue">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
-                      <path d="m8.5 15 2.1-2.2 2 1.8 2.1-3 2.8 3.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    Image Captioning
-                  </span>
-                  <span class="preview-status-chip">Generated</span>
+              <section class="hero-output-panel" aria-label="Image Captioning output preview">
+                <div class="panel-header">
+                  <div>
+                    <span class="panel-label">AI Image Understanding</span>
+                    <h3>Image Captioning Output</h3>
+                  </div>
+                  <div class="panel-actions">
+                    <span class="icon-btn">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15.5V6.8A1.8 1.8 0 0 1 6.8 5h8.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      Copy Results
+                    </span>
+                    <span class="icon-btn">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      Regenerate
+                    </span>
+                  </div>
                 </div>
 
-                <div class="caption-preview-grid">
-                  <article class="preview-result-card image-preview-card">
+                <div class="result-panel premium-result-grid hero-result-grid">
+                  <article class="result-item image-preview-card">
                     <div class="result-item-header">
                       <span class="result-tag image-tag">Image Preview</span>
                     </div>
-                    <div class="hero-image-preview">
-                      <img src="{{ url_for('static', filename='arabic.png') }}" alt="Arabic learning visual">
+                    <div class="preview-image-shell">
+                      <img class="preview-image" src="{{ url_for('static', filename='arabic.png') }}" alt="Arabic learning visual">
                     </div>
                   </article>
 
-                  <div class="preview-result-list">
-                    <article class="preview-result-card">
+                  <div class="result-list">
+                    <article class="result-item">
                       <div class="result-item-header">
                         <span class="result-tag english-tag">English Caption</span>
-                        <span class="mini-action ghost">
-                          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15.5V6.8A1.8 1.8 0 0 1 6.8 5h8.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span class="mini-action">
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
                           Copy
                         </span>
                       </div>
                       <p>A polished Arabic AI learning workspace with a smart assistant, digital lesson book, and classroom-ready visual support.</p>
                     </article>
 
-                    <article class="preview-result-card">
+                    <article class="result-item">
                       <div class="result-item-header">
                         <span class="result-tag arabic-tag">Arabic Caption</span>
-                        <span class="mini-action ghost">
-                          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15.5V6.8A1.8 1.8 0 0 1 6.8 5h8.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span class="mini-action">
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
                           Copy
                         </span>
                       </div>
-                      <p class="arabic-preview-text" dir="rtl">مساحة تعليمية ذكية للغة العربية تجمع بين مساعد رقمي وكتاب دراسي تفاعلي ودعم بصري جاهز للصف.</p>
+                      <p class="arabic-text arabic-preview-text" dir="rtl">&#1605;&#1587;&#1575;&#1581;&#1577; &#1578;&#1593;&#1604;&#1610;&#1605;&#1610;&#1577; &#1584;&#1603;&#1610;&#1577; &#1604;&#1604;&#1594;&#1577; &#1575;&#1604;&#1593;&#1585;&#1576;&#1610;&#1577; &#1578;&#1580;&#1605;&#1593; &#1576;&#1610;&#1606; &#1605;&#1587;&#1575;&#1593;&#1583; &#1585;&#1602;&#1605;&#1610; &#1608;&#1603;&#1578;&#1575;&#1576; &#1583;&#1585;&#1575;&#1587;&#1610; &#1578;&#1601;&#1575;&#1593;&#1604;&#1610; &#1608;&#1583;&#1593;&#1605; &#1576;&#1589;&#1585;&#1610; &#1580;&#1575;&#1607;&#1586; &#1604;&#1604;&#1589;&#1601;.</p>
                     </article>
                   </div>
                 </div>
               </section>
 
-              <section class="preview-output-block" aria-label="Answer Evaluation output preview">
-                <div class="preview-section-header">
-                  <span class="preview-module-chip violet">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M7 3h7l4 4v14H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
-                      <path d="M14 3v5h5M8.5 12h7M8.5 15h7M8.5 18h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                    </svg>
-                    Answer Evaluation
-                  </span>
-                  <span class="preview-status-chip">AI Report</span>
+              <section class="hero-output-panel" aria-label="Answer Evaluation output preview">
+                <div class="panel-header">
+                  <div>
+                    <span class="panel-label">AI Answer Scoring</span>
+                    <h3>Answer Evaluation Output</h3>
+                  </div>
+                  <div class="panel-actions">
+                    <span class="icon-btn">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                      Copy Report
+                    </span>
+                    <span class="icon-btn">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      Re-evaluate
+                    </span>
+                  </div>
                 </div>
 
+                <div class="evaluation-results premium-evaluation-report">
                 <article class="evaluation-summary-card">
                   <div class="evaluation-summary-content">
                     <div class="evaluation-summary-heading">
@@ -138,8 +151,8 @@
                   </div>
                 </article>
 
-                <div class="preview-metric-grid">
-                  <article class="preview-metric-card">
+                <div class="metric-grid">
+                  <article class="metric-card">
                     <div class="metric-circle final-score" style="--value: 88;">
                       <span class="metric-number">8.8/10</span>
                     </div>
@@ -148,7 +161,7 @@
                       <p>Overall answer quality</p>
                     </div>
                   </article>
-                  <article class="preview-metric-card">
+                  <article class="metric-card">
                     <div class="metric-circle similarity-score" style="--value: 92;">
                       <span class="metric-number">92%</span>
                     </div>
@@ -159,17 +172,18 @@
                   </article>
                 </div>
 
-                <article class="preview-feedback-card">
+                <article class="result-item ai-feedback-card">
                   <div class="result-item-header">
                     <span class="result-tag insight-tag">AI Feedback</span>
-                    <span class="score-chip">Strong</span>
+                    <span class="feedback-chip">Strong</span>
                   </div>
-                  <h4>Clear understanding with richer vocabulary recommended.</h4>
-                  <ul>
+                  <p>Clear understanding with richer vocabulary recommended.</p>
+                  <ul class="feedback-list">
                     <li>Correctly covers the main idea and supporting context.</li>
                     <li>Add one precise Arabic term to strengthen fluency.</li>
                   </ul>
                 </article>
+                </div>
               </section>
             </div>
           </div>

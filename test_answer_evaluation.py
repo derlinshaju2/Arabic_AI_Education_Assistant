@@ -7,9 +7,18 @@ from src.answer_evaluation.preprocess import preprocess_text
 
 class ArabicPreprocessTests(unittest.TestCase):
     def test_normalizes_punctuation_and_stopwords(self):
-        text = "إلى الذكاء الاصطناعي، على الحاسوب؟"
+        text = (
+            "\u0625\u0644\u0649 \u0627\u0644\u0630\u0643\u0627\u0621 "
+            "\u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a\u060c "
+            "\u0639\u0644\u0649 \u0627\u0644\u062d\u0627\u0633\u0648\u0628\u061f"
+        )
 
-        self.assertEqual(preprocess_text(text), "الذكاء الاصطناعي الحاسوب")
+        self.assertEqual(
+            preprocess_text(text),
+            "\u0627\u0644\u0630\u0643\u0627\u0621 "
+            "\u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a "
+            "\u0627\u0644\u062d\u0627\u0633\u0648\u0628",
+        )
 
 
 class AnswerEvaluationTests(unittest.TestCase):

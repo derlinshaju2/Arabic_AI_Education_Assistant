@@ -3,11 +3,11 @@ import string
 
 
 BASE_ARABIC_STOPWORDS = {
-    "في", "من", "على", "إلى", "عن",
-    "و", "يا", "أن", "إن", "كان",
-    "ما", "هذا", "هذه", "هو", "هي",
-    "هم", "هن", "كما", "قد", "لا",
-    "لم", "لن",
+    "\u0641\u064a", "\u0645\u0646", "\u0639\u0644\u0649", "\u0625\u0644\u0649", "\u0639\u0646",
+    "\u0648", "\u064a\u0627", "\u0623\u0646", "\u0625\u0646", "\u0643\u0627\u0646",
+    "\u0645\u0627", "\u0647\u0630\u0627", "\u0647\u0630\u0647", "\u0647\u0648", "\u0647\u064a",
+    "\u0647\u0645", "\u0647\u0646", "\u0643\u0645\u0627", "\u0642\u062f", "\u0644\u0627",
+    "\u0644\u0645", "\u0644\u0646",
 }
 
 
@@ -18,13 +18,12 @@ def normalize_arabic(text):
     text = str(text)
 
     text = re.sub(r"[\u0617-\u061A\u064B-\u0652]", "", text)
-
-    text = re.sub(r"[إأآا]", "ا", text)
-    text = re.sub(r"ى", "ي", text)
-    text = re.sub(r"ؤ", "و", text)
-    text = re.sub(r"ئ", "ي", text)
-    text = re.sub(r"ة", "ه", text)
-    text = re.sub(r"ـ", "", text)
+    text = re.sub(r"[\u0625\u0623\u0622\u0627]", "\u0627", text)
+    text = re.sub(r"\u0649", "\u064a", text)
+    text = re.sub(r"\u0624", "\u0648", text)
+    text = re.sub(r"\u0626", "\u064a", text)
+    text = re.sub(r"\u0629", "\u0647", text)
+    text = re.sub(r"\u0640", "", text)
 
     return text
 
@@ -33,7 +32,7 @@ arabic_stopwords = {normalize_arabic(word) for word in BASE_ARABIC_STOPWORDS}
 
 
 def remove_punctuation(text):
-    arabic_punct = "؟،؛«»"
+    arabic_punct = "\u061f\u060c\u061b\u00ab\u00bb"
     all_punct = string.punctuation + arabic_punct
     return text.translate(str.maketrans("", "", all_punct))
 
