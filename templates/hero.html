@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,293 +8,126 @@
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
   >
 
-  <meta
-    name="description"
-    content="IntelliArabic is an AI-powered Arabic learning assistant for image captioning and automated answer evaluation."
-  >
+  <title>
+    IntelliArabic - AI-Powered Arabic Learning & Evaluation
+  </title>
 
-  <title>IntelliArabic | AI-Powered Arabic Learning</title>
-
-  <!-- Main landing page stylesheet -->
+  <!-- Existing landing page styles -->
   <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='hero.css') }}?v=hero-20260626-3"
+    href="{{ url_for('static', filename='hero.css') }}?v=hero-fullwidth-20260626"
   >
 
-  <!-- Mobile navigation drawer stylesheet -->
+  <!-- Mobile drawer styles: load after hero.css -->
   <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='hero-mobile-menu.css') }}?v=mobile-drawer-20260626-3"
+    href="{{ url_for('static', filename='hero-mobile-menu.css') }}?v=mobile-drawer-20260626"
   >
-
-  <style>
-    /*
-      Small template-specific styles.
-      The main page design remains inside hero.css and
-      hero-mobile-menu.css.
-    */
-
-    html {
-      scroll-padding-top: 90px;
-    }
-
-    .skip-link {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 12000;
-
-      padding: 10px 14px;
-
-      border-radius: 10px;
-
-      background: #0f172a;
-      color: #ffffff;
-
-      font-weight: 800;
-
-      transform: translateY(-150%);
-      transition: transform 180ms ease;
-    }
-
-    .skip-link:focus {
-      transform: translateY(0);
-    }
-
-    .nav-login {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .brand-logo {
-      display: grid;
-      width: 42px;
-      height: 42px;
-
-      flex: 0 0 auto;
-      place-items: center;
-
-      overflow: hidden;
-
-      border-radius: 13px;
-
-      background:
-        linear-gradient(
-          135deg,
-          #2563eb 0%,
-          #6366f1 55%,
-          #7c3aed 100%
-        );
-
-      color: #ffffff;
-
-      box-shadow: 0 12px 24px rgba(79, 70, 229, 0.22);
-    }
-
-    .brand-logo svg {
-      width: 25px;
-      height: 25px;
-    }
-
-    .mobile-drawer-brand .brand-logo {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-    }
-
-    .footer-brand .brand-logo {
-      width: 40px;
-      height: 40px;
-    }
-
-    .hero-preview {
-      width: 100%;
-      min-width: 0;
-    }
-
-    .hero-illustration {
-      width: min(78%, 220px);
-      height: auto;
-    }
-
-    .preview-window-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .faq-list article {
-      scroll-margin-top: 100px;
-    }
-
-    .footer-brand-row {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-
-      color: #0f172a;
-
-      font-weight: 850;
-    }
-
-    @media (max-width: 980px) {
-      .nav-login {
-        display: none !important;
-      }
-    }
-
-    @media (max-width: 520px) {
-      .brand-logo {
-        width: 38px;
-        height: 38px;
-      }
-
-      .brand-logo svg {
-        width: 23px;
-        height: 23px;
-      }
-    }
-  </style>
 </head>
 
 <body>
-  <a class="skip-link" href="#mainContent">
-    Skip to main content
-  </a>
-
   <div class="site-shell">
 
-    <!-- =====================================================
+    <!-- ==========================================
          HEADER
-         ===================================================== -->
-
-    <header class="site-header" id="siteHeader">
+         ========================================== -->
+    <header class="site-header">
       <div class="nav-inner">
 
-        <!-- Brand -->
         <a
-          href="#home"
           class="brand"
+          href="#home"
           aria-label="IntelliArabic home"
         >
-          <span class="brand-logo" aria-hidden="true">
-            <svg viewBox="0 0 32 32">
-              <path
-                d="M7 7.5h18v14H12l-5 4v-18z"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.2"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M11 12h10M11 16h7"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.2"
-                stroke-linecap="round"
-              />
-            </svg>
-          </span>
-
+          <img
+            src="{{ url_for('static', filename='arabic.png') }}"
+            alt="IntelliArabic logo"
+          >
           <span>IntelliArabic</span>
         </a>
 
-        <!-- Desktop navigation -->
         <nav
           class="desktop-nav"
           aria-label="Primary navigation"
         >
           <a href="#home">Home</a>
           <a href="#features">Features</a>
-          <a href="#workflow">How It Works</a>
-          <a href="#testimonials">Benefits</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#about">About</a>
           <a href="#faq">FAQ</a>
+
+          <button
+            type="button"
+            class="nav-login"
+            onclick="window.location.href='/login'"
+          >
+            Login
+          </button>
         </nav>
 
-        <!-- Desktop login button -->
-        <a
-          href="{{ url_for('login') }}"
-          class="nav-login"
-        >
-          Login
-        </a>
-
-        <!-- Mobile hamburger button -->
+        <!-- Mobile hamburger -->
         <button
-          type="button"
-          class="menu-button"
           id="mobileMenuButton"
+          class="menu-button"
+          type="button"
           aria-label="Open navigation menu"
-          aria-controls="mobileDrawer"
+          aria-controls="mobileMenuDrawer"
           aria-expanded="false"
         >
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
+          <span></span>
+          <span></span>
+          <span></span>
         </button>
 
       </div>
     </header>
 
-    <!-- =====================================================
-         MOBILE MENU BACKDROP
-         ===================================================== -->
-
+    <!-- ==========================================
+         MOBILE DRAWER BACKDROP
+         ========================================== -->
     <div
-      class="mobile-menu-backdrop"
       id="mobileMenuBackdrop"
+      class="mobile-menu-backdrop"
       aria-hidden="true"
     ></div>
 
-    <!-- =====================================================
-         MOBILE NAVIGATION DRAWER
-         ===================================================== -->
-
+    <!-- ==========================================
+         MOBILE SLIDE-OUT DRAWER
+         ========================================== -->
     <aside
+      id="mobileMenuDrawer"
       class="mobile-drawer"
-      id="mobileDrawer"
+      role="dialog"
+      aria-modal="true"
       aria-label="Mobile navigation"
       aria-hidden="true"
+      tabindex="-1"
       inert
     >
-      <!-- Drawer header -->
       <div class="mobile-drawer-header">
-        <a
-          href="#home"
-          class="mobile-drawer-brand"
-          data-mobile-menu-link
-          aria-label="Go to IntelliArabic home"
-        >
-          <span class="brand-logo" aria-hidden="true">
-            <svg viewBox="0 0 32 32">
-              <path
-                d="M7 7.5h18v14H12l-5 4v-18z"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.2"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M11 12h10M11 16h7"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.2"
-                stroke-linecap="round"
-              />
-            </svg>
-          </span>
 
+        <a
+          class="mobile-drawer-brand"
+          href="#home"
+          data-mobile-menu-link
+        >
+          <img
+            src="{{ url_for('static', filename='arabic.png') }}"
+            alt="IntelliArabic logo"
+          >
           <span>IntelliArabic</span>
         </a>
 
         <button
-          type="button"
-          class="mobile-menu-close"
           id="mobileMenuClose"
+          class="mobile-menu-close"
+          type="button"
           aria-label="Close navigation menu"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
             <path
               d="M6 6l12 12M18 6L6 18"
               fill="none"
@@ -305,824 +137,377 @@
             />
           </svg>
         </button>
+
       </div>
 
-      <!-- Drawer navigation -->
       <nav
         class="mobile-drawer-nav"
-        aria-label="Mobile menu"
+        aria-label="Mobile navigation links"
       >
         <a href="#home" data-mobile-menu-link>
-          Home
+          <span class="mobile-nav-number">01</span>
+          <span>Home</span>
         </a>
 
         <a href="#features" data-mobile-menu-link>
-          Features
+          <span class="mobile-nav-number">02</span>
+          <span>Features</span>
         </a>
 
-        <a href="#workflow" data-mobile-menu-link>
-          How It Works
+        <a href="#how-it-works" data-mobile-menu-link>
+          <span class="mobile-nav-number">03</span>
+          <span>How It Works</span>
         </a>
 
-        <a href="#testimonials" data-mobile-menu-link>
-          Benefits
+        <a href="#about" data-mobile-menu-link>
+          <span class="mobile-nav-number">04</span>
+          <span>About</span>
         </a>
 
         <a href="#faq" data-mobile-menu-link>
-          FAQ
+          <span class="mobile-nav-number">05</span>
+          <span>FAQ</span>
         </a>
       </nav>
 
-      <!-- Drawer footer -->
       <div class="mobile-drawer-footer">
         <a
-          href="{{ url_for('login') }}"
           class="mobile-drawer-login"
+          href="/login"
+          data-mobile-menu-link
         >
           Login to IntelliArabic
         </a>
 
-        <p class="mobile-drawer-note">
-          AI-powered Arabic image captioning and answer evaluation.
+        <p>
+          AI-powered Arabic caption generation and semantic
+          answer evaluation for modern learning.
         </p>
       </div>
     </aside>
 
-    <!-- =====================================================
+    <!-- ==========================================
          MAIN CONTENT
-         ===================================================== -->
+         ========================================== -->
+    <main id="home">
 
-    <main id="mainContent">
-
-      <!-- ===================================================
-           HERO SECTION
-           =================================================== -->
-
-      <section
-        class="hero-section"
-        id="home"
-        aria-labelledby="heroTitle"
-      >
+      <!-- HERO SECTION -->
+      <section class="hero-section">
         <div class="hero-grid">
-
-          <!-- Hero text -->
           <div class="hero-copy">
+
             <p class="eyebrow">
-              AI-Powered Arabic Education
+              AI-Powered Arabic Learning & Evaluation
             </p>
 
-            <h1 id="heroTitle">
-              Understand images and evaluate Arabic answers with AI.
+            <h1>
+              IntelliArabic brings image captioning and answer
+              evaluation into one premium AI learning platform.
             </h1>
 
             <p class="hero-text">
-              IntelliArabic combines computer vision, natural language
-              processing and multilingual AI models to generate Arabic
-              image captions and evaluate written answers intelligently.
+              Generate Arabic captions from images, score student
+              responses with semantic similarity, and accelerate
+              Arabic learning with university-grade AI tools.
             </p>
 
             <div class="hero-actions">
               <a
-                href="{{ url_for('register') }}"
                 class="primary-action"
+                href="/captioning"
               >
-                Create Free Account
+                Try Image Captioning
               </a>
 
               <a
-                href="#features"
                 class="secondary-action"
+                href="/evaluation"
               >
-                Explore Features
+                Evaluate Answers
               </a>
             </div>
+
           </div>
-
-          <!-- Hero product preview -->
-          <div
-            class="hero-preview"
-            aria-label="IntelliArabic application preview"
-          >
-            <div class="preview-panel">
-
-              <!-- Preview window header -->
-              <div class="preview-topbar">
-                <div
-                  class="window-dots"
-                  aria-hidden="true"
-                >
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-
-                <span class="preview-label">
-                  IntelliArabic AI Workspace
-                </span>
-
-                <div
-                  class="preview-window-actions"
-                  aria-hidden="true"
-                >
-                  <span class="preview-status-chip">
-                    AI Ready
-                  </span>
-                </div>
-              </div>
-
-              <div class="preview-content">
-
-                <!-- Image captioning preview -->
-                <article class="preview-output-block">
-                  <div class="preview-section-header">
-                    <span class="preview-module-chip blue">
-                      <svg
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                      >
-                        <rect
-                          x="3"
-                          y="4"
-                          width="18"
-                          height="16"
-                          rx="3"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="1.8"
-                        />
-                        <circle
-                          cx="9"
-                          cy="10"
-                          r="2"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="1.8"
-                        />
-                        <path
-                          d="M5 17l4-4 3 3 3-4 4 5"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="1.8"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
-
-                      Image Captioning
-                    </span>
-
-                    <span class="preview-status-chip">
-                      Generated
-                    </span>
-                  </div>
-
-                  <div class="caption-preview-grid">
-
-                    <!-- Uploaded image preview -->
-                    <div class="preview-result-card image-preview-card">
-                      <div class="result-item-header">
-                        <span class="result-tag image-tag">
-                          Uploaded Image
-                        </span>
-                      </div>
-
-                      <div class="hero-image-preview">
-                        <svg
-                          class="hero-illustration"
-                          viewBox="0 0 260 180"
-                          role="img"
-                          aria-label="Illustration of a student learning with a laptop"
-                        >
-                          <defs>
-                            <linearGradient
-                              id="heroGradient"
-                              x1="0"
-                              y1="0"
-                              x2="1"
-                              y2="1"
-                            >
-                              <stop
-                                offset="0%"
-                                stop-color="#dbeafe"
-                              />
-                              <stop
-                                offset="100%"
-                                stop-color="#ede9fe"
-                              />
-                            </linearGradient>
-                          </defs>
-
-                          <rect
-                            x="8"
-                            y="8"
-                            width="244"
-                            height="164"
-                            rx="24"
-                            fill="url(#heroGradient)"
-                          />
-
-                          <circle
-                            cx="74"
-                            cy="68"
-                            r="25"
-                            fill="#f8c9a5"
-                          />
-
-                          <path
-                            d="M50 65c2-25 47-31 53 2-9-8-21-12-34-8-7 2-13 5-19 6z"
-                            fill="#334155"
-                          />
-
-                          <path
-                            d="M39 150c4-36 23-55 43-55 25 0 43 22 46 55"
-                            fill="#6366f1"
-                          />
-
-                          <rect
-                            x="104"
-                            y="89"
-                            width="94"
-                            height="56"
-                            rx="8"
-                            fill="#ffffff"
-                            stroke="#94a3b8"
-                            stroke-width="3"
-                          />
-
-                          <path
-                            d="M94 148h116"
-                            stroke="#64748b"
-                            stroke-width="5"
-                            stroke-linecap="round"
-                          />
-
-                          <circle
-                            cx="151"
-                            cy="116"
-                            r="10"
-                            fill="#e0e7ff"
-                          />
-
-                          <path
-                            d="M146 116h10M151 111v10"
-                            stroke="#4f46e5"
-                            stroke-width="2.5"
-                            stroke-linecap="round"
-                          />
-
-                          <circle
-                            cx="215"
-                            cy="52"
-                            r="19"
-                            fill="#ffffff"
-                          />
-
-                          <text
-                            x="215"
-                            y="59"
-                            text-anchor="middle"
-                            font-size="19"
-                            font-weight="800"
-                            fill="#2563eb"
-                          >
-                            ع
-                          </text>
-                        </svg>
-                      </div>
-                    </div>
-
-                    <!-- Generated captions -->
-                    <div class="preview-result-list">
-
-                      <div class="preview-result-card">
-                        <div class="result-item-header">
-                          <span class="result-tag english-tag">
-                            English Caption
-                          </span>
-                        </div>
-
-                        <p>
-                          A student is learning Arabic using a laptop.
-                        </p>
-                      </div>
-
-                      <div class="preview-result-card">
-                        <div class="result-item-header">
-                          <span class="result-tag arabic-tag">
-                            Arabic Caption
-                          </span>
-                        </div>
-
-                        <p
-                          class="arabic-preview-text"
-                          lang="ar"
-                          dir="rtl"
-                        >
-                          طالب يتعلم اللغة العربية باستخدام الحاسوب المحمول.
-                        </p>
-                      </div>
-
-                    </div>
-                  </div>
-                </article>
-
-                <!-- Answer evaluation preview -->
-                <article class="preview-output-block">
-                  <div class="preview-section-header">
-                    <span class="preview-module-chip violet">
-                      <svg
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                      >
-                        <path
-                          d="M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="1.8"
-                        />
-                        <path
-                          d="M7 8h10M7 12h7M7 16h5"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="1.8"
-                          stroke-linecap="round"
-                        />
-                      </svg>
-
-                      Answer Evaluation
-                    </span>
-
-                    <span class="preview-status-chip">
-                      Analysis Complete
-                    </span>
-                  </div>
-
-                  <div class="evaluation-summary-card">
-                    <div class="evaluation-summary-content">
-                      <div class="evaluation-summary-heading">
-                        <span class="mini-label">
-                          Semantic Evaluation
-                        </span>
-
-                        <h4>
-                          Student answer compared with the reference
-                        </h4>
-                      </div>
-
-                      <div class="summary-scoreline">
-                        <span>
-                          Score:
-                          <strong>8/10</strong>
-                        </span>
-
-                        <span>
-                          Similarity:
-                          <strong>78%</strong>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="preview-metric-grid">
-
-                    <div class="preview-metric-card">
-                      <div
-                        class="metric-circle final-score"
-                        style="--value: 80;"
-                        aria-label="Final score 8 out of 10"
-                      >
-                        <span class="metric-number">
-                          8/10
-                        </span>
-                      </div>
-
-                      <div>
-                        <span class="detail-label">
-                          Final Score
-                        </span>
-
-                        <p>
-                          Calculated from semantic meaning and concept coverage.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div class="preview-metric-card">
-                      <div
-                        class="metric-circle similarity-score"
-                        style="--value: 78;"
-                        aria-label="Similarity score 78 percent"
-                      >
-                        <span class="metric-number">
-                          78%
-                        </span>
-                      </div>
-
-                      <div>
-                        <span class="detail-label">
-                          Similarity
-                        </span>
-
-                        <p>
-                          Measures how closely both Arabic answers match.
-                        </p>
-                      </div>
-                    </div>
-
-                  </div>
-
-                  <div class="preview-feedback-card">
-                    <div class="result-item-header">
-                      <h4>AI Feedback</h4>
-
-                      <span class="score-chip">
-                        Good Answer
-                      </span>
-                    </div>
-
-                    <ul>
-                      <li>
-                        The main concept is explained correctly.
-                      </li>
-
-                      <li>
-                        Add one more supporting detail for a stronger answer.
-                      </li>
-                    </ul>
-                  </div>
-                </article>
-
-              </div>
-            </div>
-          </div>
-
         </div>
       </section>
 
-      <!-- ===================================================
-           FEATURES
-           =================================================== -->
-
+      <!-- FEATURES SECTION -->
       <section
-        class="content-section"
         id="features"
-        aria-labelledby="featuresTitle"
+        class="content-section"
       >
         <div class="section-heading">
-          <p class="section-kicker">
-            Core Features
-          </p>
+          <p class="section-kicker">Features</p>
 
-          <h2 id="featuresTitle">
-            Intelligent tools designed for Arabic learning
+          <h2>
+            Everything educators need to teach Arabic
+            with AI confidence.
           </h2>
 
           <p>
-            Use computer vision and multilingual language models through
-            one simple, responsive learning platform.
+            From image captioning to semantic grading,
+            IntelliArabic provides an intelligent workflow
+            for classrooms, tutors, and research programs.
           </p>
         </div>
 
         <div class="feature-grid">
 
           <article class="feature-card">
-            <div
-              class="feature-icon blue"
-              aria-hidden="true"
-            >
-              <svg viewBox="0 0 24 24">
-                <rect
-                  x="3"
-                  y="4"
-                  width="18"
-                  height="16"
-                  rx="3"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                />
-                <circle
-                  cx="9"
-                  cy="10"
-                  r="2"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                />
-                <path
-                  d="M5 17l4-4 3 3 3-4 4 5"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
+            <div class="feature-icon blue">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path d="M5 12a7 7 0 0 1 14 0"/>
+                <path d="M12 7v6"/>
+                <path d="M8 12h8"/>
               </svg>
             </div>
 
-            <h3>Arabic Image Captioning</h3>
+            <h3>Arabic Image Caption Generation</h3>
 
             <p>
-              Upload an image and generate meaningful English and Arabic
-              descriptions using transformer-based AI models.
+              Upload images and instantly receive high-quality
+              Arabic captions for education and assessment.
             </p>
           </article>
 
           <article class="feature-card">
-            <div
-              class="feature-icon violet"
-              aria-hidden="true"
-            >
-              <svg viewBox="0 0 24 24">
-                <path
-                  d="M4 4h16v16H4z"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M8 9h8M8 13h5M8 17h7"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                />
+            <div class="feature-icon violet">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path d="m9 12 2 2 4-4"/>
+                <path d="M4 19h16"/>
+                <path d="M6 4h12"/>
               </svg>
             </div>
 
-            <h3>Answer Evaluation</h3>
+            <h3>Arabic Answer Evaluation</h3>
 
             <p>
-              Compare a student's Arabic response with a reference answer
-              and receive a semantic similarity score.
+              Score written answers using semantic similarity
+              and adaptive feedback for learners.
             </p>
           </article>
 
           <article class="feature-card">
-            <div
-              class="feature-icon green"
-              aria-hidden="true"
-            >
-              <svg viewBox="0 0 24 24">
-                <path
-                  d="M4 19V9M10 19V5M16 19v-7M22 19H2"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                />
+            <div class="feature-icon green">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path d="M12 4v4"/>
+                <path d="M12 20v-4"/>
+                <path d="M4 12h4"/>
+                <path d="M16 12h4"/>
+                <path d="m7.5 7.5 2.5 2.5"/>
+                <path d="m14 14 2.5 2.5"/>
+                <path d="m7.5 16.5 2.5-2.5"/>
               </svg>
             </div>
 
-            <h3>Clear Score Prediction</h3>
+            <h3>Similarity Score Calculation</h3>
 
             <p>
-              View similarity percentages, scores out of ten and
-              structured feedback in an easy-to-understand format.
+              Understand student performance with confidence
+              scores and semantic grading metrics.
             </p>
           </article>
 
           <article class="feature-card">
-            <div
-              class="feature-icon rose"
-              aria-hidden="true"
-            >
-              <svg viewBox="0 0 24 24">
-                <path
-                  d="M12 3l2.2 4.6L19 9l-3.5 3.5.8 5-4.3-2.3-4.3 2.3.8-5L5 9l4.8-1.4L12 3z"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linejoin="round"
-                />
+            <div class="feature-icon rose">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path d="M12 5v14"/>
+                <path d="M5 7h14"/>
+                <path d="M5 17h14"/>
               </svg>
             </div>
 
-            <h3>Responsive Experience</h3>
+            <h3>AI-Powered Learning Assistance</h3>
 
             <p>
-              Access the platform comfortably from desktop, tablet or
-              mobile devices with a clean and accessible interface.
+              A complete assistant for teachers, tutors,
+              and researchers working with Arabic learning.
             </p>
           </article>
 
         </div>
       </section>
 
-      <!-- ===================================================
-           HOW IT WORKS
-           =================================================== -->
-
+      <!-- HOW IT WORKS -->
       <section
+        id="how-it-works"
         class="workflow-section"
-        id="workflow"
-        aria-labelledby="workflowTitle"
       >
         <div class="workflow-copy">
-          <p class="section-kicker">
-            How It Works
-          </p>
+          <p class="section-kicker">How It Works</p>
 
-          <h2 id="workflowTitle">
-            Start learning in a few simple steps
+          <h2>
+            A simple three-step workflow for educators
+            and students.
           </h2>
 
           <p>
-            Create an account, select an AI module and receive
-            understandable results without complicated configuration.
+            From image upload to semantic grading,
+            IntelliArabic delivers transparent AI-powered
+            Arabic learning support with results you can trust.
           </p>
-
-          <a
-            href="{{ url_for('register') }}"
-            class="primary-action"
-          >
-            Get Started
-          </a>
         </div>
 
         <div class="step-list">
 
           <article class="step-card">
-            <span aria-hidden="true">01</span>
+            <span>1</span>
 
-            <h3>Create your account</h3>
+            <h3>Upload your learning material</h3>
 
             <p>
-              Register securely or sign in to access the IntelliArabic
-              learning workspace.
+              Teachers or students upload images,
+              questions and sample answers to the platform.
             </p>
           </article>
 
           <article class="step-card">
-            <span aria-hidden="true">02</span>
+            <span>2</span>
 
-            <h3>Select an AI module</h3>
+            <h3>Generate captions and scores</h3>
 
             <p>
-              Choose Arabic image captioning or automated answer
-              evaluation from the dashboard.
+              IntelliArabic creates Arabic captions,
+              evaluates responses and generates
+              similarity-based scores.
             </p>
           </article>
 
           <article class="step-card">
-            <span aria-hidden="true">03</span>
+            <span>3</span>
 
-            <h3>Provide your input</h3>
-
-            <p>
-              Upload an image or enter the question, reference answer and
-              student answer.
-            </p>
-          </article>
-
-          <article class="step-card">
-            <span aria-hidden="true">04</span>
-
-            <h3>Review the AI result</h3>
+            <h3>Review insights and improve learning</h3>
 
             <p>
-              Read generated captions, semantic scores and improvement
-              suggestions in a structured result panel.
+              Use AI insights to refine lessons,
+              personalize feedback and improve Arabic fluency.
             </p>
           </article>
 
         </div>
       </section>
 
-      <!-- ===================================================
-           BENEFITS
-           =================================================== -->
-
+      <!-- TESTIMONIALS -->
       <section
+        id="about"
         class="testimonial-section"
-        id="testimonials"
-        aria-labelledby="benefitsTitle"
       >
         <div class="section-heading">
-          <p class="section-kicker">
-            Learning Benefits
-          </p>
+          <p class="section-kicker">Testimonials</p>
 
-          <h2 id="benefitsTitle">
-            A practical assistant for students and educators
+          <h2>
+            Trusted by educators and institutions worldwide.
           </h2>
-
-          <p>
-            IntelliArabic is designed to make Arabic learning activities
-            easier to understand, evaluate and improve.
-          </p>
         </div>
 
         <div class="testimonial-grid">
 
           <article>
             <p>
-              “Understand visual content through clear Arabic and English
-              descriptions.”
+              “IntelliArabic transformed our Arabic curriculum
+              with fast, reliable grading support.”
             </p>
 
             <span>
-              Image-based language learning
+              Dr. Amina Farouk, Curriculum Lead
             </span>
           </article>
 
           <article>
             <p>
-              “Receive consistent semantic scoring instead of relying only
-              on exact word matching.”
+              “The captioning features save time and help
+              students connect visual learning to Arabic
+              vocabulary.”
             </p>
 
             <span>
-              Intelligent answer analysis
+              Prof. Omar Salem, Arabic Language Department
             </span>
           </article>
 
           <article>
             <p>
-              “Identify correct concepts, missing information and possible
-              improvements.”
+              “A polished platform that feels built for
+              modern academic institutions.”
             </p>
 
             <span>
-              Structured educational feedback
+              Leila Mansour, EdTech Coordinator
             </span>
           </article>
 
         </div>
       </section>
 
-      <!-- ===================================================
-           FAQ
-           =================================================== -->
-
+      <!-- FAQ -->
       <section
-        class="faq-section"
         id="faq"
-        aria-labelledby="faqTitle"
+        class="faq-section"
       >
         <div class="faq-heading">
-          <p class="section-kicker">
-            Frequently Asked Questions
-          </p>
+          <p class="section-kicker">FAQ</p>
 
-          <h2 id="faqTitle">
-            Common questions about IntelliArabic
-          </h2>
-
-          <p class="hero-text">
-            Learn how the image captioning and answer evaluation modules
-            work.
-          </p>
+          <h2>Frequently asked questions</h2>
         </div>
 
         <div class="faq-list">
 
           <article>
             <h3>
-              What types of images can I upload?
+              How accurate are the Arabic captions?
             </h3>
 
             <p>
-              You can upload common image formats such as JPG, JPEG, PNG
-              and WebP, subject to the file restrictions configured by the
-              application.
+              The AI models provide context-aware captions
+              and Arabic translations designed for
+              educational use.
             </p>
           </article>
 
           <article>
             <h3>
-              How is the Arabic caption generated?
+              Can I use IntelliArabic for classroom grading?
             </h3>
 
             <p>
-              The application first understands the image using a vision
-              model and then translates the generated description into
-              Arabic.
+              Yes. It supports educators with scalable
+              semantic grading and structured learner feedback.
             </p>
           </article>
 
           <article>
             <h3>
-              How does answer evaluation work?
+              Does this work for all Arabic dialects?
             </h3>
 
             <p>
-              The system compares the semantic meaning of the student's
-              answer with the reference answer and converts the similarity
-              into a score.
-            </p>
-          </article>
-
-          <article>
-            <h3>
-              Does the student answer need to use exactly the same words?
-            </h3>
-
-            <p>
-              No. The multilingual sentence model compares meaning, so
-              answers can receive a strong score even when different
-              wording is used correctly.
+              The platform is optimized for Modern Standard
+              Arabic and educational contexts while remaining
+              flexible across Arabic varieties.
             </p>
           </article>
 
@@ -1131,91 +516,64 @@
 
     </main>
 
-    <!-- =====================================================
+    <!-- ==========================================
          FOOTER
-         ===================================================== -->
-
+         ========================================== -->
     <footer class="site-footer">
-      <div class="footer-brand">
+      <div>
         <a
+          class="brand footer-brand"
           href="#home"
-          class="footer-brand-row"
-          aria-label="Return to IntelliArabic home"
         >
-          <span class="brand-logo" aria-hidden="true">
-            <svg viewBox="0 0 32 32">
-              <path
-                d="M7 7.5h18v14H12l-5 4v-18z"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.2"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M11 12h10M11 16h7"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.2"
-                stroke-linecap="round"
-              />
-            </svg>
-          </span>
-
+          <img
+            src="{{ url_for('static', filename='arabic.png') }}"
+            alt="IntelliArabic logo"
+          >
           <span>IntelliArabic</span>
         </a>
 
         <p>
-          AI-powered Arabic image captioning and automated answer
-          evaluation.
+          AI-driven Arabic education for modern classrooms,
+          research teams and language programs.
         </p>
       </div>
 
       <nav aria-label="Footer navigation">
         <a href="#features">Features</a>
-        <a href="#workflow">How It Works</a>
+        <a href="#how-it-works">How It Works</a>
         <a href="#faq">FAQ</a>
-        <a href="{{ url_for('login') }}">Login</a>
-        <a href="{{ url_for('register') }}">Create Account</a>
       </nav>
     </footer>
 
   </div>
 
-  <!-- =======================================================
+  <!-- ==========================================
        MOBILE DRAWER JAVASCRIPT
-       ======================================================= -->
-
+       ========================================== -->
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      "use strict";
+    document.addEventListener('DOMContentLoaded', function () {
+      'use strict';
 
       const menuButton =
-        document.getElementById("mobileMenuButton");
+        document.getElementById('mobileMenuButton');
 
-      const drawer =
-        document.getElementById("mobileDrawer");
+      const menuDrawer =
+        document.getElementById('mobileMenuDrawer');
 
-      const backdrop =
-        document.getElementById("mobileMenuBackdrop");
+      const menuBackdrop =
+        document.getElementById('mobileMenuBackdrop');
 
       const closeButton =
-        document.getElementById("mobileMenuClose");
-
-      const drawerLinks = drawer
-        ? drawer.querySelectorAll("[data-mobile-menu-link]")
-        : [];
+        document.getElementById('mobileMenuClose');
 
       if (
         !menuButton ||
-        !drawer ||
-        !backdrop ||
+        !menuDrawer ||
+        !menuBackdrop ||
         !closeButton
       ) {
         return;
       }
-
-      let savedScrollPosition = 0;
-      let previouslyFocusedElement = null;
 
       const focusableSelector = [
         'a[href]',
@@ -1224,251 +582,226 @@
         'select:not([disabled])',
         'textarea:not([disabled])',
         '[tabindex]:not([tabindex="-1"])'
-      ].join(",");
+      ].join(',');
 
-      function menuIsOpen() {
-        return drawer.classList.contains("is-open");
+      let previousFocus = null;
+      let lockedScrollPosition = 0;
+
+      function isMenuOpen() {
+        return menuDrawer.classList.contains('is-open');
+      }
+
+      function getFocusableElements() {
+        return Array.from(
+          menuDrawer.querySelectorAll(focusableSelector)
+        ).filter(function (element) {
+          return (
+            !element.hasAttribute('disabled') &&
+            element.getAttribute('aria-hidden') !== 'true' &&
+            element.offsetParent !== null
+          );
+        });
       }
 
       function lockPageScroll() {
-        savedScrollPosition =
+        lockedScrollPosition =
           window.scrollY ||
           document.documentElement.scrollTop ||
           0;
 
         document.documentElement.classList.add(
-          "mobile-menu-open"
+          'mobile-menu-open'
         );
 
         document.body.classList.add(
-          "mobile-menu-open"
+          'mobile-menu-open'
         );
 
-        document.body.style.position = "fixed";
         document.body.style.top =
-          "-" + savedScrollPosition + "px";
-        document.body.style.left = "0";
-        document.body.style.right = "0";
-        document.body.style.width = "100%";
+          '-' + lockedScrollPosition + 'px';
       }
 
       function unlockPageScroll() {
         document.documentElement.classList.remove(
-          "mobile-menu-open"
+          'mobile-menu-open'
         );
 
         document.body.classList.remove(
-          "mobile-menu-open"
+          'mobile-menu-open'
         );
 
-        document.body.style.position = "";
-        document.body.style.top = "";
-        document.body.style.left = "";
-        document.body.style.right = "";
-        document.body.style.width = "";
+        document.body.style.removeProperty('top');
 
         window.scrollTo({
-          top: savedScrollPosition,
+          top: lockedScrollPosition,
           left: 0,
-          behavior: "auto"
+          behavior: 'auto'
         });
       }
 
       function openMenu() {
-        if (menuIsOpen()) {
+        if (isMenuOpen()) {
           return;
         }
 
-        previouslyFocusedElement =
-          document.activeElement;
+        previousFocus = document.activeElement;
 
-        drawer.inert = false;
+        menuButton.classList.add('is-open');
+        menuDrawer.classList.add('is-open');
+        menuBackdrop.classList.add('is-open');
 
-        drawer.classList.add("is-open");
-        backdrop.classList.add("is-open");
-        menuButton.classList.add("is-open");
-
-        drawer.setAttribute(
-          "aria-hidden",
-          "false"
-        );
-
-        backdrop.setAttribute(
-          "aria-hidden",
-          "false"
+        menuButton.setAttribute(
+          'aria-expanded',
+          'true'
         );
 
         menuButton.setAttribute(
-          "aria-expanded",
-          "true"
+          'aria-label',
+          'Close navigation menu'
         );
 
-        menuButton.setAttribute(
-          "aria-label",
-          "Close navigation menu"
+        menuDrawer.setAttribute(
+          'aria-hidden',
+          'false'
         );
+
+        menuBackdrop.setAttribute(
+          'aria-hidden',
+          'false'
+        );
+
+        menuDrawer.removeAttribute('inert');
+
+        try {
+          menuDrawer.inert = false;
+        } catch (error) {
+          // Older browsers can continue without inert support.
+        }
 
         lockPageScroll();
 
-        window.setTimeout(function () {
+        window.requestAnimationFrame(function () {
           closeButton.focus();
-        }, 60);
+        });
       }
 
-      function closeMenu(restoreFocus) {
-        if (!menuIsOpen()) {
+      function closeMenu(options) {
+        if (!isMenuOpen()) {
           return;
         }
 
-        const shouldRestoreFocus =
-          restoreFocus !== false;
+        const settings = options || {};
+        const restoreFocus =
+          settings.restoreFocus !== false;
 
-        drawer.classList.remove("is-open");
-        backdrop.classList.remove("is-open");
-        menuButton.classList.remove("is-open");
+        menuButton.classList.remove('is-open');
+        menuDrawer.classList.remove('is-open');
+        menuBackdrop.classList.remove('is-open');
 
-        drawer.setAttribute(
-          "aria-hidden",
-          "true"
-        );
-
-        backdrop.setAttribute(
-          "aria-hidden",
-          "true"
+        menuButton.setAttribute(
+          'aria-expanded',
+          'false'
         );
 
         menuButton.setAttribute(
-          "aria-expanded",
-          "false"
+          'aria-label',
+          'Open navigation menu'
         );
 
-        menuButton.setAttribute(
-          "aria-label",
-          "Open navigation menu"
+        menuDrawer.setAttribute(
+          'aria-hidden',
+          'true'
         );
 
-        drawer.inert = true;
+        menuBackdrop.setAttribute(
+          'aria-hidden',
+          'true'
+        );
+
+        menuDrawer.setAttribute('inert', '');
+
+        try {
+          menuDrawer.inert = true;
+        } catch (error) {
+          // Older browsers can continue without inert support.
+        }
 
         unlockPageScroll();
 
         if (
-          shouldRestoreFocus &&
-          previouslyFocusedElement &&
-          typeof previouslyFocusedElement.focus ===
-            "function"
+          restoreFocus &&
+          previousFocus &&
+          typeof previousFocus.focus === 'function'
         ) {
-          previouslyFocusedElement.focus();
+          window.requestAnimationFrame(function () {
+            previousFocus.focus();
+          });
         }
       }
 
-      function scrollToSection(target) {
-        if (!target) {
-          return;
+      function toggleMenu() {
+        if (isMenuOpen()) {
+          closeMenu();
+        } else {
+          openMenu();
         }
-
-        const reduceMotion =
-          window.matchMedia(
-            "(prefers-reduced-motion: reduce)"
-          ).matches;
-
-        target.scrollIntoView({
-          behavior: reduceMotion
-            ? "auto"
-            : "smooth",
-          block: "start"
-        });
       }
 
       menuButton.addEventListener(
-        "click",
-        function () {
-          if (menuIsOpen()) {
-            closeMenu(true);
-          } else {
-            openMenu();
-          }
-        }
+        'click',
+        toggleMenu
       );
 
       closeButton.addEventListener(
-        "click",
+        'click',
         function () {
-          closeMenu(true);
+          closeMenu();
         }
       );
 
-      backdrop.addEventListener(
-        "click",
+      // Clicking the semi-transparent area closes the menu.
+      menuBackdrop.addEventListener(
+        'click',
         function () {
-          closeMenu(true);
+          closeMenu();
         }
       );
 
-      drawerLinks.forEach(function (link) {
-        link.addEventListener(
-          "click",
-          function (event) {
-            const href =
-              link.getAttribute("href");
+      // Close after selecting any navigation item.
+      menuDrawer
+        .querySelectorAll('[data-mobile-menu-link]')
+        .forEach(function (link) {
+          link.addEventListener('click', function () {
+            closeMenu({
+              restoreFocus: false
+            });
+          });
+        });
 
-            if (
-              href &&
-              href.charAt(0) === "#"
-            ) {
-              const target =
-                document.querySelector(href);
-
-              if (target) {
-                event.preventDefault();
-
-                closeMenu(false);
-
-                window.setTimeout(
-                  function () {
-                    scrollToSection(target);
-                  },
-                  310
-                );
-              }
-            }
-          }
-        );
-      });
-
+      // Keyboard support.
       document.addEventListener(
-        "keydown",
+        'keydown',
         function (event) {
-          if (!menuIsOpen()) {
+          if (!isMenuOpen()) {
             return;
           }
 
-          if (event.key === "Escape") {
+          if (event.key === 'Escape') {
             event.preventDefault();
-            closeMenu(true);
+            closeMenu();
             return;
           }
 
-          if (event.key !== "Tab") {
+          if (event.key !== 'Tab') {
             return;
           }
 
           const focusableElements =
-            Array.from(
-              drawer.querySelectorAll(
-                focusableSelector
-              )
-            ).filter(function (element) {
-              return (
-                !element.hasAttribute(
-                  "disabled"
-                ) &&
-                element.getClientRects().length > 0
-              );
-            });
+            getFocusableElements();
 
           if (!focusableElements.length) {
             event.preventDefault();
-            closeButton.focus();
+            menuDrawer.focus();
             return;
           }
 
@@ -1482,15 +815,19 @@
 
           if (
             event.shiftKey &&
-            document.activeElement ===
-              firstElement
+            (
+              document.activeElement === firstElement ||
+              document.activeElement === menuDrawer
+            )
           ) {
             event.preventDefault();
             lastElement.focus();
-          } else if (
+            return;
+          }
+
+          if (
             !event.shiftKey &&
-            document.activeElement ===
-              lastElement
+            document.activeElement === lastElement
           ) {
             event.preventDefault();
             firstElement.focus();
@@ -1498,23 +835,29 @@
         }
       );
 
+      // Close when returning to desktop size.
       window.addEventListener(
-        "resize",
+        'resize',
         function () {
           if (
             window.innerWidth > 980 &&
-            menuIsOpen()
+            isMenuOpen()
           ) {
-            closeMenu(false);
+            closeMenu({
+              restoreFocus: false
+            });
           }
         }
       );
 
+      // Prevent unwanted open menu after restoring page cache.
       window.addEventListener(
-        "pageshow",
+        'pageshow',
         function () {
-          if (menuIsOpen()) {
-            closeMenu(false);
+          if (isMenuOpen()) {
+            closeMenu({
+              restoreFocus: false
+            });
           }
         }
       );
@@ -1522,4 +865,3 @@
   </script>
 </body>
 </html>
-```
