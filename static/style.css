@@ -6741,3 +6741,351 @@ canvas {
         min-height: 0 !important;
     }
 }
+
+
+
+/* ==========================================================
+   IMAGE CAPTIONING — ANSWER EVALUATION PROPORTIONS
+   Desktop/tablet: equal-height horizontal cards
+   Mobile: preserve existing stacked layout
+   ========================================================== */
+
+@media (min-width: 769px) {
+
+    /* Allow the captioning module to use the full content width */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"] {
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+
+        margin: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    /* Two equal-width columns */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .split-workspace {
+        display: grid !important;
+
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(0, 1fr) !important;
+
+        grid-auto-rows: 1fr;
+
+        align-items: stretch !important;
+        justify-items: stretch !important;
+
+        gap: 24px !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Equal card size and appearance */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.input-panel,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.output-panel {
+        box-sizing: border-box !important;
+
+        display: flex !important;
+        flex-direction: column !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+
+        height: 100% !important;
+        min-height: clamp(560px, 67vh, 700px) !important;
+
+        margin: 0 !important;
+        padding: 24px !important;
+
+        align-self: stretch !important;
+
+        border-radius: 18px !important;
+
+        overflow: hidden;
+    }
+
+    /* Input form fills the entire left card */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel form {
+        display: flex !important;
+        flex: 1 1 auto !important;
+        flex-direction: column !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+
+        gap: 18px !important;
+
+        margin: 0 !important;
+    }
+
+    /* Large upload area occupying most of the input card */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel .file-drop {
+        box-sizing: border-box !important;
+
+        display: flex !important;
+        flex: 1 1 auto !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 390px !important;
+        height: auto !important;
+
+        align-items: center !important;
+        justify-content: center !important;
+
+        margin: 0 !important;
+        padding: 28px !important;
+
+        border-radius: 14px !important;
+
+        overflow: hidden;
+    }
+
+    /* Keep upload content centered */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel .drop-content {
+        display: flex !important;
+        flex-direction: column !important;
+
+        width: 100%;
+
+        align-items: center !important;
+        justify-content: center !important;
+
+        text-align: center;
+    }
+
+    /* Uploaded preview should fill the available upload area */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel .upload-preview {
+        display: block;
+
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100% !important;
+        max-height: 430px !important;
+
+        object-fit: contain !important;
+
+        border-radius: 12px;
+    }
+
+    /* Full-width button fixed at bottom of left card */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel .button.primary,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel button[type="submit"] {
+        flex: 0 0 auto !important;
+
+        width: 100% !important;
+        min-height: 48px;
+
+        margin-top: auto !important;
+
+        align-self: stretch !important;
+    }
+
+    /* Output card fills the same height as input */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel {
+        display: flex !important;
+        flex-direction: column !important;
+
+        min-height: clamp(560px, 67vh, 700px) !important;
+    }
+
+    /* Result heading remains at the top */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .panel-header,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .result-header {
+        flex: 0 0 auto;
+
+        width: 100%;
+        min-width: 0;
+
+        margin-bottom: 18px;
+    }
+
+    /* Result content expands to fill the right card */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .output-content,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .result-content,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .result-container {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+
+        width: 100%;
+        min-width: 0;
+        min-height: 0;
+    }
+
+    /* Larger generated image preview */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .preview-image,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel #resultImage,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel img {
+        display: block;
+
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 310px !important;
+        max-height: 310px !important;
+
+        flex: 0 0 310px;
+
+        object-fit: contain !important;
+
+        margin: 0 0 18px !important;
+
+        border-radius: 14px;
+    }
+
+    /* Caption results fill remaining card space */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .result-list {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+
+        width: 100%;
+        min-width: 0;
+
+        gap: 14px;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .result-item {
+        box-sizing: border-box;
+
+        flex: 1 1 0;
+
+        width: 100%;
+        min-width: 0;
+
+        padding: 16px;
+
+        border-radius: 12px;
+    }
+
+    /* Prevent caption overflow */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel p,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .arabic-text {
+        width: 100%;
+        max-width: 100%;
+
+        margin-bottom: 0;
+
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+}
+
+/* Larger desktop spacing */
+@media (min-width: 1200px) {
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .split-workspace {
+        gap: 26px !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.input-panel,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.output-panel {
+        min-height: 650px !important;
+        padding: 28px !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel .file-drop {
+        min-height: 430px !important;
+    }
+}
+
+/* Preserve the current mobile stacked design */
+@media (max-width: 768px) {
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .split-workspace {
+        display: grid !important;
+
+        grid-template-columns:
+            minmax(0, 1fr) !important;
+
+        gap: 12px !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.input-panel,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.output-panel {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+
+        height: auto !important;
+        min-height: 0 !important;
+
+        margin: 0 !important;
+    }
+}
+
