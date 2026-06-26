@@ -1,104 +1,370 @@
+
 <!-- Image Captioning Module Content -->
-<div class="module-content-wrapper sider-workspace" data-module-view="captioning">
+<div
+    class="module-content-wrapper sider-workspace"
+    data-module-view="captioning"
+>
+    <!-- Module heading -->
     <section class="workspace-heading">
         <div class="workspace-title-group">
             <div class="workspace-heading-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
-                    <path d="m8.5 15 2.1-2.2 2 1.8 2.1-3 2.8 3.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path
+                        d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Z"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    />
+
+                    <path
+                        d="m8.5 15 2.1-2.2 2 1.8 2.1-3 2.8 3.4"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
                 </svg>
             </div>
+
             <div>
-                <p class="workspace-kicker">AI IMAGE UNDERSTANDING</p>
+                <p class="workspace-kicker">
+                    AI IMAGE UNDERSTANDING
+                </p>
             </div>
         </div>
     </section>
 
+    <!-- Desktop: two columns | Mobile: stacked -->
     <div class="split-workspace">
+
+        <!-- ==========================================
+             LEFT PANEL — IMAGE INPUT
+             ========================================== -->
         <section class="workspace-panel input-panel">
-            <form class="stack" id="captionForm" action="/upload" method="post" enctype="multipart/form-data">
-                <div class="file-drop" id="captionDropZone">
-                    <input type="file" name="image" id="captionFileInput" accept="image/jpeg,image/png,image/webp,image/gif" required>
-                    <div class="drop-content" id="captionDropContent">
+            <form
+                class="stack"
+                id="captionForm"
+                action="/upload"
+                method="post"
+                enctype="multipart/form-data"
+            >
+                <!-- Image upload area -->
+                <div
+                    class="file-drop"
+                    id="captionDropZone"
+                >
+                    <input
+                        type="file"
+                        name="image"
+                        id="captionFileInput"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        required
+                    >
+
+                    <div
+                        class="drop-content"
+                        id="captionDropContent"
+                    >
                         <div class="drop-icon">
-                            <svg viewBox="0 0 24 24" role="img">
-                                <path d="M12 15V4m0 0L8 8m4-4l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M5 15v2.5A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5V15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                            <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M12 15V4m0 0L8 8m4-4l4 4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+
+                                <path
+                                    d="M5 15v2.5A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5V15"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                />
                             </svg>
                         </div>
-                        <span class="file-title" id="captionFileTitle">Drag & drop or click to upload</span>
-                        <span class="file-formats">Supports JPG, PNG, WebP, GIF</span>
+
+                        <span
+                            class="file-title"
+                            id="captionFileTitle"
+                        >
+                            Drag &amp; drop or click to upload
+                        </span>
+
+                        <span class="file-formats">
+                            Supports JPG, PNG, WebP, GIF
+                        </span>
                     </div>
                 </div>
 
-                <div id="captionError" class="sr-only" role="status" aria-live="polite" hidden></div>
+                <!-- Error/status message -->
+                <div
+                    id="captionError"
+                    class="sr-only"
+                    role="status"
+                    aria-live="polite"
+                    hidden
+                ></div>
 
-                <button class="button primary full" type="submit" id="captionSubmit" disabled>
-                    <span class="btn-text">Generate Caption</span>
-                    <span class="btn-loader" style="display:none;"><span class="spinner"></span> Processing...</span>
+                <!-- Shared action button component -->
+                <button
+                    class="button primary full module-action-button"
+                    type="submit"
+                    id="captionSubmit"
+                >
+                    <span class="btn-text">
+                        Generate Caption
+                    </span>
+
+                    <span
+                        class="btn-loader"
+                        style="display: none;"
+                    >
+                        <span class="spinner"></span>
+                        Analyzing image...
+                    </span>
                 </button>
             </form>
         </section>
 
+        <!-- ==========================================
+             RIGHT PANEL — GENERATED OUTPUT
+             ========================================== -->
         <section class="workspace-panel output-panel">
+
+            <!-- Output actions -->
             <div class="panel-header">
                 <div class="panel-actions">
-                    <button class="icon-btn" type="button" onclick="copyCaption()" title="Copy captions">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15.5V6.8A1.8 1.8 0 0 1 6.8 5h8.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <button
+                        class="icon-btn"
+                        type="button"
+                        onclick="copyCaption()"
+                        title="Copy captions"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <rect
+                                x="8"
+                                y="8"
+                                width="11"
+                                height="11"
+                                rx="2.2"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                            />
+
+                            <path
+                                d="M5 15.5V6.8A1.8 1.8 0 0 1 6.8 5h8.7"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+
                         Copy Results
                     </button>
-                    <button class="icon-btn" type="button" onclick="regenerateCaption()" title="Regenerate Caption">
-                        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+                    <button
+                        class="icon-btn"
+                        type="button"
+                        onclick="regenerateCaption()"
+                        title="Regenerate Caption"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="16"
+                            height="16"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+
                         Regenerate
                     </button>
                 </div>
             </div>
 
-            <div class="output-empty-state" id="captionOutputEmpty">
+            <!-- Empty output state -->
+            <div
+                class="output-empty-state"
+                id="captionOutputEmpty"
+            >
                 <div class="output-empty-icon">
-                    <svg viewBox="0 0 24 24" role="img">
-                        <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Z" fill="none" stroke="currentColor" stroke-width="1.7"/>
-                        <path d="m8.5 15 2.1-2.2 2 1.8 2.1-3 2.8 3.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Z"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                        />
+
+                        <path
+                            d="m8.5 15 2.1-2.2 2 1.8 2.1-3 2.8 3.4"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
                     </svg>
                 </div>
+
                 <h4>Results will appear here</h4>
-                <p>Upload an image to preview the generated English caption and Arabic translation.</p>
+
+                <p>
+                    Upload an image to preview the generated English
+                    caption and Arabic translation.
+                </p>
             </div>
 
-            <div class="result-skeleton" id="captionSkeleton" hidden aria-hidden="true">
+            <!-- Loading skeleton -->
+            <div
+                class="result-skeleton"
+                id="captionSkeleton"
+                hidden
+                aria-hidden="true"
+            >
                 <div class="skeleton-media"></div>
                 <div class="skeleton-card"></div>
                 <div class="skeleton-card short"></div>
             </div>
 
-            <div class="result-panel premium-result-grid" id="captionResults" style="display:none;">
+            <!-- Generated results -->
+            <div
+                class="result-panel premium-result-grid"
+                id="captionResults"
+                style="display: none;"
+                aria-live="polite"
+            >
+                <!-- Uploaded image preview -->
                 <article class="result-item image-preview-card">
                     <div class="result-item-header">
-                        <span class="result-tag image-tag">Image Preview</span>
+                        <span class="result-tag image-tag">
+                            Image Preview
+                        </span>
                     </div>
-                    <img class="preview-image" id="resultImage" src="" alt="Uploaded image">
+
+                    <img
+                        class="preview-image"
+                        id="resultImage"
+                        src=""
+                        alt="Uploaded image"
+                    >
                 </article>
 
+                <!-- Captions -->
                 <div class="result-list">
+
+                    <!-- English caption -->
                     <article class="result-item">
                         <div class="result-item-header">
-                            <span class="result-tag english-tag">English Caption</span>
-                            <button class="mini-action" type="button" onclick="copyTextFromElement('resultEnglish', 'English caption copied')">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+                            <span class="result-tag english-tag">
+                                English Caption
+                            </span>
+
+                            <button
+                                class="mini-action"
+                                type="button"
+                                onclick="copyTextFromElement('resultEnglish', 'English caption copied')"
+                                title="Copy English caption"
+                            >
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <rect
+                                        x="9"
+                                        y="9"
+                                        width="13"
+                                        height="13"
+                                        rx="2"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                    />
+
+                                    <path
+                                        d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                    />
+                                </svg>
+
                                 Copy
                             </button>
                         </div>
+
                         <p id="resultEnglish"></p>
                     </article>
+
+                    <!-- Arabic caption -->
                     <article class="result-item">
                         <div class="result-item-header">
-                            <span class="result-tag arabic-tag">Arabic Caption</span>
-                            <button class="mini-action" type="button" onclick="copyTextFromElement('resultArabic', 'Arabic caption copied')">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+                            <span class="result-tag arabic-tag">
+                                Arabic Caption
+                            </span>
+
+                            <button
+                                class="mini-action"
+                                type="button"
+                                onclick="copyTextFromElement('resultArabic', 'Arabic caption copied')"
+                                title="Copy Arabic caption"
+                            >
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <rect
+                                        x="9"
+                                        y="9"
+                                        width="13"
+                                        height="13"
+                                        rx="2"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                    />
+
+                                    <path
+                                        d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                    />
+                                </svg>
+
                                 Copy
                             </button>
                         </div>
-                        <p class="arabic-text" id="resultArabic" dir="rtl"></p>
+
+                        <p
+                            class="arabic-text"
+                            id="resultArabic"
+                            dir="rtl"
+                            lang="ar"
+                        ></p>
                     </article>
                 </div>
             </div>

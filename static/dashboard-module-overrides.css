@@ -1,0 +1,394 @@
+/* ==========================================================
+   SHARED MODULE ACTION BUTTON
+   Overrides older ID-based button rules safely.
+   ========================================================== */
+
+/*
+ * Both selectors use the same shared component styling.
+ * The form IDs provide enough specificity to override older
+ * #contentArea #captionSubmit rules.
+ */
+#contentArea #captionForm .module-action-button,
+#contentArea #evaluationForm .module-action-button {
+    box-sizing: border-box !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+
+    padding: 0 20px !important;
+    margin: 0 !important;
+
+    border: none !important;
+    border-radius: 12px !important;
+
+    background: linear-gradient(
+        135deg,
+        #2563eb 0%,
+        #4f46e5 55%,
+        #7c3aed 100%
+    ) !important;
+
+    color: #ffffff !important;
+
+    font-family: inherit !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    letter-spacing: 0.01em !important;
+
+    text-align: center;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 9px 20px rgba(79, 70, 229, 0.25) !important;
+
+    transition:
+        transform 180ms ease,
+        background 180ms ease,
+        box-shadow 180ms ease,
+        filter 180ms ease,
+        opacity 180ms ease !important;
+
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+/* Shared hover state */
+#contentArea #captionForm .module-action-button:hover:not(:disabled),
+#contentArea #evaluationForm .module-action-button:hover:not(:disabled) {
+    background: linear-gradient(
+        135deg,
+        #1d4ed8 0%,
+        #4338ca 55%,
+        #6d28d9 100%
+    ) !important;
+
+    transform: translateY(-1px) !important;
+    filter: brightness(1.03) !important;
+
+    box-shadow:
+        0 13px 26px rgba(79, 70, 229, 0.32) !important;
+}
+
+/* Shared active state */
+#contentArea #captionForm .module-action-button:active:not(:disabled),
+#contentArea #evaluationForm .module-action-button:active:not(:disabled) {
+    background: linear-gradient(
+        135deg,
+        #1e40af 0%,
+        #3730a3 55%,
+        #5b21b6 100%
+    ) !important;
+
+    transform: translateY(0) !important;
+    filter: none !important;
+
+    box-shadow:
+        0 6px 14px rgba(79, 70, 229, 0.24) !important;
+}
+
+/* Shared keyboard-focus state */
+#contentArea #captionForm .module-action-button:focus-visible,
+#contentArea #evaluationForm .module-action-button:focus-visible {
+    outline: 3px solid rgba(99, 102, 241, 0.28) !important;
+    outline-offset: 3px;
+}
+
+/* Shared disabled/loading state */
+#contentArea #captionForm .module-action-button:disabled,
+#contentArea #evaluationForm .module-action-button:disabled {
+    cursor: not-allowed !important;
+
+    opacity: 0.65 !important;
+
+    transform: none !important;
+    filter: none !important;
+
+    box-shadow:
+        0 5px 12px rgba(79, 70, 229, 0.16) !important;
+}
+
+/* Shared text and loader alignment */
+#contentArea #captionForm .module-action-button .btn-text,
+#contentArea #captionForm .module-action-button .btn-loader,
+#contentArea #evaluationForm .module-action-button .btn-text,
+#contentArea #evaluationForm .module-action-button .btn-loader {
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    color: inherit !important;
+
+    font-family: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    line-height: 1 !important;
+}
+
+
+/* ==========================================================
+   IMAGE CAPTIONING DESKTOP LAYOUT
+   ========================================================== */
+
+@media (min-width: 769px) {
+    #contentArea
+    .sider-workspace[data-module-view="captioning"] {
+        box-sizing: border-box !important;
+
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+
+        margin: 0 !important;
+        padding-top: 10px !important;
+        padding-bottom: 16px !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-heading {
+        margin: 0 0 10px !important;
+        padding: 0 !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .split-workspace {
+        display: grid !important;
+
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(0, 1fr) !important;
+
+        align-items: stretch !important;
+
+        gap: 22px !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.input-panel,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.output-panel {
+        box-sizing: border-box !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+
+        height: clamp(
+            440px,
+            calc(100dvh - 190px),
+            560px
+        ) !important;
+
+        min-height: 0 !important;
+        max-height: 560px !important;
+
+        margin: 0 !important;
+        padding: 20px !important;
+
+        align-self: stretch !important;
+
+        gap: 14px !important;
+
+        border-radius: 16px !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.input-panel {
+        display: flex !important;
+        flex-direction: column !important;
+
+        overflow: hidden !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    #captionForm {
+        display: flex !important;
+        flex: 1 1 auto !important;
+        flex-direction: column !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+
+        gap: 14px !important;
+
+        margin: 0 !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel .file-drop {
+        box-sizing: border-box !important;
+
+        display: flex !important;
+        flex: 1 1 auto !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 250px !important;
+
+        align-items: center !important;
+        justify-content: center !important;
+
+        margin: 0 !important;
+        padding: 24px !important;
+
+        border-radius: 14px !important;
+
+        overflow: hidden !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel .drop-content {
+        display: flex !important;
+        flex-direction: column !important;
+
+        width: 100%;
+
+        align-items: center !important;
+        justify-content: center !important;
+
+        text-align: center;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    #captionForm .module-action-button {
+        flex: 0 0 48px !important;
+
+        margin-top: auto !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.output-panel {
+        display: flex !important;
+        flex-direction: column !important;
+
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .output-empty-state {
+        flex: 1 1 auto !important;
+
+        min-height: 0 !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .preview-image {
+        width: 100% !important;
+        max-width: 100% !important;
+
+        height: auto !important;
+        max-height: 230px !important;
+
+        object-fit: contain !important;
+
+        border-radius: 12px;
+    }
+}
+
+
+/* Short laptop screens */
+@media (min-width: 769px) and (max-height: 700px) {
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.input-panel,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.output-panel {
+        height: calc(100dvh - 170px) !important;
+        min-height: 400px !important;
+
+        padding: 16px !important;
+
+        gap: 10px !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel .file-drop {
+        min-height: 210px !important;
+
+        padding: 18px !important;
+    }
+}
+
+
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+@media (max-width: 768px) {
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .split-workspace {
+        display: grid !important;
+
+        grid-template-columns:
+            minmax(0, 1fr) !important;
+
+        gap: 12px !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.input-panel,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.output-panel {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+
+        margin: 0 !important;
+    }
+
+    #contentArea #captionForm .module-action-button,
+    #contentArea #evaluationForm .module-action-button {
+        height: 44px !important;
+        min-height: 44px !important;
+        max-height: 44px !important;
+
+        padding: 0 16px !important;
+
+        border-radius: 11px !important;
+
+        font-size: 13px !important;
+    }
+}

@@ -13,13 +13,19 @@
     <!-- Main application styles -->
     <link
         rel="stylesheet"
-        href="/static/style.css?v=captioning-equal-panels-20260626-3"
+        href="{{ url_for('static', filename='style.css') }}?v=dashboard-base-20260626-4"
     >
 
-    <!-- Mobile module/sidebar fixes -->
+    <!-- Mobile module and sidebar fixes -->
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='mobile-module-fix.css') }}?v=mobile-module-fix-20260626-2"
+    >
+
+    <!-- Dashboard layout and shared module-button overrides -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='dashboard-module-overrides.css') }}?v=dashboard-overrides-20260626-2"
     >
 </head>
 
@@ -34,7 +40,7 @@
                 <div class="sidebar-brand">
                     <div class="brand-mark">
                         <img
-                            src="/static/arabic.png"
+                            src="{{ url_for('static', filename='arabic.png') }}"
                             alt="IntelliArabic"
                             style="height: 24px;"
                         >
@@ -494,14 +500,16 @@
     </script>
 
     <!-- Main application JavaScript -->
-    <script src="/static/script.js?v=dashboard-captioning-layout-20260626-2"></script>
+    <script
+        src="{{ url_for('static', filename='script.js') }}?v=dashboard-modules-20260626-3"
+    ></script>
 
-    <!-- Mobile sidebar fix must load after the main JavaScript -->
+    <!-- Mobile sidebar behavior -->
     <script
         src="{{ url_for('static', filename='mobile-module-fix.js') }}?v=mobile-module-fix-20260626-2"
     ></script>
 
-    <!-- Load the first dashboard module -->
+    <!-- Load Image Captioning as the default module -->
     <script>
         document.addEventListener(
             'DOMContentLoaded',

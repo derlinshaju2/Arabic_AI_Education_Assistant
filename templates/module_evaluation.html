@@ -1,149 +1,420 @@
+
 <!-- Answer Evaluation Module Content -->
-<div class="module-content-wrapper sider-workspace" data-module-view="evaluation">
+<div
+    class="module-content-wrapper sider-workspace"
+    data-module-view="evaluation"
+>
+    <!-- Module heading -->
     <section class="workspace-heading">
         <div class="workspace-title-group">
             <div class="workspace-heading-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M7 3h7l4 4v14H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
-                    <path d="M14 3v5h5M8.5 12h7M8.5 15h7M8.5 18h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <path
+                        d="M7 3h7l4 4v14H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    />
+
+                    <path
+                        d="M14 3v5h5M8.5 12h7M8.5 15h7M8.5 18h4"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                    />
                 </svg>
             </div>
+
             <div>
-                <p class="workspace-kicker">AI ANSWER SCORING</p>
+                <p class="workspace-kicker">
+                    AI ANSWER SCORING
+                </p>
             </div>
         </div>
     </section>
 
+    <!-- Desktop: two columns | Mobile: stacked -->
     <div class="split-workspace">
+
+        <!-- ==========================================
+             LEFT PANEL — ANSWER INPUT
+             ========================================== -->
         <section class="workspace-panel input-panel">
-            <form class="stack" id="evaluationForm" action="/evaluate" method="post" enctype="multipart/form-data">
+            <form
+                class="stack"
+                id="evaluationForm"
+                action="/evaluate"
+                method="post"
+                enctype="multipart/form-data"
+            >
+                <!-- Question -->
                 <div class="field">
                     <div class="field-label-row">
-                        <label for="subject">Question</label>
-                        <span><span id="questionCounter">0</span> chars</span>
+                        <label for="subject">
+                            Question
+                        </label>
+
+                        <span>
+                            <span id="questionCounter">0</span>
+                            chars
+                        </span>
                     </div>
-                    <input type="text" id="subject" name="subject" placeholder="Enter the question or topic..." required>
+
+                    <input
+                        type="text"
+                        id="subject"
+                        name="subject"
+                        placeholder="Enter the question or topic..."
+                        required
+                    >
                 </div>
 
+                <!-- Reference answer -->
                 <div class="field">
                     <div class="field-label-row">
-                        <label for="reference">Reference Answer</label>
-                        <span><span id="refWordCounter">0</span> words</span>
+                        <label for="reference">
+                            Reference Answer
+                        </label>
+
+                        <span>
+                            <span id="refWordCounter">0</span>
+                            words
+                        </span>
                     </div>
-                    <textarea id="reference" name="reference" placeholder="Enter the correct/reference answer..." required></textarea>
-                    <div class="char-counter"><span id="refCounter">0</span>/500 chars</div>
+
+                    <textarea
+                        id="reference"
+                        name="reference"
+                        placeholder="Enter the correct/reference answer..."
+                        maxlength="500"
+                        required
+                    ></textarea>
+
+                    <div class="char-counter">
+                        <span id="refCounter">0</span>/500 chars
+                    </div>
                 </div>
 
+                <!-- Student answer -->
                 <div class="field">
                     <div class="field-label-row">
-                        <label for="student">Student Answer</label>
-                        <span><span id="stuWordCounter">0</span> words</span>
+                        <label for="student">
+                            Student Answer
+                        </label>
+
+                        <span>
+                            <span id="stuWordCounter">0</span>
+                            words
+                        </span>
                     </div>
-                    <textarea id="student" name="student" placeholder="Enter the student's answer..." required></textarea>
-                    <div class="char-counter"><span id="stuCounter">0</span>/500 chars</div>
+
+                    <textarea
+                        id="student"
+                        name="student"
+                        placeholder="Enter the student's answer..."
+                        maxlength="500"
+                        required
+                    ></textarea>
+
+                    <div class="char-counter">
+                        <span id="stuCounter">0</span>/500 chars
+                    </div>
                 </div>
 
-                <div id="evaluationError" class="sr-only" role="status" aria-live="polite" hidden></div>
+                <!-- Error/status message -->
+                <div
+                    id="evaluationError"
+                    class="sr-only"
+                    role="status"
+                    aria-live="polite"
+                    hidden
+                ></div>
 
+                <!-- Form actions -->
                 <div class="form-actions-row">
-                    <button class="button primary full" type="submit" id="evaluationSubmit">
-                        <span class="btn-text">Evaluate Answer</span>
-                        <span class="btn-loader" style="display:none;"><span class="spinner"></span> Analyzing answers...</span>
+
+                    <!-- Shared action-button component -->
+                    <button
+                        class="button primary full module-action-button"
+                        type="submit"
+                        id="evaluationSubmit"
+                    >
+                        <span class="btn-text">
+                            Evaluate Answer
+                        </span>
+
+                        <span
+                            class="btn-loader"
+                            style="display: none;"
+                        >
+                            <span class="spinner"></span>
+                            Analyzing answers...
+                        </span>
                     </button>
-                    <button class="button secondary" type="button" onclick="clearEvaluationModule()">Clear</button>
+
+                    <button
+                        class="button secondary"
+                        type="button"
+                        onclick="clearEvaluationModule()"
+                    >
+                        Clear
+                    </button>
                 </div>
             </form>
         </section>
 
+        <!-- ==========================================
+             RIGHT PANEL — EVALUATION OUTPUT
+             ========================================== -->
         <section class="workspace-panel output-panel">
+
+            <!-- Output actions -->
             <div class="panel-header">
                 <div class="panel-actions">
-                    <button class="icon-btn" type="button" onclick="copyEvaluation()" title="Copy evaluation">
-                        <svg viewBox="0 0 24 24" width="16" height="16"><rect x="9" y="9" width="13" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                    <button
+                        class="icon-btn"
+                        type="button"
+                        onclick="copyEvaluation()"
+                        title="Copy evaluation"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="16"
+                            height="16"
+                            aria-hidden="true"
+                        >
+                            <rect
+                                x="9"
+                                y="9"
+                                width="13"
+                                height="13"
+                                rx="2"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            />
+
+                            <path
+                                d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            />
+                        </svg>
+
                         Copy Report
                     </button>
-                    <button class="icon-btn" type="button" onclick="reevaluateAnswer()" title="Re-evaluate">
-                        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+                    <button
+                        class="icon-btn"
+                        type="button"
+                        onclick="reevaluateAnswer()"
+                        title="Re-evaluate"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="16"
+                            height="16"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+
                         Re-evaluate
                     </button>
                 </div>
             </div>
 
-            <div class="output-empty-state" id="evaluationOutputEmpty">
+            <!-- Empty output state -->
+            <div
+                class="output-empty-state"
+                id="evaluationOutputEmpty"
+            >
                 <div class="output-empty-icon">
-                    <svg viewBox="0 0 24 24" role="img">
-                        <path d="M7 3h7l4 4v14H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.7"/>
-                        <path d="M14 3v5h5M8.5 12h7M8.5 15h7M8.5 18h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                            d="M7 3h7l4 4v14H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                        />
+
+                        <path
+                            d="M14 3v5h5M8.5 12h7M8.5 15h7M8.5 18h4"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                            stroke-linecap="round"
+                        />
                     </svg>
                 </div>
+
                 <h4>Evaluation appears here</h4>
-                <p>Submit the question, reference answer, and student answer to generate feedback.</p>
+
+                <p>
+                    Submit the question, reference answer, and student
+                    answer to generate feedback.
+                </p>
             </div>
 
-            <div class="result-skeleton" id="evaluationSkeleton" hidden aria-hidden="true">
+            <!-- Loading skeleton -->
+            <div
+                class="result-skeleton"
+                id="evaluationSkeleton"
+                hidden
+                aria-hidden="true"
+            >
                 <div class="skeleton-score-row">
                     <div class="skeleton-circle"></div>
                     <div class="skeleton-circle"></div>
                 </div>
+
                 <div class="skeleton-card"></div>
                 <div class="skeleton-card short"></div>
                 <div class="skeleton-card"></div>
             </div>
 
-            <div class="evaluation-results premium-evaluation-report" id="evaluationResults" style="display:none;">
+            <!-- Evaluation results -->
+            <div
+                class="evaluation-results premium-evaluation-report"
+                id="evaluationResults"
+                style="display: none;"
+                aria-live="polite"
+            >
+                <!-- Evaluation summary -->
                 <article class="evaluation-summary-card">
                     <div class="evaluation-summary-content">
                         <div class="evaluation-summary-heading">
-                            <span class="result-tag insight-tag">Evaluation Summary</span>
-                            <h4>Professional AI Evaluation Report</h4>
+                            <span class="result-tag insight-tag">
+                                Evaluation Summary
+                            </span>
+
+                            <h4>
+                                Professional AI Evaluation Report
+                            </h4>
                         </div>
+
                         <div class="summary-scoreline">
-                            <span>Score: <strong><span id="summaryFinalScore">0</span>/10</strong></span>
-                            <span>Similarity: <strong id="summarySimilarity">0%</strong></span>
+                            <span>
+                                Score:
+                                <strong>
+                                    <span id="summaryFinalScore">0</span>/10
+                                </strong>
+                            </span>
+
+                            <span>
+                                Similarity:
+                                <strong id="summarySimilarity">
+                                    0%
+                                </strong>
+                            </span>
                         </div>
                     </div>
                 </article>
 
+                <!-- Score metrics -->
                 <div class="metric-grid">
                     <article class="metric-card">
-                        <div class="metric-circle final-score" id="finalScoreCircle" style="--value: 0;">
-                            <span class="metric-number"><span id="finalScoreValue">0</span>/10</span>
+                        <div
+                            class="metric-circle final-score"
+                            id="finalScoreCircle"
+                            style="--value: 0;"
+                        >
+                            <span class="metric-number">
+                                <span id="finalScoreValue">0</span>/10
+                            </span>
                         </div>
+
                         <div>
-                            <span class="detail-label">Final Score</span>
+                            <span class="detail-label">
+                                Final Score
+                            </span>
+
                             <p>Overall answer quality</p>
                         </div>
                     </article>
+
                     <article class="metric-card">
-                        <div class="metric-circle similarity-score" id="similarityCircle" style="--value: 0;">
-                            <span class="metric-number" id="similarityValue">0%</span>
+                        <div
+                            class="metric-circle similarity-score"
+                            id="similarityCircle"
+                            style="--value: 0;"
+                        >
+                            <span
+                                class="metric-number"
+                                id="similarityValue"
+                            >
+                                0%
+                            </span>
                         </div>
+
                         <div>
-                            <span class="detail-label">Similarity Score</span>
+                            <span class="detail-label">
+                                Similarity Score
+                            </span>
+
                             <p>Match against reference</p>
                         </div>
                     </article>
                 </div>
 
-                <article class="result-item ai-feedback-card" id="feedbackCorrect">
+                <!-- Strengths -->
+                <article
+                    class="result-item ai-feedback-card"
+                    id="feedbackCorrect"
+                >
                     <div class="result-item-header">
-                        <span class="result-tag insight-tag">Strengths</span>
+                        <span class="result-tag insight-tag">
+                            Strengths
+                        </span>
                     </div>
-                    <ul class="feedback-list" id="correctList"></ul>
+
+                    <ul
+                        class="feedback-list"
+                        id="correctList"
+                    ></ul>
                 </article>
 
-                <article class="result-item ai-feedback-card" id="feedbackMissing">
+                <!-- Areas to improve -->
+                <article
+                    class="result-item ai-feedback-card"
+                    id="feedbackMissing"
+                >
                     <div class="result-item-header">
-                        <span class="result-tag insight-tag">Areas to Improve</span>
+                        <span class="result-tag insight-tag">
+                            Areas to Improve
+                        </span>
                     </div>
-                    <ul class="feedback-list" id="missingList"></ul>
+
+                    <ul
+                        class="feedback-list"
+                        id="missingList"
+                    ></ul>
                 </article>
 
-                <article class="result-item ai-feedback-card" id="feedbackSuggestions">
+                <!-- Suggestions -->
+                <article
+                    class="result-item ai-feedback-card"
+                    id="feedbackSuggestions"
+                >
                     <div class="result-item-header">
-                        <span class="result-tag insight-tag">Next Steps</span>
+                        <span class="result-tag insight-tag">
+                            Next Steps
+                        </span>
                     </div>
-                    <ul class="feedback-list" id="suggestionsList"></ul>
+
+                    <ul
+                        class="feedback-list"
+                        id="suggestionsList"
+                    ></ul>
                 </article>
             </div>
         </section>
