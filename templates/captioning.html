@@ -2,56 +2,167 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Captioning - Arabic AI Education Assistant</title>
-    <link rel="stylesheet" href="/static/style.css?v=mobile-compact-20260625">
-    <link rel="stylesheet" href="{{ url_for('static', filename='mobile-module-fix.css') }}?v=mobile-module-fix-20260626-1">
 
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
+    <title>
+        Image Captioning - Arabic AI Education Assistant
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css?v=mobile-compact-20260625"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='mobile-module-fix.css') }}?v=mobile-module-fix-20260626-1"
+    >
+
+    <!-- Desktop/tablet two-column captioning layout -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='captioning-layout.css') }}?v=captioning-two-column-20260626-1"
+    >
 </head>
 
-<script
-  src="{{ url_for('static', filename='mobile-module-fix.js') }}?v=mobile-module-fix-20260626-1">
-</script>
-
-
 <body>
-    <!-- TOP NAVIGATION -->
+    <!-- ==========================================
+         TOP NAVIGATION
+         ========================================== -->
     <header class="topbar">
         <div class="brand-row">
-            <a href="/dashboard" class="brand-mark" title="Back to Dashboard">
-                <svg viewBox="0 0 24 24" role="img">
-                    <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" fill="none" stroke="currentColor" stroke-width="1.8"/>
-                    <path d="M8 10.2h8M8 13.8h5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <a
+                href="/dashboard"
+                class="brand-mark"
+                title="Back to Dashboard"
+                aria-label="Back to Dashboard"
+            >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                        d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    />
+
+                    <path
+                        d="M8 10.2h8M8 13.8h5.2"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                    />
                 </svg>
             </a>
-            <span class="brand-text">Image Captioning</span>
+
+            <span class="brand-text">
+                Image Captioning
+            </span>
         </div>
-        <nav class="top-actions" aria-label="Account">
-            <a href="/dashboard" class="button secondary small">Back to Dashboard</a>
+
+        <nav
+            class="top-actions"
+            aria-label="Account"
+        >
+            <a
+                href="/dashboard"
+                class="button secondary small"
+            >
+                Back to Dashboard
+            </a>
+
             <div class="profile-dropdown-wrapper">
-                <button class="profile-trigger" id="profileTrigger" aria-label="User menu" aria-expanded="false">
+                <button
+                    type="button"
+                    class="profile-trigger"
+                    id="profileTrigger"
+                    aria-label="User menu"
+                    aria-expanded="false"
+                >
                     {% if user.profileImage %}
-                    <img class="user-avatar" src="{{ user.profileImage }}" alt="{{ user.name }}" width="36" height="36">
+                    <img
+                        class="user-avatar"
+                        src="{{ user.profileImage }}"
+                        alt="{{ user.name }}"
+                        width="36"
+                        height="36"
+                    >
                     {% else %}
-                    <div class="user-avatar initial">{{ user.name[:1].upper() if user.name else 'U' }}</div>
-                    {% endif %}
-                    <div class="user-info">
-                        <span class="user-name">{{ user.name }}</span>
-                        <span class="user-email">{{ user.email }}</span>
+                    <div class="user-avatar initial">
+                        {{ user.name[:1].upper() if user.name else 'U' }}
                     </div>
-                    <svg class="dropdown-chevron" viewBox="0 0 24 24" width="16" height="16">
-                        <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    {% endif %}
+
+                    <div class="user-info">
+                        <span class="user-name">
+                            {{ user.name }}
+                        </span>
+
+                        <span class="user-email">
+                            {{ user.email }}
+                        </span>
+                    </div>
+
+                    <svg
+                        class="dropdown-chevron"
+                        viewBox="0 0 24 24"
+                        width="16"
+                        height="16"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M6 9l6 6 6-6"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
                     </svg>
                 </button>
-                <div class="profile-dropdown" id="profileDropdown">
+
+                <div
+                    class="profile-dropdown"
+                    id="profileDropdown"
+                >
                     <div class="dropdown-header">
-                        <span class="dropdown-user-name">{{ user.name }}</span>
-                        <span class="dropdown-user-email">{{ user.email }}</span>
+                        <span class="dropdown-user-name">
+                            {{ user.name }}
+                        </span>
+
+                        <span class="dropdown-user-email">
+                            {{ user.email }}
+                        </span>
                     </div>
+
                     <div class="dropdown-divider"></div>
-                    <a href="/logout" class="dropdown-item danger" data-logout-link onclick="return window.logout ? window.logout(event) : true">
-                        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+                    <a
+                        href="/logout"
+                        class="dropdown-item danger"
+                        data-logout-link
+                        onclick="return window.logout ? window.logout(event) : true"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="16"
+                            height="16"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+
                         Logout
                     </a>
                 </div>
@@ -59,138 +170,343 @@
         </nav>
     </header>
 
+    <!-- ==========================================
+         PAGE CONTENT
+         ========================================== -->
     <main class="page-shell">
-        <!-- MODULE HEADER -->
+
+        <!-- Module heading -->
         <section class="module-page-header">
-            <a href="/dashboard" class="back-link">
-                <svg viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <a
+                href="/dashboard"
+                class="back-link"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    width="18"
+                    height="18"
+                    aria-hidden="true"
+                >
+                    <path
+                        d="M19 12H5M12 19l-7-7 7-7"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                </svg>
+
                 Back to Dashboard
             </a>
+
             <div class="module-page-title">
                 <div class="module-icon">
-                    <svg viewBox="0 0 24 24" role="img">
-                        <path d="M4 7.5A2.5 2.5 0 016.5 5h11A2.5 2.5 0 0120 7.5v9A2.5 2.5 0 0117.5 19h-11A2.5 2.5 0 014 16.5v-9z" fill="none" stroke="currentColor" stroke-width="1.8"/>
-                        <path d="M8 5l1.2-2h5.6L16 5M8.5 15l2.2-2.4 1.9 1.8 2.2-3 2.7 3.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M4 7.5A2.5 2.5 0 016.5 5h11A2.5 2.5 0 0120 7.5v9A2.5 2.5 0 0117.5 19h-11A2.5 2.5 0 014 16.5v-9z"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        />
+
+                        <path
+                            d="M8 5l1.2-2h5.6L16 5M8.5 15l2.2-2.4 1.9 1.8 2.2-3 2.7 3.6"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
                     </svg>
                 </div>
+
                 <div>
                     <h1>Image Captioning</h1>
-                    <p class="subtitle">Upload an image to generate an Arabic caption with English translation</p>
+
+                    <p class="subtitle">
+                        Upload an image to generate an Arabic caption
+                        with English translation
+                    </p>
                 </div>
             </div>
         </section>
 
-        <div class="module-single-grid">
-            <article class="module-card module-card-full">
-                <!-- Form with both AJAX and standard POST fallback -->
-                <form class="stack" id="captionForm" action="/upload" method="post" enctype="multipart/form-data">
-                    <div class="file-drop" id="captionDropZone">
-                        <input type="file" name="image" id="captionFileInput" accept="image/jpeg,image/png,image/webp,image/gif" required>
-                        <div class="drop-content" id="captionDropContent">
+        <!-- ======================================
+             RESPONSIVE CAPTIONING WORKSPACE
+             Desktop/tablet: two columns
+             Mobile: vertically stacked
+             ====================================== -->
+        <div class="captioning-layout">
+
+            <!-- LEFT: Image upload and input -->
+            <article
+                class="module-card module-card-full captioning-input-card"
+            >
+                <form
+                    class="stack"
+                    id="captionForm"
+                    action="/upload"
+                    method="post"
+                    enctype="multipart/form-data"
+                >
+                    <div
+                        class="file-drop"
+                        id="captionDropZone"
+                    >
+                        <input
+                            type="file"
+                            name="image"
+                            id="captionFileInput"
+                            accept="image/jpeg,image/png,image/webp,image/gif"
+                            required
+                        >
+
+                        <div
+                            class="drop-content"
+                            id="captionDropContent"
+                        >
                             <div class="drop-icon">
-                                <svg viewBox="0 0 24 24" role="img">
-                                    <path d="M12 15V4m0 0L8 8m4-4l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M5 15v2.5A2.5 2.5 0 007.5 20h9a2.5 2.5 0 002.5-2.5V15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M12 15V4m0 0L8 8m4-4l4 4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+
+                                    <path
+                                        d="M5 15v2.5A2.5 2.5 0 007.5 20h9a2.5 2.5 0 002.5-2.5V15"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                        stroke-linecap="round"
+                                    />
                                 </svg>
                             </div>
-                            <span class="file-title" id="captionFileTitle">Drag & drop or click to upload</span>
-                            <span class="file-formats">Supports JPG, PNG, WebP, GIF</span>
+
+                            <span
+                                class="file-title"
+                                id="captionFileTitle"
+                            >
+                                Drag &amp; drop or click to upload
+                            </span>
+
+                            <span class="file-formats">
+                                Supports JPG, PNG, WebP, GIF
+                            </span>
                         </div>
-                        <img class="upload-preview" id="captionPreview" alt="Preview" style="display:none;">
+
+                        <img
+                            class="upload-preview"
+                            id="captionPreview"
+                            alt="Selected image preview"
+                            style="display: none;"
+                        >
                     </div>
 
-                    <div id="captionError" class="alert error-msg" style="display:none;"></div>
+                    <div
+                        id="captionError"
+                        class="alert error-msg"
+                        style="display: none;"
+                        role="alert"
+                    ></div>
 
-                    <button class="button primary full" type="submit" id="captionSubmit">
-                        <span class="btn-text">Generate Caption</span>
-                        <span class="btn-loader" style="display:none;"><span class="spinner"></span> Analyzing image...</span>
+                    {% if caption_error %}
+                    <p
+                        class="alert error-msg"
+                        role="alert"
+                    >
+                        {{ caption_error }}
+                    </p>
+                    {% endif %}
+
+                    <button
+                        class="button primary full"
+                        type="submit"
+                        id="captionSubmit"
+                    >
+                        <span class="btn-text">
+                            Generate Caption
+                        </span>
+
+                        <span
+                            class="btn-loader"
+                            style="display: none;"
+                        >
+                            <span class="spinner"></span>
+                            Analyzing image...
+                        </span>
                     </button>
                 </form>
-
-                <!-- Caption Results - shown by JS or server-side -->
-                {% if caption_result %}
-                <div class="result-panel" id="captionResults">
-                    <div class="result-header">
-                        <h3>Generated Caption</h3>
-                        <div class="result-actions">
-                            <button class="icon-btn" onclick="copyCaption()" title="Copy to clipboard">
-                                <svg viewBox="0 0 24 24" width="16" height="16"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-                                Copy
-                            </button>
-                            <button class="icon-btn" onclick="downloadCaption()" title="Download result">
-                                <svg viewBox="0 0 24 24" width="16" height="16"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                Download
-                            </button>
-                        </div>
-                    </div>
-                    <img class="preview-image" id="resultImage" src="{{ caption_result.image_url }}" alt="Uploaded image">
-                    <div class="result-list">
-                        <div class="result-item">
-                            <span class="result-tag arabic-tag">Arabic Caption</span>
-                            <p class="arabic-text" id="resultArabic" dir="rtl">{{ caption_result.arabic_caption }}</p>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-tag english-tag">English Translation</span>
-                            <p id="resultEnglish">{{ caption_result.english_caption }}</p>
-                        </div>
-                    </div>
-                </div>
-                {% else %}
-                <div class="result-panel" id="captionResults" style="display:none;">
-                    <div class="result-header">
-                        <h3>Generated Caption</h3>
-                        <div class="result-actions">
-                            <button class="icon-btn" onclick="copyCaption()" title="Copy to clipboard">
-                                <svg viewBox="0 0 24 24" width="16" height="16"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-                                Copy
-                            </button>
-                            <button class="icon-btn" onclick="downloadCaption()" title="Download result">
-                                <svg viewBox="0 0 24 24" width="16" height="16"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                Download
-                            </button>
-                        </div>
-                    </div>
-                    <img class="preview-image" id="resultImage" src="" alt="Uploaded image">
-                    <div class="result-list">
-                        <div class="result-item">
-                            <span class="result-tag arabic-tag">Arabic Caption</span>
-                            <p class="arabic-text" id="resultArabic" dir="rtl"></p>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-tag english-tag">English Translation</span>
-                            <p id="resultEnglish"></p>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if caption_error %}
-                <p class="alert error-msg">{{ caption_error }}</p>
-                {% endif %}
             </article>
+
+            <!-- RIGHT: Generated caption result -->
+            <article
+                class="result-panel captioning-output-card"
+                id="captionResults"
+                {% if not caption_result %}
+                style="display: none;"
+                {% endif %}
+            >
+                <div class="result-header">
+                    <h3>Generated Caption</h3>
+
+                    <div class="result-actions">
+                        <button
+                            type="button"
+                            class="icon-btn"
+                            onclick="copyCaption()"
+                            title="Copy to clipboard"
+                        >
+                            <svg
+                                viewBox="0 0 24 24"
+                                width="16"
+                                height="16"
+                                aria-hidden="true"
+                            >
+                                <rect
+                                    x="9"
+                                    y="9"
+                                    width="13"
+                                    height="13"
+                                    rx="2"
+                                    ry="2"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                />
+
+                                <path
+                                    d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                />
+                            </svg>
+
+                            Copy
+                        </button>
+
+                        <button
+                            type="button"
+                            class="icon-btn"
+                            onclick="downloadCaption()"
+                            title="Download result"
+                        >
+                            <svg
+                                viewBox="0 0 24 24"
+                                width="16"
+                                height="16"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                            </svg>
+
+                            Download
+                        </button>
+                    </div>
+                </div>
+
+                <img
+                    class="preview-image"
+                    id="resultImage"
+                    {% if caption_result %}
+                    src="{{ caption_result.image_url }}"
+                    {% else %}
+                    src=""
+                    {% endif %}
+                    alt="Uploaded image"
+                >
+
+                <div class="result-list">
+                    <div class="result-item">
+                        <span class="result-tag arabic-tag">
+                            Arabic Caption
+                        </span>
+
+                        <p
+                            class="arabic-text"
+                            id="resultArabic"
+                            dir="rtl"
+                            lang="ar"
+                        >
+                            {% if caption_result %}
+                            {{ caption_result.arabic_caption }}
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="result-item">
+                        <span class="result-tag english-tag">
+                            English Translation
+                        </span>
+
+                        <p id="resultEnglish">
+                            {% if caption_result %}
+                            {{ caption_result.english_caption }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </article>
+
         </div>
     </main>
 
+    <!-- ==========================================
+         PAGE DATA
+         ========================================== -->
     <script>
         window.USER_DATA = {{ user | tojson }};
-        window.AUTH_TOKEN = {{ auth_token|default('')|tojson }};
+        window.AUTH_TOKEN =
+            {{ auth_token | default('') | tojson }};
+
         if (window.AUTH_TOKEN) {
             try {
-                sessionStorage.setItem('authToken', window.AUTH_TOKEN);
-            } catch (err) {
-                // Keep using window.AUTH_TOKEN when embedded storage is blocked.
+                sessionStorage.setItem(
+                    'authToken',
+                    window.AUTH_TOKEN
+                );
+            } catch (error) {
+                // Continue using window.AUTH_TOKEN.
             }
         } else {
             try {
-                window.AUTH_TOKEN = sessionStorage.getItem('authToken') || '';
-            } catch (err) {
+                window.AUTH_TOKEN =
+                    sessionStorage.getItem('authToken') || '';
+            } catch (error) {
                 window.AUTH_TOKEN = '';
             }
         }
+
         {% if caption_result %}
-        window._lastCaption = {{ caption_result | tojson }};
+        window._lastCaption =
+            {{ caption_result | tojson }};
         {% endif %}
     </script>
+
+    <!-- Existing application functionality -->
     <script src="/static/script.js?v=logout-hero-fix-20260624"></script>
+
+    <!-- Mobile sidebar and spacing fix -->
+    <script
+        src="{{ url_for('static', filename='mobile-module-fix.js') }}?v=mobile-module-fix-20260626-1"
+    ></script>
 </body>
 </html>

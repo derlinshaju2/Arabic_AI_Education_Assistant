@@ -1,0 +1,162 @@
+
+/* ==========================================================
+   IntelliArabic — Image Captioning Responsive Layout
+   Desktop/tablet: input left, results right
+   Mobile: existing stacked layout remains unchanged
+   ========================================================== */
+
+/*
+ * Do not apply new structural styles on mobile.
+ * This preserves the current mobile design.
+ */
+.captioning-layout {
+  width: 100%;
+  min-width: 0;
+}
+
+/* ==========================================================
+   TABLET AND DESKTOP
+   ========================================================== */
+
+@media (min-width: 769px) {
+  .captioning-layout {
+    display: grid !important;
+
+    width: 100%;
+    min-width: 0;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1fr);
+
+    align-items: stretch;
+    gap: 22px;
+
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Keep both cards equal and properly aligned */
+  .captioning-input-card,
+  .captioning-output-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 100%;
+
+    margin: 0 !important;
+
+    align-self: stretch;
+  }
+
+  /* Prevent old full-width rules from spanning both columns */
+  .captioning-layout .module-card-full,
+  .captioning-layout .full-width,
+  .captioning-layout [class*="full-width"] {
+    grid-column: auto !important;
+  }
+
+  /* Keep the upload panel compact and aligned */
+  .captioning-input-card {
+    display: flex;
+    flex-direction: column;
+
+    gap: 16px;
+  }
+
+  /* Keep the result card aligned with the upload card */
+  .captioning-output-card {
+    display: flex;
+    flex-direction: column;
+
+    gap: 16px;
+
+    overflow: hidden;
+  }
+
+  /* Prevent large upload areas from stretching the page */
+  .captioning-input-card .file-drop,
+  .captioning-input-card .upload-area,
+  .captioning-input-card .drop-zone {
+    width: 100%;
+    min-height: 220px;
+    height: auto;
+
+    margin: 0;
+  }
+
+  /* Responsive image preview */
+  .captioning-input-card img,
+  .captioning-output-card img,
+  .captioning-input-card .image-preview,
+  .captioning-output-card .image-preview {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Keep controls aligned without changing their design */
+  .captioning-input-card .form-group,
+  .captioning-input-card .input-group,
+  .captioning-input-card .language-selector,
+  .captioning-output-card .result-section {
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+  }
+
+  /* Keep the action button aligned with the card */
+  .captioning-input-card .button.full,
+  .captioning-input-card .btn-full,
+  .captioning-input-card button[type="submit"] {
+    width: 100%;
+    margin-top: auto;
+  }
+
+  /* Prevent long captions from overflowing */
+  .captioning-output-card p,
+  .captioning-output-card textarea,
+  .captioning-output-card .caption-text,
+  .captioning-output-card .arabic-caption,
+  .captioning-output-card .english-caption {
+    max-width: 100%;
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .captioning-output-card textarea {
+    resize: vertical;
+  }
+}
+
+/* ==========================================================
+   LARGE DESKTOP
+   ========================================================== */
+
+@media (min-width: 1200px) {
+  .captioning-layout {
+    gap: 24px;
+  }
+}
+
+/* ==========================================================
+   MOBILE
+   Preserve the current vertically stacked layout
+   ========================================================== */
+
+@media (max-width: 768px) {
+  .captioning-layout {
+    display: block;
+  }
+
+  .captioning-input-card,
+  .captioning-output-card {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .captioning-output-card {
+    margin-top: 12px;
+  }
+}
