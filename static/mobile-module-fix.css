@@ -1,0 +1,539 @@
+```css
+/* ==========================================================
+   IntelliArabic — Mobile Module Layout Fix
+   Affects only screens up to 980px
+   ========================================================== */
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Keep desktop layout unchanged */
+@media (max-width: 980px) {
+    /* ------------------------------------------------------
+       PAGE STRUCTURE
+       ------------------------------------------------------ */
+
+    html {
+        height: 100%;
+    }
+
+    body {
+        min-height: 100%;
+        margin: 0;
+    }
+
+    .dashboard-container,
+    body.sidebar-collapsed .dashboard-container {
+        display: grid !important;
+        width: 100% !important;
+        height: 100dvh !important;
+        min-height: 0 !important;
+
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-rows: minmax(0, 1fr) !important;
+
+        overflow: hidden !important;
+    }
+
+    .main-content {
+        display: grid !important;
+        width: 100% !important;
+        height: 100dvh !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+
+        grid-template-rows: auto minmax(0, 1fr) !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        overflow: hidden !important;
+        transform: none !important;
+    }
+
+    body.sidebar-open .main-content {
+        width: 100% !important;
+        margin: 0 !important;
+        transform: none !important;
+    }
+
+    /* ------------------------------------------------------
+       MOBILE HEADER
+       ------------------------------------------------------ */
+
+    .topbar {
+        position: relative !important;
+        top: auto !important;
+        z-index: 100 !important;
+
+        display: flex !important;
+        width: 100% !important;
+        min-height: 62px !important;
+
+        flex: 0 0 auto;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: nowrap !important;
+
+        gap: 10px !important;
+        padding: 9px 12px !important;
+
+        border-bottom: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.96) !important;
+
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+
+    .topbar-left {
+        display: flex !important;
+        min-width: 0 !important;
+        flex: 1 1 auto;
+        align-items: center !important;
+
+        gap: 10px !important;
+    }
+
+    .page-title {
+        min-width: 0 !important;
+        margin: 0 !important;
+
+        overflow: hidden;
+
+        color: #020617;
+        font-size: clamp(18px, 5vw, 22px) !important;
+        font-weight: 800 !important;
+        line-height: 1.2 !important;
+
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .top-actions {
+        display: flex !important;
+        width: auto !important;
+
+        flex: 0 0 auto;
+        align-items: center !important;
+        justify-content: flex-end !important;
+
+        gap: 7px !important;
+    }
+
+    .sidebar-toggle-mobile {
+        display: grid !important;
+        width: 42px !important;
+        height: 42px !important;
+
+        flex: 0 0 42px;
+        place-items: center;
+
+        margin: 0 !important;
+        padding: 8px !important;
+
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
+
+        background: #ffffff !important;
+        color: var(--foreground) !important;
+
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+
+        cursor: pointer;
+    }
+
+    .topbar-sidebar-toggle {
+        display: grid !important;
+    }
+
+    .sidebar-collapse-toggle {
+        display: none !important;
+    }
+
+    .lang-switch {
+        width: 42px !important;
+        min-width: 42px !important;
+        height: 42px !important;
+
+        justify-content: center !important;
+
+        padding: 0 !important;
+    }
+
+    .lang-switch span {
+        display: none !important;
+    }
+
+    .profile-trigger {
+        min-width: 42px !important;
+        min-height: 42px !important;
+
+        justify-content: center !important;
+
+        gap: 0 !important;
+        padding: 2px !important;
+    }
+
+    .topbar .user-info,
+    .topbar .dropdown-chevron {
+        display: none !important;
+    }
+
+    /* ------------------------------------------------------
+       SCROLLING CONTENT AREA
+       ------------------------------------------------------ */
+
+    .content-area {
+        position: relative;
+
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+
+        align-content: start !important;
+        justify-content: start !important;
+
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+
+        background: var(--background);
+    }
+
+    /* Prevent unnecessary empty space */
+    .module-content-wrapper,
+    .page-shell {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: 0 !important;
+        height: auto !important;
+
+        margin: 0 auto !important;
+        padding: 12px 12px 30px !important;
+
+        align-content: start !important;
+        justify-content: start !important;
+    }
+
+    .sider-workspace,
+    .module-page,
+    .module-workspace,
+    .workspace-content {
+        min-height: 0 !important;
+        height: auto !important;
+
+        margin-top: 0 !important;
+
+        align-content: start !important;
+        justify-content: start !important;
+    }
+
+    .module-page-header {
+        margin: 0 0 12px !important;
+        padding: 0 !important;
+    }
+
+    .module-page-title {
+        display: grid !important;
+
+        grid-template-columns: 1fr !important;
+
+        gap: 8px !important;
+        margin: 0 !important;
+    }
+
+    .module-page-title > div {
+        gap: 5px !important;
+    }
+
+    .module-page-title h1,
+    .module-page-title h2 {
+        margin: 0 !important;
+
+        font-size: clamp(22px, 6vw, 27px) !important;
+        line-height: 1.2 !important;
+    }
+
+    .module-page-title .subtitle {
+        margin: 0 !important;
+
+        font-size: 14px !important;
+        line-height: 1.45 !important;
+    }
+
+    .module-page-title .module-icon {
+        width: 44px !important;
+        height: 44px !important;
+    }
+
+    .module-single-grid,
+    .split-workspace,
+    .module-grid,
+    .workspace-grid {
+        min-height: 0 !important;
+        height: auto !important;
+
+        align-content: start !important;
+        justify-content: start !important;
+
+        gap: 12px !important;
+        margin-top: 0 !important;
+    }
+
+    /* ------------------------------------------------------
+       MODULE CARDS
+       ------------------------------------------------------ */
+
+    .module-card,
+    .module-card-full,
+    .workspace-panel,
+    .result-panel,
+    .eval-results {
+        min-width: 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+
+        margin-top: 0 !important;
+    }
+
+    .module-card,
+    .module-card-full,
+    .workspace-panel {
+        gap: 14px !important;
+        padding: 14px !important;
+
+        border-radius: 16px !important;
+    }
+
+    .file-drop {
+        min-height: 150px !important;
+        height: auto !important;
+
+        padding: 18px 14px !important;
+    }
+
+    .drop-icon {
+        width: 46px !important;
+        height: 46px !important;
+    }
+
+    .file-drop h3,
+    .file-drop strong {
+        font-size: 17px !important;
+        line-height: 1.3 !important;
+        text-align: center;
+    }
+
+    .file-drop p {
+        font-size: 13px !important;
+        line-height: 1.4 !important;
+        text-align: center;
+    }
+
+    .button.primary,
+    .button.full {
+        min-height: 48px !important;
+    }
+
+    .result-panel,
+    .eval-results {
+        padding: 14px !important;
+    }
+
+    .result-header {
+        gap: 10px !important;
+    }
+
+    .result-actions {
+        gap: 8px !important;
+    }
+
+    /* ------------------------------------------------------
+       FIXED MOBILE SIDEBAR
+       ------------------------------------------------------ */
+
+    .sidebar {
+        position: fixed !important;
+        inset: 0 auto 0 0 !important;
+        z-index: 1001 !important;
+
+        display: flex !important;
+        width: min(84vw, 300px) !important;
+        max-width: calc(100vw - 38px) !important;
+
+        height: 100vh !important;
+        height: 100dvh !important;
+        min-height: 100dvh !important;
+
+        flex-direction: column !important;
+
+        margin: 0 !important;
+
+        overflow: hidden !important;
+
+        border-right: 1px solid var(--border) !important;
+
+        /* Fully opaque background */
+        background: #f8fafc !important;
+        background-color: #f8fafc !important;
+
+        box-shadow: 18px 0 48px rgba(15, 23, 42, 0.2) !important;
+
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+
+        transform: translate3d(-102%, 0, 0) !important;
+
+        transition:
+            transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+            opacity 180ms ease,
+            visibility 0s linear 260ms !important;
+
+        will-change: transform;
+    }
+
+    .sidebar.open {
+        left: 0 !important;
+
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+
+        transform: translate3d(0, 0, 0) !important;
+
+        transition-delay: 0s !important;
+    }
+
+    .sidebar-header {
+        flex: 0 0 auto;
+    }
+
+    .sidebar-nav {
+        min-height: 0;
+        flex: 1 1 auto;
+
+        overflow-x: hidden;
+        overflow-y: auto;
+
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .sidebar-footer {
+        flex: 0 0 auto;
+        margin-top: auto !important;
+
+        background: #f8fafc !important;
+    }
+
+    /* Backdrop */
+    body.sidebar-open::before {
+        content: "";
+
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+
+        background: rgba(15, 23, 42, 0.48);
+
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+
+        animation: mobileSidebarBackdropIn 180ms ease;
+    }
+
+    @keyframes mobileSidebarBackdropIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    /*
+       Never move, resize or transform the page when the
+       sidebar opens.
+    */
+    body.sidebar-open .dashboard-container,
+    body.sidebar-open .main-content,
+    body.sidebar-open .content-area,
+    body.sidebar-open .topbar {
+        margin: 0 !important;
+        transform: none !important;
+    }
+
+    /* Hide floating assistant while drawer is open */
+    body.sidebar-open .floating-ai-button,
+    body.sidebar-open .ai-assistant-button,
+    body.sidebar-open .floating-chat-button,
+    body.sidebar-open .chatbot-toggle,
+    body.sidebar-open .assistant-fab,
+    body.sidebar-open .ai-fab,
+    body.sidebar-open [data-ai-toggle] {
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .topbar {
+        min-height: 58px !important;
+        padding: 8px 10px !important;
+    }
+
+    .sidebar-toggle-mobile {
+        width: 40px !important;
+        height: 40px !important;
+        flex-basis: 40px;
+    }
+
+    .module-content-wrapper,
+    .page-shell {
+        padding: 10px 10px 26px !important;
+    }
+
+    .module-page-header {
+        margin-bottom: 10px !important;
+    }
+
+    .module-card,
+    .module-card-full,
+    .workspace-panel,
+    .result-panel,
+    .eval-results {
+        padding: 12px !important;
+    }
+
+    .file-drop {
+        min-height: 142px !important;
+        padding: 16px 12px !important;
+    }
+
+    .result-actions {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar,
+    body.sidebar-open::before {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+```
