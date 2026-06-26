@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,16 +13,16 @@
     IntelliArabic - AI-Powered Arabic Learning & Evaluation
   </title>
 
-  <!-- Existing landing page styles -->
+  <!-- Existing landing-page styles -->
   <link
     rel="stylesheet"
     href="{{ url_for('static', filename='hero.css') }}?v=hero-fullwidth-20260626"
   >
 
-  <!-- Mobile drawer styles: load after hero.css -->
+  <!-- Mobile navigation styles -->
   <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='hero-mobile-menu.css') }}?v=mobile-drawer-20260626"
+    href="{{ url_for('static', filename='hero-mobile-menu.css') }}?v=mobile-minimal-20260626-2"
   >
 </head>
 
@@ -43,6 +44,7 @@
             src="{{ url_for('static', filename='arabic.png') }}"
             alt="IntelliArabic logo"
           >
+
           <span>IntelliArabic</span>
         </a>
 
@@ -65,7 +67,7 @@
           </button>
         </nav>
 
-        <!-- Mobile hamburger -->
+        <!-- Mobile hamburger button -->
         <button
           id="mobileMenuButton"
           class="menu-button"
@@ -74,9 +76,9 @@
           aria-controls="mobileMenuDrawer"
           aria-expanded="false"
         >
-          <span></span>
-          <span></span>
-          <span></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
         </button>
 
       </div>
@@ -92,7 +94,7 @@
     ></div>
 
     <!-- ==========================================
-         MOBILE SLIDE-OUT DRAWER
+         MOBILE NAVIGATION DRAWER
          ========================================== -->
     <aside
       id="mobileMenuDrawer"
@@ -104,17 +106,21 @@
       tabindex="-1"
       inert
     >
+      <!-- Drawer header -->
       <div class="mobile-drawer-header">
 
         <a
           class="mobile-drawer-brand"
           href="#home"
           data-mobile-menu-link
+          aria-label="Go to IntelliArabic home"
         >
           <img
             src="{{ url_for('static', filename='arabic.png') }}"
-            alt="IntelliArabic logo"
+            alt=""
+            aria-hidden="true"
           >
+
           <span>IntelliArabic</span>
         </a>
 
@@ -140,48 +146,231 @@
 
       </div>
 
+      <!-- Drawer links -->
       <nav
         class="mobile-drawer-nav"
         aria-label="Mobile navigation links"
       >
-        <a href="#home" data-mobile-menu-link>
-          <span class="mobile-nav-number">01</span>
+        <a
+          href="#home"
+          class="mobile-nav-link is-active"
+          data-mobile-menu-link
+          aria-current="page"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M3 11.5 12 4l9 7.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+
+            <path
+              d="M5.5 10.5V20h13v-9.5M9.5 20v-6h5v6"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+            />
+          </svg>
+
           <span>Home</span>
         </a>
 
-        <a href="#features" data-mobile-menu-link>
-          <span class="mobile-nav-number">02</span>
+        <a
+          href="#features"
+          class="mobile-nav-link"
+          data-mobile-menu-link
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect
+              x="4"
+              y="4"
+              width="6"
+              height="6"
+              rx="1.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+
+            <rect
+              x="14"
+              y="4"
+              width="6"
+              height="6"
+              rx="1.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+
+            <rect
+              x="4"
+              y="14"
+              width="6"
+              height="6"
+              rx="1.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+
+            <rect
+              x="14"
+              y="14"
+              width="6"
+              height="6"
+              rx="1.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+          </svg>
+
           <span>Features</span>
         </a>
 
-        <a href="#how-it-works" data-mobile-menu-link>
-          <span class="mobile-nav-number">03</span>
+        <a
+          href="#how-it-works"
+          class="mobile-nav-link"
+          data-mobile-menu-link
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle
+              cx="6"
+              cy="6"
+              r="2"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+
+            <circle
+              cx="18"
+              cy="12"
+              r="2"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+
+            <circle
+              cx="6"
+              cy="18"
+              r="2"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+
+            <path
+              d="M8 6h3a3 3 0 0 1 3 3v0a3 3 0 0 0 3 3M8 18h3a3 3 0 0 0 3-3"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+
           <span>How It Works</span>
         </a>
 
-        <a href="#about" data-mobile-menu-link>
-          <span class="mobile-nav-number">04</span>
+        <a
+          href="#about"
+          class="mobile-nav-link"
+          data-mobile-menu-link
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle
+              cx="12"
+              cy="12"
+              r="9"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+
+            <path
+              d="M12 11v5M12 8h.01"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+
           <span>About</span>
         </a>
 
-        <a href="#faq" data-mobile-menu-link>
-          <span class="mobile-nav-number">05</span>
+        <a
+          href="#faq"
+          class="mobile-nav-link"
+          data-mobile-menu-link
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle
+              cx="12"
+              cy="12"
+              r="9"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+
+            <path
+              d="M9.8 9a2.3 2.3 0 1 1 3.4 2c-.8.5-1.2.9-1.2 2"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+
+            <path
+              d="M12 16.5h.01"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+            />
+          </svg>
+
           <span>FAQ</span>
         </a>
       </nav>
 
+      <!-- Compact drawer footer -->
       <div class="mobile-drawer-footer">
         <a
           class="mobile-drawer-login"
           href="/login"
           data-mobile-menu-link
         >
-          Login to IntelliArabic
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M10 5H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+
+            <path
+              d="M13 8l4 4-4 4M17 12H9"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+
+          <span>Login</span>
         </a>
 
-        <p>
-          AI-powered Arabic caption generation and semantic
-          answer evaluation for modern learning.
+        <p class="mobile-drawer-note">
+          AI-powered Arabic learning and evaluation.
         </p>
       </div>
     </aside>
@@ -237,7 +426,9 @@
         class="content-section"
       >
         <div class="section-heading">
-          <p class="section-kicker">Features</p>
+          <p class="section-kicker">
+            Features
+          </p>
 
           <h2>
             Everything educators need to teach Arabic
@@ -268,7 +459,9 @@
               </svg>
             </div>
 
-            <h3>Arabic Image Caption Generation</h3>
+            <h3>
+              Arabic Image Caption Generation
+            </h3>
 
             <p>
               Upload images and instantly receive high-quality
@@ -291,7 +484,9 @@
               </svg>
             </div>
 
-            <h3>Arabic Answer Evaluation</h3>
+            <h3>
+              Arabic Answer Evaluation
+            </h3>
 
             <p>
               Score written answers using semantic similarity
@@ -318,7 +513,9 @@
               </svg>
             </div>
 
-            <h3>Similarity Score Calculation</h3>
+            <h3>
+              Similarity Score Calculation
+            </h3>
 
             <p>
               Understand student performance with confidence
@@ -341,7 +538,9 @@
               </svg>
             </div>
 
-            <h3>AI-Powered Learning Assistance</h3>
+            <h3>
+              AI-Powered Learning Assistance
+            </h3>
 
             <p>
               A complete assistant for teachers, tutors,
@@ -358,7 +557,9 @@
         class="workflow-section"
       >
         <div class="workflow-copy">
-          <p class="section-kicker">How It Works</p>
+          <p class="section-kicker">
+            How It Works
+          </p>
 
           <h2>
             A simple three-step workflow for educators
@@ -377,7 +578,9 @@
           <article class="step-card">
             <span>1</span>
 
-            <h3>Upload your learning material</h3>
+            <h3>
+              Upload your learning material
+            </h3>
 
             <p>
               Teachers or students upload images,
@@ -388,7 +591,9 @@
           <article class="step-card">
             <span>2</span>
 
-            <h3>Generate captions and scores</h3>
+            <h3>
+              Generate captions and scores
+            </h3>
 
             <p>
               IntelliArabic creates Arabic captions,
@@ -400,7 +605,9 @@
           <article class="step-card">
             <span>3</span>
 
-            <h3>Review insights and improve learning</h3>
+            <h3>
+              Review insights and improve learning
+            </h3>
 
             <p>
               Use AI insights to refine lessons,
@@ -411,13 +618,15 @@
         </div>
       </section>
 
-      <!-- TESTIMONIALS -->
+      <!-- TESTIMONIALS / ABOUT -->
       <section
         id="about"
         class="testimonial-section"
       >
         <div class="section-heading">
-          <p class="section-kicker">Testimonials</p>
+          <p class="section-kicker">
+            Testimonials
+          </p>
 
           <h2>
             Trusted by educators and institutions worldwide.
@@ -469,9 +678,13 @@
         class="faq-section"
       >
         <div class="faq-heading">
-          <p class="section-kicker">FAQ</p>
+          <p class="section-kicker">
+            FAQ
+          </p>
 
-          <h2>Frequently asked questions</h2>
+          <h2>
+            Frequently asked questions
+          </h2>
         </div>
 
         <div class="faq-list">
@@ -524,11 +737,13 @@
         <a
           class="brand footer-brand"
           href="#home"
+          aria-label="Return to IntelliArabic home"
         >
           <img
             src="{{ url_for('static', filename='arabic.png') }}"
             alt="IntelliArabic logo"
           >
+
           <span>IntelliArabic</span>
         </a>
 
@@ -575,6 +790,29 @@
         return;
       }
 
+      const drawerLinks =
+        menuDrawer.querySelectorAll(
+          '[data-mobile-menu-link]'
+        );
+
+      const navigationLinks =
+        menuDrawer.querySelectorAll(
+          '.mobile-nav-link[href^="#"]'
+        );
+
+      const pageSections = Array.from(
+        navigationLinks
+      )
+        .map(function (link) {
+          const selector =
+            link.getAttribute('href');
+
+          return selector
+            ? document.querySelector(selector)
+            : null;
+        })
+        .filter(Boolean);
+
       const focusableSelector = [
         'a[href]',
         'button:not([disabled])',
@@ -586,21 +824,39 @@
 
       let previousFocus = null;
       let lockedScrollPosition = 0;
+      let scrollUpdatePending = false;
 
       function isMenuOpen() {
-        return menuDrawer.classList.contains('is-open');
+        return menuDrawer.classList.contains(
+          'is-open'
+        );
       }
 
       function getFocusableElements() {
         return Array.from(
-          menuDrawer.querySelectorAll(focusableSelector)
+          menuDrawer.querySelectorAll(
+            focusableSelector
+          )
         ).filter(function (element) {
           return (
             !element.hasAttribute('disabled') &&
-            element.getAttribute('aria-hidden') !== 'true' &&
-            element.offsetParent !== null
+            element.getAttribute('aria-hidden') !==
+              'true' &&
+            element.getClientRects().length > 0
           );
         });
+      }
+
+      function setDrawerInert(value) {
+        try {
+          menuDrawer.inert = value;
+        } catch (error) {
+          if (value) {
+            menuDrawer.setAttribute('inert', '');
+          } else {
+            menuDrawer.removeAttribute('inert');
+          }
+        }
       }
 
       function lockPageScroll() {
@@ -617,8 +873,12 @@
           'mobile-menu-open'
         );
 
+        document.body.style.position = 'fixed';
         document.body.style.top =
           '-' + lockedScrollPosition + 'px';
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.width = '100%';
       }
 
       function unlockPageScroll() {
@@ -630,7 +890,11 @@
           'mobile-menu-open'
         );
 
-        document.body.style.removeProperty('top');
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.width = '';
 
         window.scrollTo({
           top: lockedScrollPosition,
@@ -644,7 +908,10 @@
           return;
         }
 
-        previousFocus = document.activeElement;
+        previousFocus =
+          document.activeElement;
+
+        setDrawerInert(false);
 
         menuButton.classList.add('is-open');
         menuDrawer.classList.add('is-open');
@@ -670,19 +937,13 @@
           'false'
         );
 
-        menuDrawer.removeAttribute('inert');
-
-        try {
-          menuDrawer.inert = false;
-        } catch (error) {
-          // Older browsers can continue without inert support.
-        }
-
         lockPageScroll();
 
-        window.requestAnimationFrame(function () {
-          closeButton.focus();
-        });
+        window.requestAnimationFrame(
+          function () {
+            closeButton.focus();
+          }
+        );
       }
 
       function closeMenu(options) {
@@ -691,6 +952,7 @@
         }
 
         const settings = options || {};
+
         const restoreFocus =
           settings.restoreFocus !== false;
 
@@ -718,24 +980,20 @@
           'true'
         );
 
-        menuDrawer.setAttribute('inert', '');
-
-        try {
-          menuDrawer.inert = true;
-        } catch (error) {
-          // Older browsers can continue without inert support.
-        }
-
+        setDrawerInert(true);
         unlockPageScroll();
 
         if (
           restoreFocus &&
           previousFocus &&
-          typeof previousFocus.focus === 'function'
+          typeof previousFocus.focus ===
+            'function'
         ) {
-          window.requestAnimationFrame(function () {
-            previousFocus.focus();
-          });
+          window.requestAnimationFrame(
+            function () {
+              previousFocus.focus();
+            }
+          );
         }
       }
 
@@ -745,6 +1003,131 @@
         } else {
           openMenu();
         }
+      }
+
+      function setActiveNavigationLink(sectionId) {
+        navigationLinks.forEach(function (link) {
+          const isActive =
+            link.getAttribute('href') ===
+            '#' + sectionId;
+
+          link.classList.toggle(
+            'is-active',
+            isActive
+          );
+
+          if (isActive) {
+            link.setAttribute(
+              'aria-current',
+              'page'
+            );
+          } else {
+            link.removeAttribute(
+              'aria-current'
+            );
+          }
+        });
+      }
+
+      function updateActiveNavigationLink() {
+        scrollUpdatePending = false;
+
+        if (!pageSections.length) {
+          return;
+        }
+
+        const currentPosition =
+          window.scrollY + 150;
+
+        let currentSection =
+          pageSections[0];
+
+        pageSections.forEach(function (section) {
+          if (
+            section.offsetTop <=
+            currentPosition
+          ) {
+            currentSection = section;
+          }
+        });
+
+        if (currentSection && currentSection.id) {
+          setActiveNavigationLink(
+            currentSection.id
+          );
+        }
+      }
+
+      function requestActiveLinkUpdate() {
+        if (scrollUpdatePending) {
+          return;
+        }
+
+        scrollUpdatePending = true;
+
+        window.requestAnimationFrame(
+          updateActiveNavigationLink
+        );
+      }
+
+      function navigateToSection(link) {
+        const href =
+          link.getAttribute('href');
+
+        if (
+          !href ||
+          href.charAt(0) !== '#'
+        ) {
+          closeMenu({
+            restoreFocus: false
+          });
+
+          return;
+        }
+
+        const target =
+          document.querySelector(href);
+
+        if (!target) {
+          closeMenu();
+          return;
+        }
+
+        closeMenu({
+          restoreFocus: false
+        });
+
+        const prefersReducedMotion =
+          window.matchMedia(
+            '(prefers-reduced-motion: reduce)'
+          ).matches;
+
+        window.setTimeout(
+          function () {
+            target.scrollIntoView({
+              behavior: prefersReducedMotion
+                ? 'auto'
+                : 'smooth',
+              block: 'start'
+            });
+
+            if (
+              window.history &&
+              window.history.replaceState
+            ) {
+              window.history.replaceState(
+                null,
+                '',
+                href
+              );
+            }
+
+            setActiveNavigationLink(
+              target.id
+            );
+          },
+          280
+        );
       }
 
       menuButton.addEventListener(
@@ -759,7 +1142,6 @@
         }
       );
 
-      // Clicking the semi-transparent area closes the menu.
       menuBackdrop.addEventListener(
         'click',
         function () {
@@ -767,18 +1149,29 @@
         }
       );
 
-      // Close after selecting any navigation item.
-      menuDrawer
-        .querySelectorAll('[data-mobile-menu-link]')
-        .forEach(function (link) {
-          link.addEventListener('click', function () {
+      drawerLinks.forEach(function (link) {
+        link.addEventListener(
+          'click',
+          function (event) {
+            const href =
+              link.getAttribute('href');
+
+            if (
+              href &&
+              href.charAt(0) === '#'
+            ) {
+              event.preventDefault();
+              navigateToSection(link);
+              return;
+            }
+
             closeMenu({
               restoreFocus: false
             });
-          });
-        });
+          }
+        );
+      });
 
-      // Keyboard support.
       document.addEventListener(
         'keydown',
         function (event) {
@@ -816,8 +1209,10 @@
           if (
             event.shiftKey &&
             (
-              document.activeElement === firstElement ||
-              document.activeElement === menuDrawer
+              document.activeElement ===
+                firstElement ||
+              document.activeElement ===
+                menuDrawer
             )
           ) {
             event.preventDefault();
@@ -827,7 +1222,8 @@
 
           if (
             !event.shiftKey &&
-            document.activeElement === lastElement
+            document.activeElement ===
+              lastElement
           ) {
             event.preventDefault();
             firstElement.focus();
@@ -835,7 +1231,14 @@
         }
       );
 
-      // Close when returning to desktop size.
+      window.addEventListener(
+        'scroll',
+        requestActiveLinkUpdate,
+        {
+          passive: true
+        }
+      );
+
       window.addEventListener(
         'resize',
         function () {
@@ -847,10 +1250,11 @@
               restoreFocus: false
             });
           }
+
+          requestActiveLinkUpdate();
         }
       );
 
-      // Prevent unwanted open menu after restoring page cache.
       window.addEventListener(
         'pageshow',
         function () {
@@ -859,9 +1263,14 @@
               restoreFocus: false
             });
           }
+
+          requestActiveLinkUpdate();
         }
       );
+
+      requestActiveLinkUpdate();
     });
   </script>
 </body>
 </html>
+```
