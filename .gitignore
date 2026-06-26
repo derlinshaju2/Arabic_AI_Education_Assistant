@@ -1,49 +1,30 @@
-# Dataset
-dataset/
-
-# Features
-features/
-
-# Models
-models/
-*.h5
-*.pt
-*.bin
-*.onnx
-
-# Python cache
-__pycache__/
-*.pyc
-
-# Virtual environments
+# Python
 venv/
-.venv/
-env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
 
-# VS Code
-.vscode/
-
-# Uploads (runtime files)
-static/uploads/*
-!static/uploads/.gitkeep
-
-# Environment variables
+# Secrets and local data
 .env
 users.db
-
-# API keys
-api key.txt
-OPEN AI.txt
 GIT TOKEN - g.txt
-
-# Logs & system files
-*.log
-*.out
-.DS_Store
-Thumbs.db
-
 *.key
 *.pem
-secrets.json
 credentials.json
-config.local.py
+secrets.json
+
+# Logs and temporary files
+*.log
+*.out
+New Text Document.txt
+test.txt
+
+# Runtime uploads
+static/uploads/*
+!static/uploads/.gitkeep
+# Local VS Code settings
+.vscode/
+
+# Local training data and generated models
+dataset/
+models/
