@@ -359,6 +359,356 @@ html body #contentArea
 
 
 /* ==========================================================
+   FINAL SHARED MODULE ACTION BUTTON
+
+   The IDs are included only to override older rules in
+   style.css. Both buttons still share one declaration block.
+   ========================================================== */
+
+:root {
+    --module-button-gradient:
+        linear-gradient(
+            90deg,
+            #7c3aed 0%,
+            #2563eb 100%
+        );
+
+    --module-button-gradient-hover:
+        linear-gradient(
+            90deg,
+            #6d28d9 0%,
+            #1d4ed8 100%
+        );
+
+    --module-button-gradient-active:
+        linear-gradient(
+            90deg,
+            #5b21b6 0%,
+            #1e40af 100%
+        );
+
+    --module-button-shadow:
+        0 10px 22px rgba(79, 70, 229, 0.28);
+
+    --module-button-shadow-hover:
+        0 14px 28px rgba(67, 56, 202, 0.34);
+
+    --module-button-shadow-active:
+        0 6px 14px rgba(55, 48, 163, 0.26);
+}
+
+
+/* Shared normal state */
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button,
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button {
+    box-sizing: border-box !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+
+    margin: 0 !important;
+    padding: 0 20px !important;
+
+    border: none !important;
+    border-radius: 12px !important;
+
+    /*
+     * Use the background shorthand so every older
+     * background declaration is overridden.
+     */
+    background:
+        var(--module-button-gradient) !important;
+
+    background-color: #7c3aed !important;
+    background-image:
+        var(--module-button-gradient) !important;
+
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 100% 100% !important;
+    background-attachment: scroll !important;
+    background-origin: border-box !important;
+    background-clip: border-box !important;
+    background-blend-mode: normal !important;
+
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    font-family: inherit !important;
+    font-size: 14px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    letter-spacing: 0.01em !important;
+
+    text-align: center !important;
+    text-decoration: none !important;
+    text-transform: none !important;
+    white-space: nowrap !important;
+
+    opacity: 1 !important;
+    filter: none !important;
+    transform: translateY(0) !important;
+
+    cursor: pointer !important;
+    user-select: none !important;
+
+    overflow: hidden !important;
+
+    box-shadow:
+        var(--module-button-shadow) !important;
+
+    transition:
+        background 180ms ease,
+        transform 180ms ease,
+        box-shadow 180ms ease,
+        filter 180ms ease,
+        opacity 180ms ease !important;
+
+    animation: none !important;
+
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+
+/* Remove older decorative overlays */
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button::before,
+
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button::after,
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button::before,
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button::after {
+    display: none !important;
+
+    width: 0 !important;
+    height: 0 !important;
+
+    content: none !important;
+
+    background: none !important;
+    background-image: none !important;
+
+    border: none !important;
+    box-shadow: none !important;
+
+    opacity: 0 !important;
+
+    animation: none !important;
+    transform: none !important;
+}
+
+
+/* Shared hover state */
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button:hover:not(:disabled),
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button:hover:not(:disabled) {
+    background:
+        var(--module-button-gradient-hover) !important;
+
+    background-color: #6d28d9 !important;
+    background-image:
+        var(--module-button-gradient-hover) !important;
+
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    transform: translateY(-1px) !important;
+    filter: brightness(1.04) !important;
+
+    box-shadow:
+        var(--module-button-shadow-hover) !important;
+}
+
+
+/* Shared active state */
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button:active:not(:disabled),
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button:active:not(:disabled) {
+    background:
+        var(--module-button-gradient-active) !important;
+
+    background-color: #5b21b6 !important;
+    background-image:
+        var(--module-button-gradient-active) !important;
+
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    transform:
+        translateY(0) scale(0.995) !important;
+
+    filter: none !important;
+
+    box-shadow:
+        var(--module-button-shadow-active) !important;
+}
+
+
+/* Shared focus state */
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button:focus,
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button:focus {
+    outline: none !important;
+}
+
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button:focus-visible,
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button:focus-visible {
+    outline:
+        3px solid rgba(99, 102, 241, 0.30) !important;
+
+    outline-offset: 3px !important;
+
+    box-shadow:
+        var(--module-button-shadow),
+        0 0 0 4px rgba(99, 102, 241, 0.12) !important;
+}
+
+
+/* Shared disabled/loading state */
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button:disabled,
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button:disabled {
+    background:
+        var(--module-button-gradient) !important;
+
+    background-color: #7c3aed !important;
+    background-image:
+        var(--module-button-gradient) !important;
+
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    opacity: 0.65 !important;
+
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+
+    transform: none !important;
+    filter: none !important;
+
+    box-shadow:
+        0 5px 12px rgba(79, 70, 229, 0.16) !important;
+}
+
+
+/* Shared text and loader */
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button .btn-text,
+
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button .btn-loader,
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button .btn-text,
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button .btn-loader {
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 8px !important;
+
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    font-family: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    line-height: 1 !important;
+
+    background: none !important;
+    background-image: none !important;
+}
+
+
+/* Shared mobile styling */
+@media (max-width: 768px) {
+    html body #contentArea
+    #captionForm
+    #captionSubmit.module-action-button,
+
+    html body #contentArea
+    #evaluationForm
+    #evaluationSubmit.module-action-button {
+        height: 44px !important;
+        min-height: 44px !important;
+        max-height: 44px !important;
+
+        padding: 0 16px !important;
+
+        border-radius: 11px !important;
+
+        font-size: 13px !important;
+    }
+}
+
+
+/* Reduced-motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+    html body #contentArea
+    #captionForm
+    #captionSubmit.module-action-button,
+
+    html body #contentArea
+    #evaluationForm
+    #evaluationSubmit.module-action-button {
+        transition: none !important;
+    }
+}
+
+
+
+
+/* ==========================================================
    IMAGE CAPTIONING DESKTOP LAYOUT
    ========================================================== */
 
@@ -674,5 +1024,146 @@ html body #contentArea
     #evaluationForm
     .module-action-button:active:not(:disabled) {
         transform: none !important;
+    }
+}
+
+
+
+/* ==========================================================
+   SHARED DESKTOP MODULE BUTTON
+   Generate Caption and Evaluate Answer use identical styling
+   ========================================================== */
+
+:root {
+    --module-button-gradient:
+        linear-gradient(90deg, #7c3aed 0%, #2563eb 100%);
+
+    --module-button-gradient-hover:
+        linear-gradient(90deg, #6d28d9 0%, #1d4ed8 100%);
+
+    --module-button-gradient-active:
+        linear-gradient(90deg, #5b21b6 0%, #1e40af 100%);
+}
+
+@media (min-width: 769px) {
+    /* One shared component for both buttons */
+    html body #contentArea #captionForm .module-action-button,
+    html body #contentArea #evaluationForm .module-action-button {
+        box-sizing: border-box !important;
+
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        width: 100% !important;
+        height: 48px !important;
+        min-height: 48px !important;
+        max-height: 48px !important;
+
+        margin: 0 !important;
+        padding: 0 20px !important;
+
+        border: none !important;
+        border-radius: 12px !important;
+
+        background-color: #7c3aed !important;
+        background-image: var(--module-button-gradient) !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: 100% 100% !important;
+
+        color: #ffffff !important;
+
+        font-family: inherit !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        line-height: 1 !important;
+        text-align: center !important;
+
+        opacity: 1 !important;
+        filter: none !important;
+        transform: translateY(0) !important;
+
+        cursor: pointer !important;
+
+        box-shadow:
+            0 10px 22px rgba(79, 70, 229, 0.28) !important;
+
+        transition:
+            background-image 180ms ease,
+            transform 180ms ease,
+            box-shadow 180ms ease,
+            filter 180ms ease,
+            opacity 180ms ease !important;
+
+        appearance: none !important;
+        -webkit-appearance: none !important;
+    }
+
+    /* Remove older decorative overlays */
+    html body #contentArea #captionForm .module-action-button::before,
+    html body #contentArea #captionForm .module-action-button::after,
+    html body #contentArea #evaluationForm .module-action-button::before,
+    html body #contentArea #evaluationForm .module-action-button::after {
+        display: none !important;
+        content: none !important;
+        background: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Identical hover state */
+    html body #contentArea
+    #captionForm
+    .module-action-button:hover:not(:disabled),
+
+    html body #contentArea
+    #evaluationForm
+    .module-action-button:hover:not(:disabled) {
+        background-color: #6d28d9 !important;
+        background-image:
+            var(--module-button-gradient-hover) !important;
+
+        transform: translateY(-1px) !important;
+        filter: brightness(1.04) !important;
+
+        box-shadow:
+            0 14px 28px rgba(67, 56, 202, 0.34) !important;
+    }
+
+    /* Identical active state */
+    html body #contentArea
+    #captionForm
+    .module-action-button:active:not(:disabled),
+
+    html body #contentArea
+    #evaluationForm
+    .module-action-button:active:not(:disabled) {
+        background-color: #5b21b6 !important;
+        background-image:
+            var(--module-button-gradient-active) !important;
+
+        transform: translateY(0) scale(0.995) !important;
+        filter: none !important;
+
+        box-shadow:
+            0 6px 14px rgba(55, 48, 163, 0.26) !important;
+    }
+
+    /* Identical disabled state */
+    html body #contentArea
+    #captionForm
+    .module-action-button:disabled,
+
+    html body #contentArea
+    #evaluationForm
+    .module-action-button:disabled {
+        background-image:
+            var(--module-button-gradient) !important;
+
+        opacity: 0.65 !important;
+        cursor: not-allowed !important;
+
+        transform: none !important;
+        filter: none !important;
     }
 }
