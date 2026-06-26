@@ -1,33 +1,33 @@
 
 /* ==========================================================
-   SHARED MODULE ACTION BUTTON COMPONENT
+   SHARED MODULE ACTION BUTTON
 
-   Used by:
-   - Generate Caption
-   - Evaluate Answer
+   Both buttons use the same component:
+   - #captionSubmit
+   - #evaluationSubmit
 
-   Both buttons must use:
+   Required HTML class:
    class="button primary full module-action-button"
    ========================================================== */
 
 :root {
     --module-button-gradient:
         linear-gradient(
-            to right,
+            90deg,
             #7c3aed 0%,
             #2563eb 100%
         );
 
     --module-button-gradient-hover:
         linear-gradient(
-            to right,
+            90deg,
             #6d28d9 0%,
             #1d4ed8 100%
         );
 
     --module-button-gradient-active:
         linear-gradient(
-            to right,
+            90deg,
             #5b21b6 0%,
             #1e40af 100%
         );
@@ -44,15 +44,19 @@
 
 
 /* ==========================================================
-   NORMAL STATE
+   SHARED NORMAL STATE
 
-   This single shared rule controls both buttons.
-   The form IDs only increase specificity to override old CSS.
+   This is one declaration block for both buttons.
+   The IDs provide enough specificity to override old rules.
    ========================================================== */
 
-body #contentArea
-:is(#captionForm, #evaluationForm)
-.module-action-button {
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button,
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button {
     box-sizing: border-box !important;
 
     position: relative !important;
@@ -80,16 +84,23 @@ body #contentArea
     background-repeat: no-repeat !important;
     background-position: center !important;
     background-size: 100% 100% !important;
+    background-attachment: scroll !important;
+    background-origin: border-box !important;
+    background-clip: border-box !important;
+    background-blend-mode: normal !important;
 
     color: #ffffff !important;
 
     font-family: inherit !important;
     font-size: 14px !important;
+    font-style: normal !important;
     font-weight: 700 !important;
     line-height: 1 !important;
     letter-spacing: 0.01em !important;
+
     text-align: center !important;
     text-decoration: none !important;
+    text-transform: none !important;
     white-space: nowrap !important;
 
     opacity: 1 !important;
@@ -114,20 +125,37 @@ body #contentArea
 
     appearance: none !important;
     -webkit-appearance: none !important;
+    -webkit-background-clip: border-box !important;
+    -webkit-text-fill-color: #ffffff !important;
     -webkit-tap-highlight-color: transparent !important;
 }
 
 
-/* Remove old decorative overlays and gradients */
+/* ==========================================================
+   REMOVE OLD BUTTON OVERLAYS
 
-body #contentArea
-:is(#captionForm, #evaluationForm)
-.module-action-button::before,
+   Prevents previous ::before and ::after gradients from
+   covering the new shared gradient.
+   ========================================================== */
 
-body #contentArea
-:is(#captionForm, #evaluationForm)
-.module-action-button::after {
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button::before,
+
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button::after,
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button::before,
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button::after {
     display: none !important;
+
+    position: static !important;
 
     width: 0 !important;
     height: 0 !important;
@@ -137,6 +165,9 @@ body #contentArea
     background: none !important;
     background-image: none !important;
 
+    border: 0 !important;
+    box-shadow: none !important;
+
     opacity: 0 !important;
 
     animation: none !important;
@@ -145,12 +176,16 @@ body #contentArea
 
 
 /* ==========================================================
-   HOVER STATE
+   SHARED HOVER STATE
    ========================================================== */
 
-body #contentArea
-:is(#captionForm, #evaluationForm)
-.module-action-button:hover:not(:disabled) {
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button:hover:not(:disabled),
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button:hover:not(:disabled) {
     background-color: #6d28d9 !important;
     background-image: var(--module-button-gradient-hover) !important;
     background-repeat: no-repeat !important;
@@ -158,6 +193,7 @@ body #contentArea
     background-size: 100% 100% !important;
 
     color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
 
     transform: translateY(-1px) !important;
     filter: brightness(1.04) !important;
@@ -167,12 +203,16 @@ body #contentArea
 
 
 /* ==========================================================
-   ACTIVE/PRESSED STATE
+   SHARED ACTIVE/PRESSED STATE
    ========================================================== */
 
-body #contentArea
-:is(#captionForm, #evaluationForm)
-.module-action-button:active:not(:disabled) {
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button:active:not(:disabled),
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button:active:not(:disabled) {
     background-color: #5b21b6 !important;
     background-image: var(--module-button-gradient-active) !important;
     background-repeat: no-repeat !important;
@@ -180,6 +220,7 @@ body #contentArea
     background-size: 100% 100% !important;
 
     color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
 
     transform: translateY(0) scale(0.995) !important;
     filter: none !important;
@@ -189,19 +230,27 @@ body #contentArea
 
 
 /* ==========================================================
-   KEYBOARD FOCUS STATE
+   SHARED KEYBOARD FOCUS STATE
    ========================================================== */
 
-body #contentArea
-:is(#captionForm, #evaluationForm)
-.module-action-button:focus {
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button:focus,
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button:focus {
     outline: none !important;
 }
 
-body #contentArea
-:is(#captionForm, #evaluationForm)
-.module-action-button:focus-visible {
-    outline: 3px solid rgba(99, 102, 241, 0.3) !important;
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button:focus-visible,
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button:focus-visible {
+    outline: 3px solid rgba(99, 102, 241, 0.30) !important;
     outline-offset: 3px !important;
 
     box-shadow:
@@ -211,14 +260,24 @@ body #contentArea
 
 
 /* ==========================================================
-   DISABLED AND LOADING STATE
+   SHARED DISABLED/LOADING STATE
    ========================================================== */
 
-body #contentArea
-:is(#captionForm, #evaluationForm)
-.module-action-button:disabled {
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button:disabled,
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button:disabled {
     background-color: #7c3aed !important;
     background-image: var(--module-button-gradient) !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 100% 100% !important;
+
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
 
     opacity: 0.65 !important;
 
@@ -234,16 +293,24 @@ body #contentArea
 
 
 /* ==========================================================
-   SHARED BUTTON CONTENT
+   SHARED BUTTON TEXT AND LOADER
    ========================================================== */
 
-body #contentArea
-:is(#captionForm, #evaluationForm)
-.module-action-button .btn-text,
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button .btn-text,
 
-body #contentArea
-:is(#captionForm, #evaluationForm)
-.module-action-button .btn-loader {
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button .btn-loader,
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button .btn-text,
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button .btn-loader {
     align-items: center !important;
     justify-content: center !important;
 
@@ -252,23 +319,37 @@ body #contentArea
     gap: 8px !important;
 
     color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
 
     font-family: inherit !important;
     font-size: inherit !important;
+    font-style: normal !important;
     font-weight: inherit !important;
     line-height: 1 !important;
     letter-spacing: inherit !important;
 
     text-align: center !important;
     white-space: nowrap !important;
+
+    background: none !important;
+    background-image: none !important;
+
+    border: 0 !important;
+    box-shadow: none !important;
+
+    filter: none !important;
 }
 
 
-/* Keep spinner aligned inside both shared buttons */
+/* Keep both loading spinners aligned */
 
-body #contentArea
-:is(#captionForm, #evaluationForm)
-.module-action-button .spinner {
+html body #contentArea
+#captionForm
+#captionSubmit.module-action-button .spinner,
+
+html body #contentArea
+#evaluationForm
+#evaluationSubmit.module-action-button .spinner {
     flex: 0 0 auto !important;
 }
 
@@ -415,12 +496,13 @@ body #contentArea
     }
 
     /*
-     * This controls only the caption button position.
-     * Visual button styling still comes from the shared component.
+     * Position-only rule.
+     * The visual styling comes from the shared component above.
      */
     #contentArea
     .sider-workspace[data-module-view="captioning"]
-    #captionForm .module-action-button {
+    #captionForm
+    #captionSubmit.module-action-button {
         flex: 0 0 48px !important;
 
         margin-top: auto !important;
@@ -532,11 +614,15 @@ body #contentArea
     }
 
     /*
-     * Both module buttons receive exactly the same mobile sizing.
+     * One mobile declaration block for both buttons.
      */
-    body #contentArea
-    :is(#captionForm, #evaluationForm)
-    .module-action-button {
+    html body #contentArea
+    #captionForm
+    #captionSubmit.module-action-button,
+
+    html body #contentArea
+    #evaluationForm
+    #evaluationSubmit.module-action-button {
         height: 44px !important;
         min-height: 44px !important;
         max-height: 44px !important;
@@ -555,19 +641,31 @@ body #contentArea
    ========================================================== */
 
 @media (prefers-reduced-motion: reduce) {
-    body #contentArea
-    :is(#captionForm, #evaluationForm)
-    .module-action-button {
+    html body #contentArea
+    #captionForm
+    #captionSubmit.module-action-button,
+
+    html body #contentArea
+    #evaluationForm
+    #evaluationSubmit.module-action-button {
         transition: none !important;
     }
 
-    body #contentArea
-    :is(#captionForm, #evaluationForm)
-    .module-action-button:hover:not(:disabled),
+    html body #contentArea
+    #captionForm
+    #captionSubmit.module-action-button:hover:not(:disabled),
 
-    body #contentArea
-    :is(#captionForm, #evaluationForm)
-    .module-action-button:active:not(:disabled) {
+    html body #contentArea
+    #evaluationForm
+    #evaluationSubmit.module-action-button:hover:not(:disabled),
+
+    html body #contentArea
+    #captionForm
+    #captionSubmit.module-action-button:active:not(:disabled),
+
+    html body #contentArea
+    #evaluationForm
+    #evaluationSubmit.module-action-button:active:not(:disabled) {
         transform: none !important;
     }
 }
