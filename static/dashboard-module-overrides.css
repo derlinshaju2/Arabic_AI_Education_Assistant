@@ -392,3 +392,76 @@
         font-size: 13px !important;
     }
 }
+
+
+
+/* ==========================================================
+   FINAL SHARED BUTTON COLOUR
+   Generate Caption and Evaluate Answer use identical colours
+   ========================================================== */
+
+#contentArea {
+    --module-button-normal: linear-gradient(
+        135deg,
+        #2563eb 0%,
+        #4f46e5 50%,
+        #7c3aed 100%
+    );
+
+    --module-button-hover: linear-gradient(
+        135deg,
+        #1d4ed8 0%,
+        #4338ca 50%,
+        #6d28d9 100%
+    );
+
+    --module-button-active: linear-gradient(
+        135deg,
+        #1e40af 0%,
+        #3730a3 50%,
+        #5b21b6 100%
+    );
+}
+
+/* Same normal colour for both buttons */
+#contentArea #captionForm .module-action-button,
+#contentArea #evaluationForm .module-action-button {
+    background-color: #4f46e5 !important;
+    background-image: var(--module-button-normal) !important;
+    background-repeat: no-repeat !important;
+    background-size: 100% 100% !important;
+
+    color: #ffffff !important;
+
+    opacity: 1 !important;
+    filter: none !important;
+
+    box-shadow:
+        0 10px 22px rgba(79, 70, 229, 0.28) !important;
+}
+
+/* Same hover colour for both buttons */
+#contentArea #captionForm .module-action-button:hover:not(:disabled),
+#contentArea #evaluationForm .module-action-button:hover:not(:disabled) {
+    background-color: #4338ca !important;
+    background-image: var(--module-button-hover) !important;
+
+    filter: brightness(1.04) !important;
+    transform: translateY(-1px) !important;
+
+    box-shadow:
+        0 14px 28px rgba(67, 56, 202, 0.34) !important;
+}
+
+/* Same active colour for both buttons */
+#contentArea #captionForm .module-action-button:active:not(:disabled),
+#contentArea #evaluationForm .module-action-button:active:not(:disabled) {
+    background-color: #3730a3 !important;
+    background-image: var(--module-button-active) !important;
+
+    filter: none !important;
+    transform: translateY(0) !important;
+
+    box-shadow:
+        0 6px 14px rgba(55, 48, 163, 0.28) !important;
+}
