@@ -6595,3 +6595,149 @@ canvas {
         padding: 12px !important;
     }
 }
+
+
+/* ==========================================================
+   DASHBOARD IMAGE CAPTIONING — TWO-COLUMN DESKTOP LAYOUT
+
+   Desktop/tablet:
+   Upload/input card on the left
+   Generated result card on the right
+
+   Mobile:
+   Cards remain vertically stacked
+   ========================================================== */
+
+/* Tablet and desktop */
+@media (min-width: 769px) {
+    .sider-workspace[data-module-view="captioning"] {
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    .sider-workspace[data-module-view="captioning"]
+    .split-workspace {
+        display: grid !important;
+
+        width: 100% !important;
+        max-width: none !important;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(0, 1fr) !important;
+
+        align-items: stretch !important;
+        justify-content: stretch !important;
+
+        gap: 20px !important;
+        margin: 0 !important;
+    }
+
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel,
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel {
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        min-height: 100% !important;
+
+        margin: 0 !important;
+        align-self: stretch !important;
+    }
+
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel form {
+        display: flex !important;
+        height: 100% !important;
+
+        flex-direction: column !important;
+
+        gap: 14px !important;
+    }
+
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel .file-drop {
+        width: 100% !important;
+        min-height: 220px !important;
+        height: auto !important;
+    }
+
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel .button.primary {
+        width: 100% !important;
+        margin-top: auto !important;
+    }
+
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel {
+        display: flex !important;
+        flex-direction: column !important;
+
+        overflow: hidden !important;
+    }
+
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .preview-image,
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel img {
+        display: block;
+
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        max-height: 320px;
+
+        object-fit: contain;
+    }
+
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel p,
+    .sider-workspace[data-module-view="captioning"]
+    .result-item {
+        max-width: 100%;
+
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+}
+
+/* Large desktop */
+@media (min-width: 1200px) {
+    .sider-workspace[data-module-view="captioning"]
+    .split-workspace {
+        grid-template-columns:
+            minmax(0, 0.95fr)
+            minmax(0, 1.05fr) !important;
+
+        gap: 24px !important;
+    }
+}
+
+/* Mobile stays vertically stacked */
+@media (max-width: 768px) {
+    .sider-workspace[data-module-view="captioning"]
+    .split-workspace {
+        display: grid !important;
+
+        grid-template-columns:
+            minmax(0, 1fr) !important;
+
+        gap: 10px !important;
+    }
+
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel,
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel {
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+    }
+}

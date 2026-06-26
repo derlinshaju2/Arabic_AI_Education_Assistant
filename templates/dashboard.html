@@ -2,56 +2,181 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>Dashboard - Arabic AI Education Assistant</title>
-    <link rel="stylesheet" href="/static/style.css?v=mobile-compact-20260625">
-    <link rel="stylesheet" href="{{ url_for('static', filename='mobile-module-fix.css') }}?v=mobile-module-fix-20260626-1">
 
+    <!-- Main application styles -->
+    <link
+        rel="stylesheet"
+        href="/static/style.css?v=captioning-two-column-20260626-2"
+    >
+
+    <!-- Mobile module/sidebar fixes -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='mobile-module-fix.css') }}?v=mobile-module-fix-20260626-2"
+    >
 </head>
-
-<script
-  src="{{ url_for('static', filename='mobile-module-fix.js') }}?v=mobile-module-fix-20260626-1">
-</script>
 
 <body>
     <div class="dashboard-container">
-        <!-- SIDEBAR -->
+
+        <!-- ==========================================
+             SIDEBAR
+             ========================================== -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-brand">
                     <div class="brand-mark">
-                        <img src="/static/arabic.png" alt="IntelliArabic" style="height:24px;" />
+                        <img
+                            src="/static/arabic.png"
+                            alt="IntelliArabic"
+                            style="height: 24px;"
+                        >
                     </div>
-                    <span class="brand-text">IntelliArabic</span>
+
+                    <span class="brand-text">
+                        IntelliArabic
+                    </span>
                 </div>
-                <button class="sidebar-collapse-toggle" id="sidebarCollapseToggle" type="button" aria-label="Collapse sidebar" aria-expanded="true" title="Collapse sidebar">
-                    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                        <rect x="3.5" y="4.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/>
-                        <path d="M9 5v14M15 9l-3 3 3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+
+                <button
+                    class="sidebar-collapse-toggle"
+                    id="sidebarCollapseToggle"
+                    type="button"
+                    aria-label="Collapse sidebar"
+                    aria-expanded="true"
+                    title="Collapse sidebar"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        width="20"
+                        height="20"
+                        aria-hidden="true"
+                    >
+                        <rect
+                            x="3.5"
+                            y="4.5"
+                            width="17"
+                            height="15"
+                            rx="3"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                        />
+
+                        <path
+                            d="M9 5v14M15 9l-3 3 3 3"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
                     </svg>
                 </button>
-                <button class="sidebar-toggle-mobile" id="sidebarToggleMobile" type="button" aria-label="Toggle sidebar" aria-expanded="false">
-                    <svg viewBox="0 0 24 24" width="20" height="20">
-                        <path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+
+                <button
+                    class="sidebar-toggle-mobile"
+                    id="sidebarToggleMobile"
+                    type="button"
+                    aria-label="Toggle sidebar"
+                    aria-expanded="false"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        width="20"
+                        height="20"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M4 6h16M4 12h16M4 18h16"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        />
                     </svg>
                 </button>
             </div>
 
-            <nav class="sidebar-nav">
+            <nav
+                class="sidebar-nav"
+                aria-label="Workspace modules"
+            >
                 <div class="nav-section">
-                    <p class="nav-section-title">WORKSPACE</p>
-                    <button class="nav-item active" data-module="captioning" onclick="switchModule(event, 'captioning')" aria-current="page" title="Image Captioning">
-                        <svg viewBox="0 0 24 24" width="18" height="18">
-                            <path d="M4 7.5A2.5 2.5 0 016.5 5h11A2.5 2.5 0 0120 7.5v9A2.5 2.5 0 0117.5 19h-11A2.5 2.5 0 014 16.5v-9z" fill="none" stroke="currentColor" stroke-width="1.8"/>
-                            <path d="M8.5 15l2.2-2.4 1.9 1.8 2.2-3 2.7 3.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <p class="nav-section-title">
+                        WORKSPACE
+                    </p>
+
+                    <button
+                        class="nav-item active"
+                        data-module="captioning"
+                        onclick="switchModule(event, 'captioning')"
+                        aria-current="page"
+                        title="Image Captioning"
+                        type="button"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="18"
+                            height="18"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M4 7.5A2.5 2.5 0 016.5 5h11A2.5 2.5 0 0120 7.5v9A2.5 2.5 0 0117.5 19h-11A2.5 2.5 0 014 16.5v-9z"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                            />
+
+                            <path
+                                d="M8.5 15l2.2-2.4 1.9 1.8 2.2-3 2.7 3.6"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
                         </svg>
+
                         <span>Image Captioning</span>
                     </button>
-                    <button class="nav-item" data-module="evaluation" onclick="switchModule(event, 'evaluation')" title="Answer Evaluation">
-                        <svg viewBox="0 0 24 24" width="18" height="18">
-                            <path d="M7 3h7l4 4v14H7a2 2 0 01-2-2V5a2 2 0 012-2z" fill="none" stroke="currentColor" stroke-width="1.8"/>
-                            <path d="M14 3v5h5M8.5 12h7M8.5 15h7M8.5 18h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+
+                    <button
+                        class="nav-item"
+                        data-module="evaluation"
+                        onclick="switchModule(event, 'evaluation')"
+                        title="Answer Evaluation"
+                        type="button"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="18"
+                            height="18"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M7 3h7l4 4v14H7a2 2 0 01-2-2V5a2 2 0 012-2z"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                            />
+
+                            <path
+                                d="M14 3v5h5M8.5 12h7M8.5 15h7M8.5 18h4"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                            />
                         </svg>
+
                         <span>Answer Evaluation</span>
                     </button>
                 </div>
@@ -59,29 +184,92 @@
 
             <div class="sidebar-footer">
                 <div class="profile-dropdown-wrapper sidebar-profile-wrapper">
-                    <button class="sidebar-profile-trigger" id="profileTrigger" type="button" aria-label="User profile menu" aria-haspopup="menu" aria-controls="profileDropdown" aria-expanded="false">
+                    <button
+                        class="sidebar-profile-trigger"
+                        id="profileTrigger"
+                        type="button"
+                        aria-label="User profile menu"
+                        aria-haspopup="menu"
+                        aria-controls="profileDropdown"
+                        aria-expanded="false"
+                    >
                         <span class="sidebar-avatar-wrap">
-                        {% if user.profileImage %}
-                        <img class="sidebar-profile-avatar" src="{{ user.profileImage }}" alt="{{ user.name }}" width="38" height="38">
-                        {% else %}
-                        <div class="sidebar-profile-avatar initial">{{ user.name[:1].upper() if user.name else 'U' }}</div>
-                        {% endif %}
-                            <span class="sidebar-online-dot" aria-hidden="true"></span>
+                            {% if user.profileImage %}
+                            <img
+                                class="sidebar-profile-avatar"
+                                src="{{ user.profileImage }}"
+                                alt="{{ user.name }}"
+                                width="38"
+                                height="38"
+                            >
+                            {% else %}
+                            <span class="sidebar-profile-avatar initial">
+                                {{ user.name[:1].upper() if user.name else 'U' }}
+                            </span>
+                            {% endif %}
+
+                            <span
+                                class="sidebar-online-dot"
+                                aria-hidden="true"
+                            ></span>
                         </span>
+
                         <span class="sidebar-profile-copy">
-                            <span class="sidebar-profile-name">{{ user.name }}</span>
-                            <span class="sidebar-profile-email">{{ user.email }}</span>
+                            <span class="sidebar-profile-name">
+                                {{ user.name }}
+                            </span>
+
+                            <span class="sidebar-profile-email">
+                                {{ user.email }}
+                            </span>
                         </span>
-                        <svg class="sidebar-profile-chevron" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-                            <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+                        <svg
+                            class="sidebar-profile-chevron"
+                            viewBox="0 0 24 24"
+                            width="16"
+                            height="16"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M6 9l6 6 6-6"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
                         </svg>
                     </button>
 
-                    <div class="profile-dropdown sidebar-profile-menu" id="profileDropdown" role="menu" aria-hidden="true">
-                        <a href="/logout" class="dropdown-item danger" role="menuitem" data-logout-link onclick="return window.logout ? window.logout(event) : true">
-                            <svg class="profile-menu-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <div
+                        class="profile-dropdown sidebar-profile-menu"
+                        id="profileDropdown"
+                        role="menu"
+                        aria-hidden="true"
+                    >
+                        <a
+                            href="/logout"
+                            class="dropdown-item danger"
+                            role="menuitem"
+                            data-logout-link
+                            onclick="return window.logout ? window.logout(event) : true"
+                        >
+                            <svg
+                                class="profile-menu-icon"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
                             </svg>
+
                             <span>Logout</span>
                         </a>
                     </div>
@@ -89,82 +277,244 @@
             </div>
         </aside>
 
-        <!-- MAIN CONTENT -->
+        <!-- ==========================================
+             MAIN CONTENT
+             ========================================== -->
         <div class="main-content">
-            <!-- TOP NAVIGATION -->
+
+            <!-- Top navigation -->
             <header class="topbar">
                 <div class="topbar-left">
-                    <button class="sidebar-toggle-mobile topbar-sidebar-toggle" id="sidebarToggleTop" type="button" aria-label="Open modules menu" aria-expanded="false">
-                        <svg viewBox="0 0 24 24" width="20" height="20">
-                            <path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <button
+                        class="sidebar-toggle-mobile topbar-sidebar-toggle"
+                        id="sidebarToggleTop"
+                        type="button"
+                        aria-label="Open modules menu"
+                        aria-expanded="false"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="20"
+                            height="20"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M4 6h16M4 12h16M4 18h16"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                            />
                         </svg>
                     </button>
-                    <h1 class="page-title" id="pageTitle">Image Captioning</h1>
+
+                    <h1
+                        class="page-title"
+                        id="pageTitle"
+                    >
+                        Image Captioning
+                    </h1>
                 </div>
-                <nav class="top-actions" aria-label="Preferences">
-                    <button class="lang-switch" id="langSwitch" aria-label="Switch language" title="Switch Language">
-                        <svg viewBox="0 0 24 24" width="18" height="18" role="img">
-                            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.8"/>
-                            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+
+                <nav
+                    class="top-actions"
+                    aria-label="Preferences"
+                >
+                    <button
+                        class="lang-switch"
+                        id="langSwitch"
+                        type="button"
+                        aria-label="Switch language"
+                        title="Switch Language"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="18"
+                            height="18"
+                            aria-hidden="true"
+                        >
+                            <circle
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                            />
+
+                            <path
+                                d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                            />
                         </svg>
-                        <span id="langLabel">العربية</span>
+
+                        <span id="langLabel">
+                            العربية
+                        </span>
                     </button>
                 </nav>
             </header>
 
-            <!-- CONTENT AREA -->
-            <main class="content-area" id="contentArea">
+            <!-- Dynamically loaded module -->
+            <main
+                class="content-area"
+                id="contentArea"
+            >
                 <div class="loading-spinner">
-                    <svg viewBox="0 0 24 24" width="48" height="48">
-                        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" opacity="0.2"/>
-                        <path d="M12 3a9 9 0 019 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="20" stroke-dashoffset="0" style="animation: spin 1s linear infinite"/>
+                    <svg
+                        viewBox="0 0 24 24"
+                        width="48"
+                        height="48"
+                        aria-hidden="true"
+                    >
+                        <circle
+                            cx="12"
+                            cy="12"
+                            r="9"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            opacity="0.2"
+                        />
+
+                        <path
+                            d="M12 3a9 9 0 019 9"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-dasharray="20"
+                            stroke-dashoffset="0"
+                            style="animation: spin 1s linear infinite;"
+                        />
                     </svg>
+
                     <p>Loading module...</p>
                 </div>
             </main>
         </div>
     </div>
 
-    <!-- HISTORY MODAL -->
-    <div class="modal-overlay" id="historyModal" style="display:none;">
+    <!-- ==========================================
+         HISTORY MODAL
+         ========================================== -->
+    <div
+        class="modal-overlay"
+        id="historyModal"
+        style="display: none;"
+    >
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Activity History</h2>
-                <button class="modal-close" onclick="closeHistoryModal()" aria-label="Close">
-                    <svg viewBox="0 0 24 24" width="20" height="20"><path d="M18 6L6 18M6 6l12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+
+                <button
+                    class="modal-close"
+                    type="button"
+                    onclick="closeHistoryModal()"
+                    aria-label="Close"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        width="20"
+                        height="20"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M18 6L6 18M6 6l12 12"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        />
+                    </svg>
                 </button>
             </div>
-            <div class="modal-body" id="historyList">
+
+            <div
+                class="modal-body"
+                id="historyList"
+            >
                 <div class="empty-state">
-                    <svg viewBox="0 0 24 24" width="48" height="48"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                    <p>No activity yet. Start using the tools to see your history.</p>
+                    <svg
+                        viewBox="0 0 24 24"
+                        width="48"
+                        height="48"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                        />
+                    </svg>
+
+                    <p>
+                        No activity yet. Start using the tools to see your history.
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- ==========================================
+         USER AND AUTHENTICATION DATA
+         ========================================== -->
     <script>
         window.USER_DATA = {{ user | tojson }};
-        window.AUTH_TOKEN = {{ auth_token|default('')|tojson }};
+        window.AUTH_TOKEN =
+            {{ auth_token | default('') | tojson }};
+
         if (window.AUTH_TOKEN) {
             try {
-                sessionStorage.setItem('authToken', window.AUTH_TOKEN);
-                window.history.replaceState({}, document.title, window.location.pathname);
-            } catch (err) {
-                // Keep using window.AUTH_TOKEN when embedded storage is blocked.
+                sessionStorage.setItem(
+                    'authToken',
+                    window.AUTH_TOKEN
+                );
+
+                window.history.replaceState(
+                    {},
+                    document.title,
+                    window.location.pathname
+                );
+            } catch (error) {
+                // Continue using window.AUTH_TOKEN.
             }
         } else {
             try {
-                window.AUTH_TOKEN = sessionStorage.getItem('authToken') || '';
-            } catch (err) {
+                window.AUTH_TOKEN =
+                    sessionStorage.getItem('authToken') || '';
+            } catch (error) {
                 window.AUTH_TOKEN = '';
             }
         }
-        // Initialize dashboard with first module
-        document.addEventListener('DOMContentLoaded', function() {
-            switchModule(null, 'captioning');
-        });
     </script>
-    <script src="/static/script.js?v=logout-hero-fix-20260624"></script>
+
+    <!-- Main application JavaScript -->
+    <script src="/static/script.js?v=dashboard-captioning-layout-20260626-2"></script>
+
+    <!-- Mobile sidebar fix must load after the main JavaScript -->
+    <script
+        src="{{ url_for('static', filename='mobile-module-fix.js') }}?v=mobile-module-fix-20260626-2"
+    ></script>
+
+    <!-- Load the first dashboard module -->
+    <script>
+        document.addEventListener(
+            'DOMContentLoaded',
+            function () {
+                if (typeof window.switchModule === 'function') {
+                    window.switchModule(null, 'captioning');
+                } else {
+                    console.error(
+                        'switchModule() was not loaded from script.js'
+                    );
+                }
+            }
+        );
+    </script>
 </body>
 </html>
