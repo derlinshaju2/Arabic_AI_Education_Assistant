@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,20 +9,25 @@
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
   >
 
+  <meta
+    name="description"
+    content="IntelliArabic is an AI-powered platform for Arabic image captioning, semantic answer evaluation and modern language learning."
+  >
+
   <title>
     IntelliArabic - AI-Powered Arabic Learning & Evaluation
   </title>
 
-  <!-- Existing landing page styles -->
+  <!-- Existing landing-page styles -->
   <link
     rel="stylesheet"
     href="{{ url_for('static', filename='hero.css') }}?v=hero-fullwidth-20260626"
   >
 
-  <!-- Mobile drawer styles: load after hero.css -->
+  <!-- Mobile drawer styles: keep this after hero.css -->
   <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='hero-mobile-menu.css') }}?v=mobile-drawer-20260626"
+    href="{{ url_for('static', filename='hero-mobile-menu.css') }}?v=mobile-drawer-refined-20260626-2"
   >
 </head>
 
@@ -37,12 +43,13 @@
         <a
           class="brand"
           href="#home"
-          aria-label="IntelliArabic home"
+          aria-label="Go to IntelliArabic home"
         >
           <img
             src="{{ url_for('static', filename='arabic.png') }}"
             alt="IntelliArabic logo"
           >
+
           <span>IntelliArabic</span>
         </a>
 
@@ -65,7 +72,7 @@
           </button>
         </nav>
 
-        <!-- Mobile hamburger -->
+        <!-- Mobile hamburger button -->
         <button
           id="mobileMenuButton"
           class="menu-button"
@@ -74,9 +81,9 @@
           aria-controls="mobileMenuDrawer"
           aria-expanded="false"
         >
-          <span></span>
-          <span></span>
-          <span></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
         </button>
 
       </div>
@@ -110,11 +117,14 @@
           class="mobile-drawer-brand"
           href="#home"
           data-mobile-menu-link
+          aria-label="Go to IntelliArabic home"
         >
           <img
             src="{{ url_for('static', filename='arabic.png') }}"
-            alt="IntelliArabic logo"
+            alt=""
+            aria-hidden="true"
           >
+
           <span>IntelliArabic</span>
         </a>
 
@@ -145,28 +155,68 @@
         aria-label="Mobile navigation links"
       >
         <a href="#home" data-mobile-menu-link>
-          <span class="mobile-nav-number">01</span>
-          <span>Home</span>
+          <span
+            class="mobile-nav-number"
+            aria-hidden="true"
+          >
+            01
+          </span>
+
+          <span class="mobile-nav-label">
+            Home
+          </span>
         </a>
 
         <a href="#features" data-mobile-menu-link>
-          <span class="mobile-nav-number">02</span>
-          <span>Features</span>
+          <span
+            class="mobile-nav-number"
+            aria-hidden="true"
+          >
+            02
+          </span>
+
+          <span class="mobile-nav-label">
+            Features
+          </span>
         </a>
 
         <a href="#how-it-works" data-mobile-menu-link>
-          <span class="mobile-nav-number">03</span>
-          <span>How It Works</span>
+          <span
+            class="mobile-nav-number"
+            aria-hidden="true"
+          >
+            03
+          </span>
+
+          <span class="mobile-nav-label">
+            How It Works
+          </span>
         </a>
 
         <a href="#about" data-mobile-menu-link>
-          <span class="mobile-nav-number">04</span>
-          <span>About</span>
+          <span
+            class="mobile-nav-number"
+            aria-hidden="true"
+          >
+            04
+          </span>
+
+          <span class="mobile-nav-label">
+            About
+          </span>
         </a>
 
         <a href="#faq" data-mobile-menu-link>
-          <span class="mobile-nav-number">05</span>
-          <span>FAQ</span>
+          <span
+            class="mobile-nav-number"
+            aria-hidden="true"
+          >
+            05
+          </span>
+
+          <span class="mobile-nav-label">
+            FAQ
+          </span>
         </a>
       </nav>
 
@@ -179,7 +229,7 @@
           Login to IntelliArabic
         </a>
 
-        <p>
+        <p class="mobile-drawer-note">
           AI-powered Arabic caption generation and semantic
           answer evaluation for modern learning.
         </p>
@@ -237,7 +287,9 @@
         class="content-section"
       >
         <div class="section-heading">
-          <p class="section-kicker">Features</p>
+          <p class="section-kicker">
+            Features
+          </p>
 
           <h2>
             Everything educators need to teach Arabic
@@ -268,7 +320,9 @@
               </svg>
             </div>
 
-            <h3>Arabic Image Caption Generation</h3>
+            <h3>
+              Arabic Image Caption Generation
+            </h3>
 
             <p>
               Upload images and instantly receive high-quality
@@ -291,7 +345,9 @@
               </svg>
             </div>
 
-            <h3>Arabic Answer Evaluation</h3>
+            <h3>
+              Arabic Answer Evaluation
+            </h3>
 
             <p>
               Score written answers using semantic similarity
@@ -318,7 +374,9 @@
               </svg>
             </div>
 
-            <h3>Similarity Score Calculation</h3>
+            <h3>
+              Similarity Score Calculation
+            </h3>
 
             <p>
               Understand student performance with confidence
@@ -341,7 +399,9 @@
               </svg>
             </div>
 
-            <h3>AI-Powered Learning Assistance</h3>
+            <h3>
+              AI-Powered Learning Assistance
+            </h3>
 
             <p>
               A complete assistant for teachers, tutors,
@@ -358,7 +418,9 @@
         class="workflow-section"
       >
         <div class="workflow-copy">
-          <p class="section-kicker">How It Works</p>
+          <p class="section-kicker">
+            How It Works
+          </p>
 
           <h2>
             A simple three-step workflow for educators
@@ -375,9 +437,11 @@
         <div class="step-list">
 
           <article class="step-card">
-            <span>1</span>
+            <span aria-hidden="true">1</span>
 
-            <h3>Upload your learning material</h3>
+            <h3>
+              Upload your learning material
+            </h3>
 
             <p>
               Teachers or students upload images,
@@ -386,9 +450,11 @@
           </article>
 
           <article class="step-card">
-            <span>2</span>
+            <span aria-hidden="true">2</span>
 
-            <h3>Generate captions and scores</h3>
+            <h3>
+              Generate captions and scores
+            </h3>
 
             <p>
               IntelliArabic creates Arabic captions,
@@ -398,9 +464,11 @@
           </article>
 
           <article class="step-card">
-            <span>3</span>
+            <span aria-hidden="true">3</span>
 
-            <h3>Review insights and improve learning</h3>
+            <h3>
+              Review insights and improve learning
+            </h3>
 
             <p>
               Use AI insights to refine lessons,
@@ -411,13 +479,15 @@
         </div>
       </section>
 
-      <!-- TESTIMONIALS -->
+      <!-- TESTIMONIALS / ABOUT -->
       <section
         id="about"
         class="testimonial-section"
       >
         <div class="section-heading">
-          <p class="section-kicker">Testimonials</p>
+          <p class="section-kicker">
+            Testimonials
+          </p>
 
           <h2>
             Trusted by educators and institutions worldwide.
@@ -469,9 +539,13 @@
         class="faq-section"
       >
         <div class="faq-heading">
-          <p class="section-kicker">FAQ</p>
+          <p class="section-kicker">
+            FAQ
+          </p>
 
-          <h2>Frequently asked questions</h2>
+          <h2>
+            Frequently asked questions
+          </h2>
         </div>
 
         <div class="faq-list">
@@ -524,11 +598,14 @@
         <a
           class="brand footer-brand"
           href="#home"
+          aria-label="Return to IntelliArabic home"
         >
           <img
             src="{{ url_for('static', filename='arabic.png') }}"
-            alt="IntelliArabic logo"
+            alt=""
+            aria-hidden="true"
           >
+
           <span>IntelliArabic</span>
         </a>
 
@@ -575,6 +652,11 @@
         return;
       }
 
+      const drawerLinks =
+        menuDrawer.querySelectorAll(
+          '[data-mobile-menu-link]'
+        );
+
       const focusableSelector = [
         'a[href]',
         'button:not([disabled])',
@@ -588,17 +670,22 @@
       let lockedScrollPosition = 0;
 
       function isMenuOpen() {
-        return menuDrawer.classList.contains('is-open');
+        return menuDrawer.classList.contains(
+          'is-open'
+        );
       }
 
       function getFocusableElements() {
         return Array.from(
-          menuDrawer.querySelectorAll(focusableSelector)
+          menuDrawer.querySelectorAll(
+            focusableSelector
+          )
         ).filter(function (element) {
           return (
             !element.hasAttribute('disabled') &&
-            element.getAttribute('aria-hidden') !== 'true' &&
-            element.offsetParent !== null
+            element.getAttribute('aria-hidden') !==
+              'true' &&
+            element.getClientRects().length > 0
           );
         });
       }
@@ -617,8 +704,12 @@
           'mobile-menu-open'
         );
 
+        document.body.style.position = 'fixed';
         document.body.style.top =
           '-' + lockedScrollPosition + 'px';
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.width = '100%';
       }
 
       function unlockPageScroll() {
@@ -630,7 +721,11 @@
           'mobile-menu-open'
         );
 
-        document.body.style.removeProperty('top');
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.width = '';
 
         window.scrollTo({
           top: lockedScrollPosition,
@@ -639,12 +734,27 @@
         });
       }
 
+      function setDrawerInert(value) {
+        try {
+          menuDrawer.inert = value;
+        } catch (error) {
+          if (value) {
+            menuDrawer.setAttribute('inert', '');
+          } else {
+            menuDrawer.removeAttribute('inert');
+          }
+        }
+      }
+
       function openMenu() {
         if (isMenuOpen()) {
           return;
         }
 
-        previousFocus = document.activeElement;
+        previousFocus =
+          document.activeElement;
+
+        setDrawerInert(false);
 
         menuButton.classList.add('is-open');
         menuDrawer.classList.add('is-open');
@@ -670,19 +780,13 @@
           'false'
         );
 
-        menuDrawer.removeAttribute('inert');
-
-        try {
-          menuDrawer.inert = false;
-        } catch (error) {
-          // Older browsers can continue without inert support.
-        }
-
         lockPageScroll();
 
-        window.requestAnimationFrame(function () {
-          closeButton.focus();
-        });
+        window.requestAnimationFrame(
+          function () {
+            closeButton.focus();
+          }
+        );
       }
 
       function closeMenu(options) {
@@ -691,6 +795,7 @@
         }
 
         const settings = options || {};
+
         const restoreFocus =
           settings.restoreFocus !== false;
 
@@ -718,24 +823,20 @@
           'true'
         );
 
-        menuDrawer.setAttribute('inert', '');
-
-        try {
-          menuDrawer.inert = true;
-        } catch (error) {
-          // Older browsers can continue without inert support.
-        }
-
+        setDrawerInert(true);
         unlockPageScroll();
 
         if (
           restoreFocus &&
           previousFocus &&
-          typeof previousFocus.focus === 'function'
+          typeof previousFocus.focus ===
+            'function'
         ) {
-          window.requestAnimationFrame(function () {
-            previousFocus.focus();
-          });
+          window.requestAnimationFrame(
+            function () {
+              previousFocus.focus();
+            }
+          );
         }
       }
 
@@ -745,6 +846,51 @@
         } else {
           openMenu();
         }
+      }
+
+      function navigateToSection(link) {
+        const href =
+          link.getAttribute('href');
+
+        if (
+          !href ||
+          href.charAt(0) !== '#'
+        ) {
+          closeMenu({
+            restoreFocus: false
+          });
+
+          return;
+        }
+
+        const target =
+          document.querySelector(href);
+
+        if (!target) {
+          closeMenu();
+          return;
+        }
+
+        closeMenu({
+          restoreFocus: false
+        });
+
+        const prefersReducedMotion =
+          window.matchMedia(
+            '(prefers-reduced-motion: reduce)'
+          ).matches;
+
+        window.setTimeout(
+          function () {
+            target.scrollIntoView({
+              behavior: prefersReducedMotion
+                ? 'auto'
+                : 'smooth',
+              block: 'start'
+            });
+          },
+          290
+        );
       }
 
       menuButton.addEventListener(
@@ -759,7 +905,6 @@
         }
       );
 
-      // Clicking the semi-transparent area closes the menu.
       menuBackdrop.addEventListener(
         'click',
         function () {
@@ -767,18 +912,29 @@
         }
       );
 
-      // Close after selecting any navigation item.
-      menuDrawer
-        .querySelectorAll('[data-mobile-menu-link]')
-        .forEach(function (link) {
-          link.addEventListener('click', function () {
+      drawerLinks.forEach(function (link) {
+        link.addEventListener(
+          'click',
+          function (event) {
+            const href =
+              link.getAttribute('href');
+
+            if (
+              href &&
+              href.charAt(0) === '#'
+            ) {
+              event.preventDefault();
+              navigateToSection(link);
+              return;
+            }
+
             closeMenu({
               restoreFocus: false
             });
-          });
-        });
+          }
+        );
+      });
 
-      // Keyboard support.
       document.addEventListener(
         'keydown',
         function (event) {
@@ -816,8 +972,10 @@
           if (
             event.shiftKey &&
             (
-              document.activeElement === firstElement ||
-              document.activeElement === menuDrawer
+              document.activeElement ===
+                firstElement ||
+              document.activeElement ===
+                menuDrawer
             )
           ) {
             event.preventDefault();
@@ -827,7 +985,8 @@
 
           if (
             !event.shiftKey &&
-            document.activeElement === lastElement
+            document.activeElement ===
+              lastElement
           ) {
             event.preventDefault();
             firstElement.focus();
@@ -835,7 +994,6 @@
         }
       );
 
-      // Close when returning to desktop size.
       window.addEventListener(
         'resize',
         function () {
@@ -850,7 +1008,6 @@
         }
       );
 
-      // Prevent unwanted open menu after restoring page cache.
       window.addEventListener(
         'pageshow',
         function () {
@@ -865,3 +1022,4 @@
   </script>
 </body>
 </html>
+```
