@@ -7089,3 +7089,480 @@ canvas {
     }
 }
 
+
+/* ==========================================================
+   FINAL CAPTIONING BUTTON + DESKTOP HEIGHT FIX
+
+   - Generate Caption and Evaluate Answer use identical styling
+   - Captioning panels fit inside the visible desktop screen
+   - Generate button remains visible without scrolling
+   - Mobile stacked layout remains unchanged
+   ========================================================== */
+
+/* ----------------------------------------------------------
+   SHARED BUTTON DESIGN
+   Apply exactly the same design to both module buttons
+   ---------------------------------------------------------- */
+
+#contentArea #captionSubmit,
+#contentArea #evalSubmit {
+    box-sizing: border-box !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+
+    padding: 0 20px !important;
+    margin-top: 0 !important;
+
+    border: 0 !important;
+    border-radius: 12px !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb 0%,
+            #4f46e5 52%,
+            #7c3aed 100%
+        ) !important;
+
+    color: #ffffff !important;
+
+    font-family: inherit !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    letter-spacing: 0.01em !important;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 10px 22px rgba(79, 70, 229, 0.24) !important;
+
+    transition:
+        transform 180ms ease,
+        box-shadow 180ms ease,
+        filter 180ms ease !important;
+}
+
+#contentArea #captionSubmit:hover:not(:disabled),
+#contentArea #evalSubmit:hover:not(:disabled) {
+    transform: translateY(-1px);
+
+    filter: brightness(1.04);
+
+    box-shadow:
+        0 14px 28px rgba(79, 70, 229, 0.30) !important;
+}
+
+#contentArea #captionSubmit:active:not(:disabled),
+#contentArea #evalSubmit:active:not(:disabled) {
+    transform: translateY(0);
+
+    box-shadow:
+        0 8px 18px rgba(79, 70, 229, 0.24) !important;
+}
+
+#contentArea #captionSubmit:focus-visible,
+#contentArea #evalSubmit:focus-visible {
+    outline: 3px solid rgba(99, 102, 241, 0.22);
+    outline-offset: 3px;
+}
+
+#contentArea #captionSubmit:disabled,
+#contentArea #evalSubmit:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.62;
+
+    transform: none !important;
+    filter: none !important;
+
+    box-shadow:
+        0 6px 14px rgba(79, 70, 229, 0.16) !important;
+}
+
+#contentArea #captionSubmit .btn-text,
+#contentArea #captionSubmit .btn-loader,
+#contentArea #evalSubmit .btn-text,
+#contentArea #evalSubmit .btn-loader {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    color: inherit;
+
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: 1;
+}
+
+
+/* ==========================================================
+   DESKTOP AND TABLET CAPTIONING LAYOUT
+   ========================================================== */
+
+@media (min-width: 769px) {
+
+    /* Keep the complete module inside the available viewport */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"] {
+        box-sizing: border-box !important;
+
+        width: 100% !important;
+        max-width: none !important;
+        min-height: 0 !important;
+
+        gap: 12px !important;
+
+        padding-top: 10px !important;
+        padding-bottom: 16px !important;
+    }
+
+    /* Reduce unused heading spacing */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-heading {
+        flex: 0 0 auto !important;
+
+        margin: 0 0 10px !important;
+        padding: 0 !important;
+    }
+
+    /* Preserve two equal horizontal columns */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .split-workspace {
+        display: grid !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(0, 1fr) !important;
+
+        grid-template-rows: minmax(0, 1fr) !important;
+
+        align-items: stretch !important;
+        justify-items: stretch !important;
+
+        gap: 22px !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /*
+     * Responsive height:
+     * - short enough to keep the button visible
+     * - large enough to retain a useful upload area
+     */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.input-panel,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.output-panel {
+        box-sizing: border-box !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+
+        height:
+            clamp(
+                440px,
+                calc(100dvh - 190px),
+                560px
+            ) !important;
+
+        min-height: 0 !important;
+        max-height: 560px !important;
+
+        margin: 0 !important;
+        padding: 20px !important;
+
+        align-self: stretch !important;
+
+        gap: 14px !important;
+
+        border-radius: 16px !important;
+    }
+
+    /* Input card should not create an internal scrollbar */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.input-panel {
+        display: flex !important;
+        flex-direction: column !important;
+
+        overflow: hidden !important;
+    }
+
+    /* Form uses all remaining card space */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel form,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel .stack {
+        display: flex !important;
+        flex: 1 1 auto !important;
+        flex-direction: column !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+
+        gap: 14px !important;
+
+        margin: 0 !important;
+    }
+
+    /* Large but balanced upload area */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel .file-drop {
+        box-sizing: border-box !important;
+
+        display: flex !important;
+        flex: 1 1 auto !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
+
+        height: auto !important;
+        min-height: 250px !important;
+        max-height: none !important;
+
+        align-items: center !important;
+        justify-content: center !important;
+
+        margin: 0 !important;
+        padding: 24px !important;
+
+        border-radius: 14px !important;
+
+        overflow: hidden !important;
+    }
+
+    /* Keep upload text centered */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel .drop-content {
+        display: flex !important;
+        flex-direction: column !important;
+
+        align-items: center !important;
+        justify-content: center !important;
+
+        width: 100%;
+
+        text-align: center;
+    }
+
+    /* Selected-image preview stays inside upload area */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel .upload-preview {
+        width: 100% !important;
+        max-width: 100% !important;
+
+        height: 100% !important;
+        max-height: 330px !important;
+
+        object-fit: contain !important;
+
+        border-radius: 12px;
+    }
+
+    /*
+     * Button always remains at the bottom and never stretches
+     * with the upload area.
+     */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    #captionSubmit {
+        flex: 0 0 48px !important;
+
+        width: 100% !important;
+
+        margin-top: auto !important;
+    }
+
+    /* Output card stays aligned with the input card */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.output-panel {
+        display: flex !important;
+        flex-direction: column !important;
+
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .panel-header {
+        flex: 0 0 auto;
+
+        margin: 0 !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .output-empty-state {
+        flex: 1 1 auto !important;
+
+        min-height: 0 !important;
+    }
+
+    /* Keep generated image balanced inside the shorter card */
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .preview-image,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel #resultImage {
+        display: block;
+
+        width: 100% !important;
+        max-width: 100% !important;
+
+        height: auto !important;
+        max-height: 230px !important;
+
+        object-fit: contain !important;
+
+        border-radius: 12px;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .result-list {
+        display: grid;
+
+        width: 100%;
+        min-width: 0;
+
+        gap: 10px;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .result-item {
+        width: 100%;
+        min-width: 0;
+
+        padding: 13px !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel p {
+        max-width: 100%;
+
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+}
+
+
+/* ==========================================================
+   EXTRA-COMPACT DESKTOP HEIGHTS
+   Helps laptops with shorter screens
+   ========================================================== */
+
+@media (min-width: 769px) and (max-height: 700px) {
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.input-panel,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.output-panel {
+        height: calc(100dvh - 170px) !important;
+        min-height: 400px !important;
+
+        padding: 16px !important;
+
+        gap: 10px !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .input-panel .file-drop {
+        min-height: 210px !important;
+
+        padding: 18px !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .preview-image,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel #resultImage {
+        max-height: 190px !important;
+    }
+}
+
+
+/* ==========================================================
+   MOBILE
+   Keep the current vertically stacked layout
+   ========================================================== */
+
+@media (max-width: 768px) {
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .split-workspace {
+        grid-template-columns:
+            minmax(0, 1fr) !important;
+    }
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.input-panel,
+
+    #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-panel.output-panel {
+        width: 100% !important;
+
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+    }
+
+    #contentArea #captionSubmit,
+    #contentArea #evalSubmit {
+        width: 100% !important;
+
+        height: 44px !important;
+        min-height: 44px !important;
+        max-height: 44px !important;
+
+        border-radius: 11px !important;
+
+        font-size: 13px !important;
+    }
+}
