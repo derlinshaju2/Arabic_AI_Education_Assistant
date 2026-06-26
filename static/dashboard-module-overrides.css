@@ -395,73 +395,184 @@
 
 
 
+
 /* ==========================================================
-   FINAL SHARED BUTTON COLOUR
-   Generate Caption and Evaluate Answer use identical colours
+   SHARED MODULE ACTION BUTTON
+   Generate Caption and Evaluate Answer are identical
    ========================================================== */
 
-#contentArea {
-    --module-button-normal: linear-gradient(
+:root {
+    --module-action-bg: linear-gradient(
         135deg,
         #2563eb 0%,
-        #4f46e5 50%,
+        #4f46e5 52%,
         #7c3aed 100%
     );
 
-    --module-button-hover: linear-gradient(
+    --module-action-bg-hover: linear-gradient(
         135deg,
         #1d4ed8 0%,
-        #4338ca 50%,
+        #4338ca 52%,
         #6d28d9 100%
     );
 
-    --module-button-active: linear-gradient(
+    --module-action-bg-active: linear-gradient(
         135deg,
         #1e40af 0%,
-        #3730a3 50%,
+        #3730a3 52%,
         #5b21b6 100%
     );
 }
 
-/* Same normal colour for both buttons */
+/*
+ * One component selector controls both buttons.
+ * The form selectors provide enough specificity to override
+ * older captioning-only button styles.
+ */
 #contentArea #captionForm .module-action-button,
 #contentArea #evaluationForm .module-action-button {
+    box-sizing: border-box !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+
+    margin: 0 !important;
+    padding: 0 20px !important;
+
+    border: 0 !important;
+    border-radius: 12px !important;
+
+    background: var(--module-action-bg) !important;
     background-color: #4f46e5 !important;
-    background-image: var(--module-button-normal) !important;
+    background-image: var(--module-action-bg) !important;
     background-repeat: no-repeat !important;
     background-size: 100% 100% !important;
 
     color: #ffffff !important;
 
+    font-family: inherit !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    letter-spacing: 0.01em !important;
+    text-align: center !important;
+
     opacity: 1 !important;
     filter: none !important;
 
+    cursor: pointer !important;
+
     box-shadow:
-        0 10px 22px rgba(79, 70, 229, 0.28) !important;
+        0 9px 20px rgba(79, 70, 229, 0.28) !important;
+
+    transition:
+        background 180ms ease,
+        transform 180ms ease,
+        box-shadow 180ms ease,
+        filter 180ms ease,
+        opacity 180ms ease !important;
+
+    appearance: none !important;
+    -webkit-appearance: none !important;
 }
 
-/* Same hover colour for both buttons */
+/* Remove old decorative overlays from both buttons */
+#contentArea #captionForm .module-action-button::before,
+#contentArea #captionForm .module-action-button::after,
+#contentArea #evaluationForm .module-action-button::before,
+#contentArea #evaluationForm .module-action-button::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Identical hover state */
 #contentArea #captionForm .module-action-button:hover:not(:disabled),
 #contentArea #evaluationForm .module-action-button:hover:not(:disabled) {
+    background: var(--module-action-bg-hover) !important;
     background-color: #4338ca !important;
-    background-image: var(--module-button-hover) !important;
+    background-image: var(--module-action-bg-hover) !important;
 
-    filter: brightness(1.04) !important;
+    color: #ffffff !important;
+
     transform: translateY(-1px) !important;
+    filter: brightness(1.03) !important;
 
     box-shadow:
-        0 14px 28px rgba(67, 56, 202, 0.34) !important;
+        0 13px 27px rgba(67, 56, 202, 0.34) !important;
 }
 
-/* Same active colour for both buttons */
+/* Identical active state */
 #contentArea #captionForm .module-action-button:active:not(:disabled),
 #contentArea #evaluationForm .module-action-button:active:not(:disabled) {
+    background: var(--module-action-bg-active) !important;
     background-color: #3730a3 !important;
-    background-image: var(--module-button-active) !important;
+    background-image: var(--module-action-bg-active) !important;
 
-    filter: none !important;
     transform: translateY(0) !important;
+    filter: none !important;
 
     box-shadow:
         0 6px 14px rgba(55, 48, 163, 0.28) !important;
+}
+
+/* Identical keyboard-focus state */
+#contentArea #captionForm .module-action-button:focus-visible,
+#contentArea #evaluationForm .module-action-button:focus-visible {
+    outline: 3px solid rgba(99, 102, 241, 0.28) !important;
+    outline-offset: 3px !important;
+}
+
+/* Identical disabled/loading state */
+#contentArea #captionForm .module-action-button:disabled,
+#contentArea #evaluationForm .module-action-button:disabled {
+    opacity: 0.65 !important;
+    cursor: not-allowed !important;
+
+    transform: none !important;
+    filter: none !important;
+
+    box-shadow:
+        0 5px 12px rgba(79, 70, 229, 0.16) !important;
+}
+
+/* Identical text and loader styling */
+#contentArea #captionForm .module-action-button .btn-text,
+#contentArea #captionForm .module-action-button .btn-loader,
+#contentArea #evaluationForm .module-action-button .btn-text,
+#contentArea #evaluationForm .module-action-button .btn-loader {
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 8px !important;
+
+    color: #ffffff !important;
+
+    font-family: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    line-height: 1 !important;
+}
+
+/* Both buttons remain identical on mobile */
+@media (max-width: 768px) {
+    #contentArea #captionForm .module-action-button,
+    #contentArea #evaluationForm .module-action-button {
+        height: 44px !important;
+        min-height: 44px !important;
+        max-height: 44px !important;
+
+        padding: 0 16px !important;
+
+        border-radius: 11px !important;
+
+        font-size: 13px !important;
+    }
 }
