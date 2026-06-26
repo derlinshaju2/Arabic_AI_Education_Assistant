@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +7,11 @@
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Arabic AI Education Assistant for image captioning and automated answer evaluation."
     >
 
     <title>Dashboard - Arabic AI Education Assistant</title>
@@ -22,10 +28,13 @@
         href="{{ url_for('static', filename='mobile-module-fix.css') }}?v=mobile-module-fix-20260626-2"
     >
 
-    <!-- Dashboard layout and shared module-button overrides -->
+    <!--
+        Load this stylesheet last so its shared module-button
+        rules override any older button styles in style.css.
+    -->
     <link
         rel="stylesheet"
-        href="{{ url_for('static', filename='dashboard-module-overrides.css') }}?v=shared-buttons-20260626-4"
+        href="{{ url_for('static', filename='dashboard-module-overrides.css') }}?v=shared-violet-blue-20260626-6"
     >
 </head>
 
@@ -35,14 +44,19 @@
         <!-- ==========================================
              SIDEBAR
              ========================================== -->
-        <aside class="sidebar">
+        <aside
+            class="sidebar"
+            id="dashboardSidebar"
+            aria-label="Dashboard navigation"
+        >
             <div class="sidebar-header">
                 <div class="sidebar-brand">
                     <div class="brand-mark">
                         <img
                             src="{{ url_for('static', filename='arabic.png') }}"
                             alt="IntelliArabic"
-                            style="height: 24px;"
+                            width="24"
+                            height="24"
                         >
                     </div>
 
@@ -51,11 +65,13 @@
                     </span>
                 </div>
 
+                <!-- Desktop sidebar collapse button -->
                 <button
                     class="sidebar-collapse-toggle"
                     id="sidebarCollapseToggle"
                     type="button"
                     aria-label="Collapse sidebar"
+                    aria-controls="dashboardSidebar"
                     aria-expanded="true"
                     title="Collapse sidebar"
                 >
@@ -87,11 +103,13 @@
                     </svg>
                 </button>
 
+                <!-- Mobile sidebar close/toggle button -->
                 <button
                     class="sidebar-toggle-mobile"
                     id="sidebarToggleMobile"
                     type="button"
-                    aria-label="Toggle sidebar"
+                    aria-label="Toggle modules menu"
+                    aria-controls="dashboardSidebar"
                     aria-expanded="false"
                 >
                     <svg
@@ -123,8 +141,9 @@
                     <button
                         class="nav-item active"
                         data-module="captioning"
-                        onclick="switchModule(event, 'captioning')"
+                        onclick="window.switchModule(event, 'captioning')"
                         aria-current="page"
+                        aria-controls="contentArea"
                         title="Image Captioning"
                         type="button"
                     >
@@ -135,14 +154,14 @@
                             aria-hidden="true"
                         >
                             <path
-                                d="M4 7.5A2.5 2.5 0 016.5 5h11A2.5 2.5 0 0120 7.5v9A2.5 2.5 0 0117.5 19h-11A2.5 2.5 0 014 16.5v-9z"
+                                d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Z"
                                 fill="none"
                                 stroke="currentColor"
                                 stroke-width="1.8"
                             />
 
                             <path
-                                d="M8.5 15l2.2-2.4 1.9 1.8 2.2-3 2.7 3.6"
+                                d="m8.5 15 2.2-2.4 1.9 1.8 2.2-3 2.7 3.6"
                                 fill="none"
                                 stroke="currentColor"
                                 stroke-width="1.8"
@@ -157,7 +176,8 @@
                     <button
                         class="nav-item"
                         data-module="evaluation"
-                        onclick="switchModule(event, 'evaluation')"
+                        onclick="window.switchModule(event, 'evaluation')"
+                        aria-controls="contentArea"
                         title="Answer Evaluation"
                         type="button"
                     >
@@ -168,7 +188,7 @@
                             aria-hidden="true"
                         >
                             <path
-                                d="M7 3h7l4 4v14H7a2 2 0 01-2-2V5a2 2 0 012-2z"
+                                d="M7 3h7l4 4v14H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"
                                 fill="none"
                                 stroke="currentColor"
                                 stroke-width="1.8"
@@ -188,13 +208,14 @@
                 </div>
             </nav>
 
+            <!-- User profile -->
             <div class="sidebar-footer">
                 <div class="profile-dropdown-wrapper sidebar-profile-wrapper">
                     <button
                         class="sidebar-profile-trigger"
                         id="profileTrigger"
                         type="button"
-                        aria-label="User profile menu"
+                        aria-label="Open user profile menu"
                         aria-haspopup="menu"
                         aria-controls="profileDropdown"
                         aria-expanded="false"
@@ -209,7 +230,10 @@
                                 height="38"
                             >
                             {% else %}
-                            <span class="sidebar-profile-avatar initial">
+                            <span
+                                class="sidebar-profile-avatar initial"
+                                aria-hidden="true"
+                            >
                                 {{ user.name[:1].upper() if user.name else 'U' }}
                             </span>
                             {% endif %}
@@ -238,7 +262,7 @@
                             aria-hidden="true"
                         >
                             <path
-                                d="M6 9l6 6 6-6"
+                                d="m6 9 6 6 6-6"
                                 fill="none"
                                 stroke="currentColor"
                                 stroke-width="2"
@@ -296,6 +320,7 @@
                         id="sidebarToggleTop"
                         type="button"
                         aria-label="Open modules menu"
+                        aria-controls="dashboardSidebar"
                         aria-expanded="false"
                     >
                         <svg
@@ -324,14 +349,14 @@
 
                 <nav
                     class="top-actions"
-                    aria-label="Preferences"
+                    aria-label="Dashboard preferences"
                 >
                     <button
                         class="lang-switch"
                         id="langSwitch"
                         type="button"
                         aria-label="Switch language"
-                        title="Switch Language"
+                        title="Switch language"
                     >
                         <svg
                             viewBox="0 0 24 24"
@@ -349,7 +374,7 @@
                             />
 
                             <path
-                                d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                                d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"
                                 fill="none"
                                 stroke="currentColor"
                                 stroke-width="1.8"
@@ -363,10 +388,13 @@
                 </nav>
             </header>
 
-            <!-- Dynamically loaded module -->
+            <!-- Dynamically loaded module content -->
             <main
                 class="content-area"
                 id="contentArea"
+                tabindex="-1"
+                aria-live="polite"
+                aria-busy="true"
             >
                 <div class="loading-spinner">
                     <svg
@@ -386,7 +414,7 @@
                         />
 
                         <path
-                            d="M12 3a9 9 0 019 9"
+                            d="M12 3a9 9 0 0 1 9 9"
                             fill="none"
                             stroke="currentColor"
                             stroke-width="2"
@@ -409,17 +437,23 @@
     <div
         class="modal-overlay"
         id="historyModal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="historyModalTitle"
+        aria-hidden="true"
         style="display: none;"
     >
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Activity History</h2>
+                <h2 id="historyModalTitle">
+                    Activity History
+                </h2>
 
                 <button
                     class="modal-close"
                     type="button"
                     onclick="closeHistoryModal()"
-                    aria-label="Close"
+                    aria-label="Close activity history"
                 >
                     <svg
                         viewBox="0 0 24 24"
@@ -428,7 +462,7 @@
                         aria-hidden="true"
                     >
                         <path
-                            d="M18 6L6 18M6 6l12 12"
+                            d="M18 6 6 18M6 6l12 12"
                             fill="none"
                             stroke="currentColor"
                             stroke-width="2"
@@ -450,7 +484,7 @@
                         aria-hidden="true"
                     >
                         <path
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                             fill="none"
                             stroke="currentColor"
                             stroke-width="1.5"
@@ -487,7 +521,10 @@
                     window.location.pathname
                 );
             } catch (error) {
-                // Continue using window.AUTH_TOKEN.
+                console.warn(
+                    'Unable to save the authentication token.',
+                    error
+                );
             }
         } else {
             try {
@@ -495,6 +532,11 @@
                     sessionStorage.getItem('authToken') || '';
             } catch (error) {
                 window.AUTH_TOKEN = '';
+
+                console.warn(
+                    'Unable to read the authentication token.',
+                    error
+                );
             }
         }
     </script>
@@ -517,6 +559,26 @@
                 if (typeof window.switchModule === 'function') {
                     window.switchModule(null, 'captioning');
                 } else {
+                    const contentArea =
+                        document.getElementById('contentArea');
+
+                    if (contentArea) {
+                        contentArea.setAttribute(
+                            'aria-busy',
+                            'false'
+                        );
+
+                        contentArea.innerHTML = `
+                            <div class="module-load-error" role="alert">
+                                <h2>Unable to load the module</h2>
+                                <p>
+                                    The dashboard script did not load correctly.
+                                    Please refresh the page.
+                                </p>
+                            </div>
+                        `;
+                    }
+
                     console.error(
                         'switchModule() was not loaded from script.js'
                     );

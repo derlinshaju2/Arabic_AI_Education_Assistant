@@ -46,7 +46,6 @@
                 id="evaluationForm"
                 action="/evaluate"
                 method="post"
-                enctype="multipart/form-data"
             >
                 <!-- Question -->
                 <div class="field">
@@ -66,6 +65,7 @@
                         id="subject"
                         name="subject"
                         placeholder="Enter the question or topic..."
+                        aria-label="Question"
                         required
                     >
                 </div>
@@ -86,8 +86,9 @@
                     <textarea
                         id="reference"
                         name="reference"
-                        placeholder="Enter the correct/reference answer..."
+                        placeholder="Enter the correct or reference answer..."
                         maxlength="500"
+                        aria-label="Reference answer"
                         required
                     ></textarea>
 
@@ -114,6 +115,7 @@
                         name="student"
                         placeholder="Enter the student's answer..."
                         maxlength="500"
+                        aria-label="Student answer"
                         required
                     ></textarea>
 
@@ -122,7 +124,7 @@
                     </div>
                 </div>
 
-                <!-- Error/status message -->
+                <!-- Error and status message -->
                 <div
                     id="evaluationError"
                     class="sr-only"
@@ -131,24 +133,24 @@
                     hidden
                 ></div>
 
-                <!-- Form actions -->
-                <div class="form-actions-row">
+                <!-- Shared primary button component -->
+                <button
+                    class="button primary full module-action-button"
+                    type="submit"
+                    id="evaluationSubmit"
+                >
+                    <span class="btn-text">
+                        Evaluate Answer
+                    </span>
 
-                    <!-- Shared action-button component -->
-
-                    <button
-                        class="button primary full module-action-button"
-                        type="submit"
-                        id="evaluationSubmit"
+                    <span
+                        class="btn-loader"
+                        style="display: none;"
                     >
-                        <span class="btn-text">Evaluate Answer</span>
-                        <span class="btn-loader" style="display: none;">
-                            <span class="spinner"></span>
-                                Analyzing answers...
-                            </span>
-                    </button>
-
-                </div>
+                        <span class="spinner"></span>
+                        Analyzing answers...
+                    </span>
+                </button>
             </form>
         </section>
 
@@ -164,7 +166,7 @@
                         class="icon-btn"
                         type="button"
                         onclick="copyEvaluation()"
-                        title="Copy evaluation"
+                        title="Copy evaluation report"
                     >
                         <svg
                             viewBox="0 0 24 24"
@@ -198,7 +200,7 @@
                         class="icon-btn"
                         type="button"
                         onclick="reevaluateAnswer()"
-                        title="Re-evaluate"
+                        title="Re-evaluate answer"
                     >
                         <svg
                             viewBox="0 0 24 24"

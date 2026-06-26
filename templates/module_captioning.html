@@ -59,6 +59,7 @@
                         name="image"
                         id="captionFileInput"
                         accept="image/jpeg,image/png,image/webp,image/gif"
+                        aria-label="Upload an image"
                         required
                     >
 
@@ -103,7 +104,7 @@
                     </div>
                 </div>
 
-                <!-- Error/status message -->
+                <!-- Error and status message -->
                 <div
                     id="captionError"
                     class="sr-only"
@@ -112,14 +113,20 @@
                     hidden
                 ></div>
 
-                <!-- Shared action button component -->
+                <!-- Shared primary button component -->
                 <button
                     class="button primary full module-action-button"
                     type="submit"
                     id="captionSubmit"
                 >
-                    <span class="btn-text">Generate Caption</span>
-                    <span class="btn-loader" style="display: none;">
+                    <span class="btn-text">
+                        Generate Caption
+                    </span>
+
+                    <span
+                        class="btn-loader"
+                        style="display: none;"
+                    >
                         <span class="spinner"></span>
                         Analyzing image...
                     </span>
@@ -173,7 +180,7 @@
                         class="icon-btn"
                         type="button"
                         onclick="regenerateCaption()"
-                        title="Regenerate Caption"
+                        title="Regenerate caption"
                     >
                         <svg
                             viewBox="0 0 24 24"
@@ -267,7 +274,7 @@
                     >
                 </article>
 
-                <!-- Captions -->
+                <!-- Caption results -->
                 <div class="result-list">
 
                     <!-- English caption -->

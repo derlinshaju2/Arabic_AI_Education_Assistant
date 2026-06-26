@@ -1,16 +1,62 @@
+
 /* ==========================================================
-   SHARED MODULE ACTION BUTTON
-   Overrides older ID-based button rules safely.
+   SHARED MODULE ACTION BUTTON COMPONENT
+
+   Used by:
+   - Generate Caption
+   - Evaluate Answer
+
+   Both buttons must use:
+   class="button primary full module-action-button"
    ========================================================== */
 
-/*
- * Both selectors use the same shared component styling.
- * The form IDs provide enough specificity to override older
- * #contentArea #captionSubmit rules.
- */
-#contentArea #captionForm .module-action-button,
-#contentArea #evaluationForm .module-action-button {
+:root {
+    --module-button-gradient:
+        linear-gradient(
+            to right,
+            #7c3aed 0%,
+            #2563eb 100%
+        );
+
+    --module-button-gradient-hover:
+        linear-gradient(
+            to right,
+            #6d28d9 0%,
+            #1d4ed8 100%
+        );
+
+    --module-button-gradient-active:
+        linear-gradient(
+            to right,
+            #5b21b6 0%,
+            #1e40af 100%
+        );
+
+    --module-button-shadow:
+        0 10px 22px rgba(79, 70, 229, 0.28);
+
+    --module-button-shadow-hover:
+        0 14px 28px rgba(67, 56, 202, 0.34);
+
+    --module-button-shadow-active:
+        0 6px 14px rgba(55, 48, 163, 0.26);
+}
+
+
+/* ==========================================================
+   NORMAL STATE
+
+   This single shared rule controls both buttons.
+   The form IDs only increase specificity to override old CSS.
+   ========================================================== */
+
+body #contentArea
+:is(#captionForm, #evaluationForm)
+.module-action-button {
     box-sizing: border-box !important;
+
+    position: relative !important;
+    isolation: isolate !important;
 
     display: inline-flex !important;
     align-items: center !important;
@@ -23,18 +69,17 @@
     min-height: 48px !important;
     max-height: 48px !important;
 
-    padding: 0 20px !important;
     margin: 0 !important;
+    padding: 0 20px !important;
 
-    border: none !important;
+    border: 0 !important;
     border-radius: 12px !important;
 
-    background: linear-gradient(
-        135deg,
-        #2563eb 0%,
-        #4f46e5 55%,
-        #7c3aed 100%
-    ) !important;
+    background-color: #7c3aed !important;
+    background-image: var(--module-button-gradient) !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 100% 100% !important;
 
     color: #ffffff !important;
 
@@ -43,72 +88,142 @@
     font-weight: 700 !important;
     line-height: 1 !important;
     letter-spacing: 0.01em !important;
+    text-align: center !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
 
-    text-align: center;
+    opacity: 1 !important;
+    filter: none !important;
+    transform: translateY(0) !important;
 
-    cursor: pointer;
+    cursor: pointer !important;
+    user-select: none !important;
 
-    box-shadow:
-        0 9px 20px rgba(79, 70, 229, 0.25) !important;
+    overflow: hidden !important;
+
+    box-shadow: var(--module-button-shadow) !important;
 
     transition:
         transform 180ms ease,
-        background 180ms ease,
         box-shadow 180ms ease,
         filter 180ms ease,
-        opacity 180ms ease !important;
+        opacity 180ms ease,
+        background-color 180ms ease !important;
 
-    appearance: none;
-    -webkit-appearance: none;
+    animation: none !important;
+
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -webkit-tap-highlight-color: transparent !important;
 }
 
-/* Shared hover state */
-#contentArea #captionForm .module-action-button:hover:not(:disabled),
-#contentArea #evaluationForm .module-action-button:hover:not(:disabled) {
-    background: linear-gradient(
-        135deg,
-        #1d4ed8 0%,
-        #4338ca 55%,
-        #6d28d9 100%
-    ) !important;
+
+/* Remove old decorative overlays and gradients */
+
+body #contentArea
+:is(#captionForm, #evaluationForm)
+.module-action-button::before,
+
+body #contentArea
+:is(#captionForm, #evaluationForm)
+.module-action-button::after {
+    display: none !important;
+
+    width: 0 !important;
+    height: 0 !important;
+
+    content: none !important;
+
+    background: none !important;
+    background-image: none !important;
+
+    opacity: 0 !important;
+
+    animation: none !important;
+    transform: none !important;
+}
+
+
+/* ==========================================================
+   HOVER STATE
+   ========================================================== */
+
+body #contentArea
+:is(#captionForm, #evaluationForm)
+.module-action-button:hover:not(:disabled) {
+    background-color: #6d28d9 !important;
+    background-image: var(--module-button-gradient-hover) !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 100% 100% !important;
+
+    color: #ffffff !important;
 
     transform: translateY(-1px) !important;
-    filter: brightness(1.03) !important;
+    filter: brightness(1.04) !important;
 
-    box-shadow:
-        0 13px 26px rgba(79, 70, 229, 0.32) !important;
+    box-shadow: var(--module-button-shadow-hover) !important;
 }
 
-/* Shared active state */
-#contentArea #captionForm .module-action-button:active:not(:disabled),
-#contentArea #evaluationForm .module-action-button:active:not(:disabled) {
-    background: linear-gradient(
-        135deg,
-        #1e40af 0%,
-        #3730a3 55%,
-        #5b21b6 100%
-    ) !important;
 
-    transform: translateY(0) !important;
+/* ==========================================================
+   ACTIVE/PRESSED STATE
+   ========================================================== */
+
+body #contentArea
+:is(#captionForm, #evaluationForm)
+.module-action-button:active:not(:disabled) {
+    background-color: #5b21b6 !important;
+    background-image: var(--module-button-gradient-active) !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 100% 100% !important;
+
+    color: #ffffff !important;
+
+    transform: translateY(0) scale(0.995) !important;
     filter: none !important;
 
+    box-shadow: var(--module-button-shadow-active) !important;
+}
+
+
+/* ==========================================================
+   KEYBOARD FOCUS STATE
+   ========================================================== */
+
+body #contentArea
+:is(#captionForm, #evaluationForm)
+.module-action-button:focus {
+    outline: none !important;
+}
+
+body #contentArea
+:is(#captionForm, #evaluationForm)
+.module-action-button:focus-visible {
+    outline: 3px solid rgba(99, 102, 241, 0.3) !important;
+    outline-offset: 3px !important;
+
     box-shadow:
-        0 6px 14px rgba(79, 70, 229, 0.24) !important;
+        var(--module-button-shadow),
+        0 0 0 4px rgba(99, 102, 241, 0.12) !important;
 }
 
-/* Shared keyboard-focus state */
-#contentArea #captionForm .module-action-button:focus-visible,
-#contentArea #evaluationForm .module-action-button:focus-visible {
-    outline: 3px solid rgba(99, 102, 241, 0.28) !important;
-    outline-offset: 3px;
-}
 
-/* Shared disabled/loading state */
-#contentArea #captionForm .module-action-button:disabled,
-#contentArea #evaluationForm .module-action-button:disabled {
-    cursor: not-allowed !important;
+/* ==========================================================
+   DISABLED AND LOADING STATE
+   ========================================================== */
+
+body #contentArea
+:is(#captionForm, #evaluationForm)
+.module-action-button:disabled {
+    background-color: #7c3aed !important;
+    background-image: var(--module-button-gradient) !important;
 
     opacity: 0.65 !important;
+
+    cursor: not-allowed !important;
+    pointer-events: none !important;
 
     transform: none !important;
     filter: none !important;
@@ -117,22 +232,44 @@
         0 5px 12px rgba(79, 70, 229, 0.16) !important;
 }
 
-/* Shared text and loader alignment */
-#contentArea #captionForm .module-action-button .btn-text,
-#contentArea #captionForm .module-action-button .btn-loader,
-#contentArea #evaluationForm .module-action-button .btn-text,
-#contentArea #evaluationForm .module-action-button .btn-loader {
-    align-items: center;
-    justify-content: center;
 
-    gap: 8px;
+/* ==========================================================
+   SHARED BUTTON CONTENT
+   ========================================================== */
 
-    color: inherit !important;
+body #contentArea
+:is(#captionForm, #evaluationForm)
+.module-action-button .btn-text,
+
+body #contentArea
+:is(#captionForm, #evaluationForm)
+.module-action-button .btn-loader {
+    align-items: center !important;
+    justify-content: center !important;
+
+    max-width: 100% !important;
+
+    gap: 8px !important;
+
+    color: #ffffff !important;
 
     font-family: inherit !important;
     font-size: inherit !important;
     font-weight: inherit !important;
     line-height: 1 !important;
+    letter-spacing: inherit !important;
+
+    text-align: center !important;
+    white-space: nowrap !important;
+}
+
+
+/* Keep spinner aligned inside both shared buttons */
+
+body #contentArea
+:is(#captionForm, #evaluationForm)
+.module-action-button .spinner {
+    flex: 0 0 auto !important;
 }
 
 
@@ -268,14 +405,19 @@
         display: flex !important;
         flex-direction: column !important;
 
-        width: 100%;
+        width: 100% !important;
+        min-width: 0 !important;
 
         align-items: center !important;
         justify-content: center !important;
 
-        text-align: center;
+        text-align: center !important;
     }
 
+    /*
+     * This controls only the caption button position.
+     * Visual button styling still comes from the shared component.
+     */
     #contentArea
     .sider-workspace[data-module-view="captioning"]
     #captionForm .module-action-button {
@@ -305,6 +447,8 @@
     #contentArea
     .sider-workspace[data-module-view="captioning"]
     .output-panel .preview-image {
+        display: block !important;
+
         width: 100% !important;
         max-width: 100% !important;
 
@@ -313,12 +457,15 @@
 
         object-fit: contain !important;
 
-        border-radius: 12px;
+        border-radius: 12px !important;
     }
 }
 
 
-/* Short laptop screens */
+/* ==========================================================
+   SHORT LAPTOP SCREENS
+   ========================================================== */
+
 @media (min-width: 769px) and (max-height: 700px) {
     #contentArea
     .sider-workspace[data-module-view="captioning"]
@@ -346,7 +493,7 @@
 
 
 /* ==========================================================
-   MOBILE
+   MOBILE LAYOUT
    ========================================================== */
 
 @media (max-width: 768px) {
@@ -354,6 +501,9 @@
     .sider-workspace[data-module-view="captioning"]
     .split-workspace {
         display: grid !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
 
         grid-template-columns:
             minmax(0, 1fr) !important;
@@ -368,6 +518,8 @@
     #contentArea
     .sider-workspace[data-module-view="captioning"]
     .workspace-panel.output-panel {
+        box-sizing: border-box !important;
+
         width: 100% !important;
         min-width: 0 !important;
         max-width: 100% !important;
@@ -379,8 +531,12 @@
         margin: 0 !important;
     }
 
-    #contentArea #captionForm .module-action-button,
-    #contentArea #evaluationForm .module-action-button {
+    /*
+     * Both module buttons receive exactly the same mobile sizing.
+     */
+    body #contentArea
+    :is(#captionForm, #evaluationForm)
+    .module-action-button {
         height: 44px !important;
         min-height: 44px !important;
         max-height: 44px !important;
@@ -394,185 +550,24 @@
 }
 
 
-
-
 /* ==========================================================
-   SHARED MODULE ACTION BUTTON
-   Generate Caption and Evaluate Answer are identical
+   REDUCED MOTION ACCESSIBILITY
    ========================================================== */
 
-:root {
-    --module-action-bg: linear-gradient(
-        135deg,
-        #2563eb 0%,
-        #4f46e5 52%,
-        #7c3aed 100%
-    );
+@media (prefers-reduced-motion: reduce) {
+    body #contentArea
+    :is(#captionForm, #evaluationForm)
+    .module-action-button {
+        transition: none !important;
+    }
 
-    --module-action-bg-hover: linear-gradient(
-        135deg,
-        #1d4ed8 0%,
-        #4338ca 52%,
-        #6d28d9 100%
-    );
+    body #contentArea
+    :is(#captionForm, #evaluationForm)
+    .module-action-button:hover:not(:disabled),
 
-    --module-action-bg-active: linear-gradient(
-        135deg,
-        #1e40af 0%,
-        #3730a3 52%,
-        #5b21b6 100%
-    );
-}
-
-/*
- * One component selector controls both buttons.
- * The form selectors provide enough specificity to override
- * older captioning-only button styles.
- */
-#contentArea #captionForm .module-action-button,
-#contentArea #evaluationForm .module-action-button {
-    box-sizing: border-box !important;
-
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    width: 100% !important;
-    min-width: 0 !important;
-
-    height: 48px !important;
-    min-height: 48px !important;
-    max-height: 48px !important;
-
-    margin: 0 !important;
-    padding: 0 20px !important;
-
-    border: 0 !important;
-    border-radius: 12px !important;
-
-    background: var(--module-action-bg) !important;
-    background-color: #4f46e5 !important;
-    background-image: var(--module-action-bg) !important;
-    background-repeat: no-repeat !important;
-    background-size: 100% 100% !important;
-
-    color: #ffffff !important;
-
-    font-family: inherit !important;
-    font-size: 14px !important;
-    font-weight: 700 !important;
-    line-height: 1 !important;
-    letter-spacing: 0.01em !important;
-    text-align: center !important;
-
-    opacity: 1 !important;
-    filter: none !important;
-
-    cursor: pointer !important;
-
-    box-shadow:
-        0 9px 20px rgba(79, 70, 229, 0.28) !important;
-
-    transition:
-        background 180ms ease,
-        transform 180ms ease,
-        box-shadow 180ms ease,
-        filter 180ms ease,
-        opacity 180ms ease !important;
-
-    appearance: none !important;
-    -webkit-appearance: none !important;
-}
-
-/* Remove old decorative overlays from both buttons */
-#contentArea #captionForm .module-action-button::before,
-#contentArea #captionForm .module-action-button::after,
-#contentArea #evaluationForm .module-action-button::before,
-#contentArea #evaluationForm .module-action-button::after {
-    display: none !important;
-    content: none !important;
-}
-
-/* Identical hover state */
-#contentArea #captionForm .module-action-button:hover:not(:disabled),
-#contentArea #evaluationForm .module-action-button:hover:not(:disabled) {
-    background: var(--module-action-bg-hover) !important;
-    background-color: #4338ca !important;
-    background-image: var(--module-action-bg-hover) !important;
-
-    color: #ffffff !important;
-
-    transform: translateY(-1px) !important;
-    filter: brightness(1.03) !important;
-
-    box-shadow:
-        0 13px 27px rgba(67, 56, 202, 0.34) !important;
-}
-
-/* Identical active state */
-#contentArea #captionForm .module-action-button:active:not(:disabled),
-#contentArea #evaluationForm .module-action-button:active:not(:disabled) {
-    background: var(--module-action-bg-active) !important;
-    background-color: #3730a3 !important;
-    background-image: var(--module-action-bg-active) !important;
-
-    transform: translateY(0) !important;
-    filter: none !important;
-
-    box-shadow:
-        0 6px 14px rgba(55, 48, 163, 0.28) !important;
-}
-
-/* Identical keyboard-focus state */
-#contentArea #captionForm .module-action-button:focus-visible,
-#contentArea #evaluationForm .module-action-button:focus-visible {
-    outline: 3px solid rgba(99, 102, 241, 0.28) !important;
-    outline-offset: 3px !important;
-}
-
-/* Identical disabled/loading state */
-#contentArea #captionForm .module-action-button:disabled,
-#contentArea #evaluationForm .module-action-button:disabled {
-    opacity: 0.65 !important;
-    cursor: not-allowed !important;
-
-    transform: none !important;
-    filter: none !important;
-
-    box-shadow:
-        0 5px 12px rgba(79, 70, 229, 0.16) !important;
-}
-
-/* Identical text and loader styling */
-#contentArea #captionForm .module-action-button .btn-text,
-#contentArea #captionForm .module-action-button .btn-loader,
-#contentArea #evaluationForm .module-action-button .btn-text,
-#contentArea #evaluationForm .module-action-button .btn-loader {
-    align-items: center !important;
-    justify-content: center !important;
-
-    gap: 8px !important;
-
-    color: #ffffff !important;
-
-    font-family: inherit !important;
-    font-size: inherit !important;
-    font-weight: inherit !important;
-    line-height: 1 !important;
-}
-
-/* Both buttons remain identical on mobile */
-@media (max-width: 768px) {
-    #contentArea #captionForm .module-action-button,
-    #contentArea #evaluationForm .module-action-button {
-        height: 44px !important;
-        min-height: 44px !important;
-        max-height: 44px !important;
-
-        padding: 0 16px !important;
-
-        border-radius: 11px !important;
-
-        font-size: 13px !important;
+    body #contentArea
+    :is(#captionForm, #evaluationForm)
+    .module-action-button:active:not(:disabled) {
+        transform: none !important;
     }
 }
