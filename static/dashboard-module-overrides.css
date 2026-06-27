@@ -2184,3 +2184,42 @@ html body #contentArea
 
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
 }
+
+@media (max-width: 768px) {
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    #captionForm
+    .file-drop {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        background-image: none !important;
+
+        border-color: #cbd5e1 !important;
+        border-style: solid !important;
+
+        box-shadow: none !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    #captionForm
+    .file-drop:hover,
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    #captionForm
+    .file-drop.drag-over,
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    #captionForm
+    .file-drop.has-file {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        background-image: none !important;
+
+        border-color: #2563eb !important;
+
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+    }
+}
