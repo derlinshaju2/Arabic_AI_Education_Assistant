@@ -2420,4 +2420,49 @@ html body #contentArea
     .preview-image {
         max-height: min(52vh, 360px) !important;
     }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel.has-results
+    .result-list
+    .result-item-header {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+
+        gap: 8px !important;
+
+        padding-bottom: 0 !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel.has-results
+    .result-list
+    .result-tag {
+        flex: 1 1 auto !important;
+
+        min-width: 0 !important;
+        max-width: calc(100% - 84px) !important;
+
+        white-space: normal !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel.has-results
+    .result-list
+    .mini-action {
+        flex: 0 0 auto !important;
+
+        width: auto !important;
+        min-width: 0 !important;
+
+        margin-left: auto !important;
+
+        justify-content: center !important;
+        white-space: nowrap !important;
+    }
 }
