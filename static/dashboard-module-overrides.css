@@ -1167,3 +1167,137 @@ html body #contentArea
         filter: none !important;
     }
 }
+
+
+/* ==========================================================
+   DESKTOP SHARED ACTION BUTTON FINAL OVERRIDE
+
+   Keep Generate Caption and Evaluate Answer visually identical
+   by routing both through the same component selector.
+   ========================================================== */
+
+@media (min-width: 769px) {
+    html body #contentArea :is(#captionForm, #evaluationForm) .module-action-button {
+        box-sizing: border-box !important;
+
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
+
+        height: 48px !important;
+        min-height: 48px !important;
+        max-height: 48px !important;
+
+        margin: 0 !important;
+        padding: 0 20px !important;
+
+        border: 0 !important;
+        border-radius: 12px !important;
+
+        background:
+            linear-gradient(
+                135deg,
+                #2563eb 0%,
+                #4f46e5 52%,
+                #7c3aed 100%
+            ) !important;
+        background-color: #2563eb !important;
+        background-image:
+            linear-gradient(
+                135deg,
+                #2563eb 0%,
+                #4f46e5 52%,
+                #7c3aed 100%
+            ) !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: 100% 100% !important;
+
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+
+        font-family: inherit !important;
+        font-size: 14px !important;
+        font-weight: 800 !important;
+        line-height: 1 !important;
+        letter-spacing: 0.01em !important;
+        text-align: center !important;
+
+        opacity: 1 !important;
+        filter: none !important;
+        transform: translateY(0) !important;
+
+        cursor: pointer !important;
+        pointer-events: auto !important;
+
+        box-shadow:
+            0 10px 22px rgba(79, 70, 229, 0.24) !important;
+
+        transition:
+            transform 180ms ease,
+            box-shadow 180ms ease,
+            filter 180ms ease !important;
+
+        appearance: none !important;
+        -webkit-appearance: none !important;
+    }
+
+    html body #contentArea :is(#captionForm, #evaluationForm) .module-action-button:hover,
+    html body #contentArea :is(#captionForm, #evaluationForm) .module-action-button:disabled:hover {
+        transform: translateY(-1px) !important;
+        filter: brightness(1.04) !important;
+
+        box-shadow:
+            0 14px 28px rgba(79, 70, 229, 0.30) !important;
+    }
+
+    html body #contentArea :is(#captionForm, #evaluationForm) .module-action-button:active,
+    html body #contentArea :is(#captionForm, #evaluationForm) .module-action-button:disabled:active {
+        transform: translateY(0) !important;
+        filter: none !important;
+
+        box-shadow:
+            0 8px 18px rgba(79, 70, 229, 0.24) !important;
+    }
+
+    html body #contentArea :is(#captionForm, #evaluationForm) .module-action-button:disabled {
+        opacity: 1 !important;
+        cursor: pointer !important;
+
+        background:
+            linear-gradient(
+                135deg,
+                #2563eb 0%,
+                #4f46e5 52%,
+                #7c3aed 100%
+            ) !important;
+        background-image:
+            linear-gradient(
+                135deg,
+                #2563eb 0%,
+                #4f46e5 52%,
+                #7c3aed 100%
+            ) !important;
+
+        box-shadow:
+            0 10px 22px rgba(79, 70, 229, 0.24) !important;
+    }
+
+    html body #contentArea :is(#captionForm, #evaluationForm) .module-action-button .btn-text,
+    html body #contentArea :is(#captionForm, #evaluationForm) .module-action-button .btn-loader {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        gap: 8px !important;
+
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+
+        font: inherit !important;
+        line-height: 1 !important;
+    }
+}
