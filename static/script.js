@@ -1153,10 +1153,18 @@ function updateSelectedImagePreview(file) {
     var emptyState = document.getElementById('captionOutputEmpty');
     var resultsPanel = document.getElementById('captionResults');
     var skeleton = document.getElementById('captionSkeleton');
+    var outputPanel = resultsPanel ? resultsPanel.closest('.output-panel') : null;
 
-    if (resultsPanel) resultsPanel.style.display = 'none';
+    if (outputPanel) outputPanel.classList.remove('has-results', 'is-loading');
+    if (resultsPanel) {
+        resultsPanel.hidden = true;
+        resultsPanel.style.display = 'none';
+    }
     if (skeleton) skeleton.hidden = true;
-    if (emptyState) emptyState.style.display = 'grid';
+    if (emptyState) {
+        emptyState.hidden = false;
+        emptyState.style.display = 'grid';
+    }
 }
 
 function setCaptionLoading(loading) {
@@ -1166,14 +1174,29 @@ function setCaptionLoading(loading) {
     var emptyState = document.getElementById('captionOutputEmpty');
     var resultsPanel = document.getElementById('captionResults');
     var skeleton = document.getElementById('captionSkeleton');
+    var outputPanel = resultsPanel ? resultsPanel.closest('.output-panel') : null;
 
     if (btn) btn.disabled = true;
     if (text) text.style.display = loading ? 'none' : '';
     if (loader) loader.style.display = loading ? 'inline-flex' : 'none';
     if (skeleton) skeleton.hidden = !loading;
+    if (outputPanel) outputPanel.classList.toggle('is-loading', Boolean(loading));
     if (loading) {
-        if (emptyState) emptyState.style.display = 'none';
-        if (resultsPanel) resultsPanel.style.display = 'none';
+        if (outputPanel) outputPanel.classList.remove('has-results');
+        if (emptyState) {
+            emptyState.hidden = true;
+            emptyState.style.display = 'none';
+        }
+        if (resultsPanel) {
+            resultsPanel.hidden = true;
+            resultsPanel.style.display = 'none';
+        }
+    } else if (!window._lastCaption && (!resultsPanel || resultsPanel.hidden)) {
+        if (outputPanel) outputPanel.classList.remove('has-results');
+        if (emptyState) {
+            emptyState.hidden = false;
+            emptyState.style.display = 'grid';
+        }
     }
 }
 
@@ -1186,13 +1209,20 @@ function displayCaptionResult(result) {
     var resultImage = document.getElementById('resultImage');
     var resultArabic = document.getElementById('resultArabic');
     var resultEnglish = document.getElementById('resultEnglish');
+    var outputPanel = resultsPanel.closest('.output-panel');
 
-    if (emptyState) emptyState.style.display = 'none';
+    if (outputPanel) outputPanel.classList.add('has-results');
+    if (outputPanel) outputPanel.classList.remove('is-loading');
+    if (emptyState) {
+        emptyState.hidden = true;
+        emptyState.style.display = 'none';
+    }
     if (skeleton) skeleton.hidden = true;
     if (resultImage) resultImage.src = result.image_url || '';
     if (resultArabic) resultArabic.textContent = result.arabic_caption || '';
     if (resultEnglish) resultEnglish.textContent = result.english_caption || '';
 
+    resultsPanel.hidden = false;
     resultsPanel.style.display = 'grid';
     window._lastCaption = result;
 }
@@ -1421,15 +1451,23 @@ window.removeCaptionImage = function() {
     var emptyState = document.getElementById('captionOutputEmpty');
     var resultsPanel = document.getElementById('captionResults');
     var skeleton = document.getElementById('captionSkeleton');
+    var outputPanel = resultsPanel ? resultsPanel.closest('.output-panel') : null;
 
     if (fileInput) fileInput.value = '';
     if (dropZone) dropZone.classList.remove('has-file');
     if (submit) submit.disabled = true;
     setText('captionFileTitle', 'Drag & drop or click to upload');
     updateSelectedImagePreview(null);
-    if (resultsPanel) resultsPanel.style.display = 'none';
+    if (outputPanel) outputPanel.classList.remove('has-results', 'is-loading');
+    if (resultsPanel) {
+        resultsPanel.hidden = true;
+        resultsPanel.style.display = 'none';
+    }
     if (skeleton) skeleton.hidden = true;
-    if (emptyState) emptyState.style.display = 'grid';
+    if (emptyState) {
+        emptyState.hidden = false;
+        emptyState.style.display = 'grid';
+    }
     window._lastCaption = null;
     showToast('Image removed.', 'success');
 };

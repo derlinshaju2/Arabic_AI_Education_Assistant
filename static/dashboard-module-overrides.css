@@ -2236,3 +2236,134 @@ html body #contentArea
         box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
     }
 }
+
+
+/* ==========================================================
+   CAPTIONING GENERATED RESULT STATE
+
+   Let generated output fully replace the placeholder on both
+   desktop and mobile, even when older display rules use
+   !important.
+   ========================================================== */
+
+html body #contentArea
+.sider-workspace[data-module-view="captioning"]
+.output-panel.has-results
+#captionOutputEmpty,
+
+html body #contentArea
+.sider-workspace[data-module-view="captioning"]
+.output-panel
+#captionOutputEmpty[hidden],
+
+html body #contentArea
+.sider-workspace[data-module-view="captioning"]
+.output-panel
+#captionResults[hidden],
+
+html body #contentArea
+.sider-workspace[data-module-view="captioning"]
+.output-panel
+#captionSkeleton[hidden] {
+    display: none !important;
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="captioning"]
+.output-panel
+#captionResults:not([hidden]) {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+    flex: 1 1 auto !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+
+    margin: 0 !important;
+
+    align-items: stretch !important;
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="captioning"]
+.output-panel.has-results
+.image-preview-card {
+    display: flex !important;
+    flex-direction: column !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="captioning"]
+.output-panel.has-results
+.preview-image {
+    flex: 1 1 auto !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+
+    margin: 0 !important;
+
+    object-fit: contain !important;
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="captioning"]
+.output-panel.has-results
+.result-list {
+    display: flex !important;
+    flex-direction: column !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="captioning"]
+.output-panel.has-results
+.result-list
+.result-item {
+    display: flex !important;
+    flex: 1 1 0 !important;
+    flex-direction: column !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+}
+
+@media (min-width: 769px) {
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel
+    #captionResults:not([hidden]) {
+        grid-template-columns:
+            minmax(220px, 0.9fr)
+            minmax(0, 1.35fr) !important;
+        grid-template-rows: minmax(0, 1fr) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel
+    #captionResults:not([hidden]) {
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-rows: auto auto !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel.has-results
+    .preview-image {
+        max-height: min(52vh, 360px) !important;
+    }
+}
