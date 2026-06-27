@@ -1921,3 +1921,41 @@ html body #contentArea
             0 10px 22px rgba(79, 70, 229, 0.28) !important;
     }
 }
+
+
+/* ==========================================================
+   DASHBOARD EVALUATION COUNTERS
+
+   Dashboard counters are block elements after each textarea,
+   so they should not inherit the absolute positioning used by
+   older textarea-wrapper counters.
+   ========================================================== */
+
+html body #contentArea
+#evaluationForm
+.field > .char-counter {
+    position: static !important;
+
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 4px 0 0 !important;
+    padding: 0 2px 0 0 !important;
+
+    color: #64748b !important;
+
+    font-size: 11px !important;
+    font-weight: 720 !important;
+    line-height: 1.2 !important;
+
+    text-align: right !important;
+
+    pointer-events: none !important;
+}
+
+html body #contentArea
+#evaluationForm
+.field > textarea + .char-counter {
+    justify-self: stretch !important;
+}
