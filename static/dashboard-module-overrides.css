@@ -1301,3 +1301,158 @@ html body #contentArea
         line-height: 1 !important;
     }
 }
+
+
+/* ==========================================================
+   DESKTOP MODULE ACTION BUTTON LOCK
+
+   Match the higher-specificity legacy button rules while still
+   keeping both modules on one shared component declaration.
+   ========================================================== */
+
+@media (min-width: 769px) {
+    html body #contentArea #captionForm #captionSubmit.module-action-button,
+    html body #contentArea #evaluationForm #evaluationSubmit.module-action-button {
+        box-sizing: border-box !important;
+
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
+
+        height: 48px !important;
+        min-height: 48px !important;
+        max-height: 48px !important;
+
+        margin: 0 !important;
+        padding: 0 20px !important;
+
+        border: 0 !important;
+        border-radius: 12px !important;
+
+        background:
+            linear-gradient(
+                90deg,
+                #7c3aed 0%,
+                #2563eb 100%
+            ) !important;
+        background-color: #7c3aed !important;
+        background-image:
+            linear-gradient(
+                90deg,
+                #7c3aed 0%,
+                #2563eb 100%
+            ) !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: 100% 100% !important;
+
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+
+        font-family: inherit !important;
+        font-size: 14px !important;
+        font-style: normal !important;
+        font-weight: 800 !important;
+        line-height: 1 !important;
+        letter-spacing: 0.01em !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+
+        opacity: 1 !important;
+        filter: none !important;
+        transform: translateY(0) !important;
+
+        cursor: pointer !important;
+
+        box-shadow:
+            0 10px 22px rgba(79, 70, 229, 0.28) !important;
+
+        transition:
+            transform 180ms ease,
+            box-shadow 180ms ease,
+            filter 180ms ease !important;
+
+        appearance: none !important;
+        -webkit-appearance: none !important;
+    }
+
+    html body #contentArea #captionForm #captionSubmit.module-action-button:hover,
+    html body #contentArea #captionForm #captionSubmit.module-action-button:disabled:hover,
+    html body #contentArea #evaluationForm #evaluationSubmit.module-action-button:hover,
+    html body #contentArea #evaluationForm #evaluationSubmit.module-action-button:disabled:hover {
+        background:
+            linear-gradient(
+                90deg,
+                #6d28d9 0%,
+                #1d4ed8 100%
+            ) !important;
+        background-color: #6d28d9 !important;
+        background-image:
+            linear-gradient(
+                90deg,
+                #6d28d9 0%,
+                #1d4ed8 100%
+            ) !important;
+
+        opacity: 1 !important;
+        transform: translateY(-1px) !important;
+        filter: brightness(1.04) !important;
+
+        box-shadow:
+            0 14px 28px rgba(67, 56, 202, 0.34) !important;
+    }
+
+    html body #contentArea #captionForm #captionSubmit.module-action-button:active,
+    html body #contentArea #captionForm #captionSubmit.module-action-button:disabled:active,
+    html body #contentArea #evaluationForm #evaluationSubmit.module-action-button:active,
+    html body #contentArea #evaluationForm #evaluationSubmit.module-action-button:disabled:active {
+        background:
+            linear-gradient(
+                90deg,
+                #5b21b6 0%,
+                #1e40af 100%
+            ) !important;
+        background-color: #5b21b6 !important;
+        background-image:
+            linear-gradient(
+                90deg,
+                #5b21b6 0%,
+                #1e40af 100%
+            ) !important;
+
+        opacity: 1 !important;
+        transform: translateY(0) scale(0.995) !important;
+        filter: none !important;
+
+        box-shadow:
+            0 6px 14px rgba(55, 48, 163, 0.26) !important;
+    }
+
+    html body #contentArea #captionForm #captionSubmit.module-action-button:disabled,
+    html body #contentArea #evaluationForm #evaluationSubmit.module-action-button:disabled {
+        background:
+            linear-gradient(
+                90deg,
+                #7c3aed 0%,
+                #2563eb 100%
+            ) !important;
+        background-color: #7c3aed !important;
+        background-image:
+            linear-gradient(
+                90deg,
+                #7c3aed 0%,
+                #2563eb 100%
+            ) !important;
+
+        opacity: 1 !important;
+        cursor: pointer !important;
+        transform: translateY(0) !important;
+        filter: none !important;
+
+        box-shadow:
+            0 10px 22px rgba(79, 70, 229, 0.28) !important;
+    }
+}
