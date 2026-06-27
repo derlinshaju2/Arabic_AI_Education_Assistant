@@ -1052,14 +1052,14 @@ window.initializeEvaluationModule = function() {
     var refWordCounter = document.getElementById('refWordCounter');
     var stuWordCounter = document.getElementById('stuWordCounter');
 
-    if (referenceTextarea && refCounter) {
+    if (referenceTextarea) {
         updateEvaluationTextStats(referenceTextarea, refCounter, refWordCounter);
         referenceTextarea.addEventListener('input', function() {
             updateEvaluationTextStats(this, refCounter, refWordCounter);
         });
     }
 
-    if (studentTextarea && stuCounter) {
+    if (studentTextarea) {
         updateEvaluationTextStats(studentTextarea, stuCounter, stuWordCounter);
         studentTextarea.addEventListener('input', function() {
             updateEvaluationTextStats(this, stuCounter, stuWordCounter);
