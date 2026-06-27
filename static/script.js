@@ -1118,7 +1118,6 @@ window.initializeEvaluationModule = function() {
                 result.reference_answer = result.reference_answer || reference;
                 result.student_answer = result.student_answer || student;
                 displayEvaluationResult(result);
-                showToast('Evaluation completed.', 'success');
             })
             .catch(function(err) {
                 console.error('[Evaluation] Error:', err);
@@ -1146,7 +1145,6 @@ function handleCaptionFileSelect(file) {
     if (captionDropZone) captionDropZone.classList.add('has-file');
     if (captionSubmit) captionSubmit.disabled = false;
     updateSelectedImagePreview(file);
-    showToast('Image ready for captioning.', 'success');
 }
 
 function updateSelectedImagePreview(file) {
