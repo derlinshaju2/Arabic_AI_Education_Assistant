@@ -1863,3 +1863,61 @@ html body #contentArea
         padding: 16px 12px !important;
     }
 }
+
+
+/* ==========================================================
+   MOBILE MODULE ACTION BUTTON COLOR LOCK
+
+   Keep Generate Caption and Evaluate Answer on the same shared
+   gradient on phones, including disabled/pre-submit states.
+   ========================================================== */
+
+@media (max-width: 768px) {
+    html body #contentArea #captionForm #captionSubmit.module-action-button,
+    html body #contentArea #evaluationForm #evaluationSubmit.module-action-button {
+        background:
+            linear-gradient(
+                90deg,
+                #7c3aed 0%,
+                #2563eb 100%
+            ) !important;
+        background-color: #7c3aed !important;
+        background-image:
+            linear-gradient(
+                90deg,
+                #7c3aed 0%,
+                #2563eb 100%
+            ) !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: 100% 100% !important;
+
+        opacity: 1 !important;
+        filter: none !important;
+
+        box-shadow:
+            0 10px 22px rgba(79, 70, 229, 0.28) !important;
+    }
+
+    html body #contentArea #captionForm #captionSubmit.module-action-button:disabled,
+    html body #contentArea #evaluationForm #evaluationSubmit.module-action-button:disabled {
+        background:
+            linear-gradient(
+                90deg,
+                #7c3aed 0%,
+                #2563eb 100%
+            ) !important;
+        background-color: #7c3aed !important;
+        background-image:
+            linear-gradient(
+                90deg,
+                #7c3aed 0%,
+                #2563eb 100%
+            ) !important;
+
+        opacity: 1 !important;
+
+        box-shadow:
+            0 10px 22px rgba(79, 70, 229, 0.28) !important;
+    }
+}
