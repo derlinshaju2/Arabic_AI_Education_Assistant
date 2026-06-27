@@ -1478,10 +1478,10 @@ html body #contentArea
         min-width: 0 !important;
         min-height: 0 !important;
 
-        gap: 14px !important;
+        gap: 12px !important;
 
         margin: 0 !important;
-        padding: 20px 20px 24px !important;
+        padding: 10px 18px 24px !important;
     }
 
     html body #contentArea
@@ -1489,7 +1489,7 @@ html body #contentArea
     .workspace-heading {
         flex: 0 0 auto !important;
 
-        margin: 0 0 4px !important;
+        margin: 0 0 10px !important;
         padding: 0 !important;
     }
 
@@ -1514,7 +1514,7 @@ html body #contentArea
         justify-items: stretch !important;
         justify-content: stretch !important;
 
-        gap: 18px !important;
+        gap: 14px !important;
 
         margin: 0 !important;
         padding: 0 !important;
@@ -1536,8 +1536,8 @@ html body #contentArea
         max-width: none !important;
         min-width: 0 !important;
 
-        height: calc(100dvh - 142px) !important;
-        min-height: 560px !important;
+        height: auto !important;
+        min-height: calc(100dvh - 142px) !important;
         max-height: none !important;
 
         margin: 0 !important;
@@ -1545,7 +1545,7 @@ html body #contentArea
 
         align-self: stretch !important;
 
-        gap: 18px !important;
+        gap: 13px !important;
 
         border-radius: 18px !important;
 
@@ -1564,7 +1564,7 @@ html body #contentArea
         min-height: 0 !important;
         height: 100% !important;
 
-        gap: 18px !important;
+        gap: 13px !important;
 
         margin: 0 !important;
     }
@@ -1589,7 +1589,7 @@ html body #contentArea
         justify-content: center !important;
 
         margin: 0 !important;
-        padding: 28px !important;
+        padding: 24px !important;
 
         border-radius: 16px !important;
 
@@ -1640,7 +1640,7 @@ html body #contentArea
         flex: 0 0 auto !important;
 
         margin: 0 !important;
-        padding-bottom: 12px !important;
+        padding-bottom: 8px !important;
     }
 
     html body #contentArea
@@ -1655,7 +1655,7 @@ html body #contentArea
         place-items: center !important;
         align-content: center !important;
 
-        padding: 32px !important;
+        padding: 16px !important;
     }
 
     html body #contentArea
@@ -1668,7 +1668,7 @@ html body #contentArea
         min-width: 0 !important;
         min-height: 0 !important;
 
-        gap: 14px !important;
+        gap: 10px !important;
     }
 }
 
@@ -1680,14 +1680,14 @@ html body #contentArea
     html body #contentArea
     .sider-workspace[data-module-view="captioning"]
     .workspace-panel.output-panel {
-        height: calc(100dvh - 170px) !important;
-        min-height: 460px !important;
+        height: auto !important;
+        min-height: calc(100dvh - 170px) !important;
     }
 
     html body #contentArea
     .sider-workspace[data-module-view="captioning"]
     #captionForm
     .file-drop {
-        padding: 20px !important;
+        padding: 18px !important;
     }
 }
