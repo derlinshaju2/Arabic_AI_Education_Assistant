@@ -2284,6 +2284,10 @@ html body #contentArea
 
     margin: 0 !important;
 
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-auto-flow: row !important;
+    grid-auto-rows: auto !important;
+
     align-items: stretch !important;
 }
 
@@ -2322,6 +2326,7 @@ html body #contentArea
     display: flex !important;
     flex-direction: column !important;
 
+    width: 100% !important;
     min-width: 0 !important;
     min-height: 0 !important;
 }
@@ -2344,10 +2349,8 @@ html body #contentArea
     .sider-workspace[data-module-view="captioning"]
     .output-panel
     #captionResults:not([hidden]) {
-        grid-template-columns:
-            minmax(220px, 0.9fr)
-            minmax(0, 1.35fr) !important;
-        grid-template-rows: minmax(0, 1fr) !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-rows: auto auto !important;
     }
 }
 
