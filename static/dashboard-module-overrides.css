@@ -1962,6 +1962,19 @@ html body #contentArea
 
 
 /* ==========================================================
+   DASHBOARD TEXTAREA RESIZE LOCK
+
+   Keep evaluation fields fixed-size and remove the native grip.
+   ========================================================== */
+
+html body #contentArea
+#evaluationForm
+textarea {
+    resize: none !important;
+}
+
+
+/* ==========================================================
    DESKTOP CAPTIONING CARD DIMENSION LOCK
 
    Match Image Captioning desktop cards to the Answer Evaluation

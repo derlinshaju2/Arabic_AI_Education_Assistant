@@ -224,7 +224,7 @@ input {
 }
 
 textarea {
-    resize: vertical;
+    resize: none;
     min-height: 100px;
     padding: 12px;
     line-height: 1.5;
@@ -3467,7 +3467,7 @@ body.sidebar-collapsed .sidebar-profile-menu {
 
 .workspace-panel textarea {
     min-height: 142px;
-    resize: vertical;
+    resize: none;
 }
 
 .output-empty-state {
