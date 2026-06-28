@@ -1234,10 +1234,21 @@ function setEvaluationLoading(loading) {
     if (btn) btn.disabled = loading;
     if (text) text.style.display = loading ? 'none' : '';
     if (loader) loader.style.display = loading ? 'inline-flex' : 'none';
-    if (skeleton) skeleton.hidden = !loading;
+    if (skeleton) skeleton.hidden = true;
     if (loading) {
         if (emptyState) emptyState.style.display = 'none';
-        if (resultsPanel) resultsPanel.style.display = 'none';
+        if (resultsPanel) {
+            resultsPanel.classList.add('is-loading');
+            resultsPanel.style.display = 'grid';
+        }
+        setText('finalScoreValue', '0');
+        setText('similarityValue', '0%');
+        setText('summarySimilarity', '0%');
+        setText('summaryFinalScore', '0');
+        updateMetricCircle('finalScoreCircle', 0);
+        updateMetricCircle('similarityCircle', 0);
+    } else if (resultsPanel) {
+        resultsPanel.classList.remove('is-loading');
     }
 }
 
@@ -1253,6 +1264,7 @@ function displayEvaluationResult(result) {
 
     if (emptyState) emptyState.style.display = 'none';
     if (skeleton) skeleton.hidden = true;
+    resultsPanel.classList.remove('is-loading');
 
     setText('finalScoreValue', formatScore(score));
     setText('similarityValue', Math.round(similarityPct) + '%');

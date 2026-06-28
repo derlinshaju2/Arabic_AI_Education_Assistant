@@ -2478,6 +2478,37 @@ html body #contentArea
 
 html body #contentArea
 .sider-workspace[data-module-view="evaluation"]
+.workspace-panel.output-panel {
+    min-height: clamp(520px, calc(100dvh - 170px), 720px) !important;
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="evaluation"]
+.output-panel
+#evaluationOutputEmpty,
+
+html body #contentArea
+.sider-workspace[data-module-view="evaluation"]
+.output-panel
+#evaluationSkeleton,
+
+html body #contentArea
+.sider-workspace[data-module-view="evaluation"]
+.output-panel
+#evaluationResults {
+    flex: 1 1 auto !important;
+    min-height: 420px !important;
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="evaluation"]
+.output-panel
+#evaluationSkeleton[hidden] {
+    display: none !important;
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="evaluation"]
 .premium-evaluation-report {
     display: grid !important;
 
@@ -2606,6 +2637,13 @@ html body #contentArea
 
 html body #contentArea
 .sider-workspace[data-module-view="evaluation"]
+.premium-evaluation-report.is-loading
+.metric-number {
+    color: #94a3b8 !important;
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="evaluation"]
 .premium-evaluation-report
 .detail-label {
     font-size: 13px !important;
@@ -2637,6 +2675,29 @@ html body #contentArea
 }
 
 @media (max-width: 768px) {
+    html body #contentArea
+    .sider-workspace[data-module-view="evaluation"]
+    .workspace-panel.output-panel {
+        min-height: 500px !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="evaluation"]
+    .output-panel
+    #evaluationOutputEmpty,
+
+    html body #contentArea
+    .sider-workspace[data-module-view="evaluation"]
+    .output-panel
+    #evaluationSkeleton,
+
+    html body #contentArea
+    .sider-workspace[data-module-view="evaluation"]
+    .output-panel
+    #evaluationResults {
+        min-height: 390px !important;
+    }
+
     html body #contentArea
     .sider-workspace[data-module-view="evaluation"]
     .premium-evaluation-report {
