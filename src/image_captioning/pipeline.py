@@ -4,8 +4,16 @@ import re
 from PIL import Image
 
 
+def _float_env(name, default):
+    try:
+        return float(os.environ.get(name, default))
+    except (TypeError, ValueError):
+        return float(default)
+
+
 CAPTION_MODEL = os.environ.get("CAPTION_MODEL", "Salesforce/blip-image-captioning-base")
 CLASSIFIER_MODEL = os.environ.get("IMAGE_CLASSIFIER_MODEL", "microsoft/resnet-50")
+CLASSIFIER_MIN_CONFIDENCE = _float_env("IMAGE_CLASSIFIER_MIN_CONFIDENCE", "0.20")
 ENABLE_CLASSIFIER_FALLBACK = os.environ.get("IMAGE_CLASSIFIER_FALLBACK", "1").lower() not in {
     "0",
     "false",
@@ -131,6 +139,12 @@ VAGUE_WORDS = {
     "thing",
     "things",
     "various",
+}
+IMAGE_QUALITY_WORDS = {
+    "blurry",
+    "detailed",
+    "quality",
+    "realistic",
 }
 STRONG_CAPTION_SCORE = 8.0
 
@@ -270,8 +284,19 @@ def _classifier_label(image):
     with torch.no_grad():
         logits = model(**inputs).logits
 
-    predicted_id = int(logits.argmax(-1).item())
-    label = model.config.id2label.get(predicted_id, "")
+    probabilities = torch.nn.functional.softmax(logits, dim=-1)[0].detach().cpu().tolist()
+    return _label_from_classifier_scores(probabilities, model.config.id2label)
+
+
+def _label_from_classifier_scores(scores, id2label, min_confidence=CLASSIFIER_MIN_CONFIDENCE):
+    if not scores:
+        return ""
+
+    predicted_id, confidence = max(enumerate(scores), key=lambda item: item[1])
+    if confidence < min_confidence:
+        return ""
+
+    label = id2label.get(predicted_id, "")
     return _clean_classifier_label(label)
 
 
@@ -385,6 +410,7 @@ def _caption_score(caption, primary_label="", evidence=None):
         | (word_set & SUBJECTIVE_MODIFIERS)
         | (word_set & EVENT_GUESSES)
         | (word_set & VAGUE_WORDS)
+        | (word_set & IMAGE_QUALITY_WORDS)
     )
     score -= len(unsupported_terms) * 1.4
 
@@ -466,7 +492,7 @@ def _replace_vague_quantities(caption):
 
 
 def _remove_unsupported_modifiers(caption):
-    for word in SUBJECTIVE_MODIFIERS | EVENT_GUESSES | VAGUE_WORDS:
+    for word in SUBJECTIVE_MODIFIERS | EVENT_GUESSES | VAGUE_WORDS | IMAGE_QUALITY_WORDS:
         caption = re.sub(rf"\b{re.escape(word)}\b", "", caption, flags=re.IGNORECASE)
     return _normalized_caption(caption)
 
@@ -494,6 +520,7 @@ def _remove_unsupported_scene_labels(caption, evidence=None):
 
 def _clean_caption_grammar(caption):
     caption = _normalized_caption(caption)
+    caption = re.sub(r"\b(?:a\s+)?close[- ]?up\s+of\b", "", caption, flags=re.IGNORECASE)
     caption = re.sub(r"\b(?:in|inside|within)\s+(?:the\s+)?(?:image|photo|picture)\b", "", caption, flags=re.IGNORECASE)
     caption = re.sub(r"\b(?:shown|visible)\s+(?:in|inside|within)\s+(?:the\s+)?(?:image|photo|picture)\b", "", caption, flags=re.IGNORECASE)
     caption = re.sub(r"\s+([,.;:])", r"\1", caption)

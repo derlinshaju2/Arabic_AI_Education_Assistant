@@ -56,6 +56,26 @@ class CaptionPipelineTests(unittest.TestCase):
             "a photo of a tabby",
         )
 
+    def test_low_confidence_classifier_label_is_ignored(self):
+        self.assertEqual(
+            pipeline._label_from_classifier_scores(
+                [0.12, 0.18],
+                {0: "dog", 1: "cat"},
+                min_confidence=0.20,
+            ),
+            "",
+        )
+
+    def test_high_confidence_classifier_label_is_used(self):
+        self.assertEqual(
+            pipeline._label_from_classifier_scores(
+                [0.12, 0.88],
+                {0: "dog", 1: "tabby, tabby cat"},
+                min_confidence=0.20,
+            ),
+            "tabby",
+        )
+
     def test_speculative_relationship_claims_are_sanitized(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             image_path = Path(tmpdir) / "sample.jpg"
@@ -109,6 +129,12 @@ class CaptionPipelineTests(unittest.TestCase):
         self.assertEqual(
             pipeline._finalize_caption("a dog sitting in the image"),
             "A dog is sitting.",
+        )
+
+    def test_caption_finalizer_removes_close_up_filler(self):
+        self.assertEqual(
+            pipeline._finalize_caption("a close-up of a dog", primary_label="dog"),
+            "A photo of a dog.",
         )
 
     def test_template_arabic_caption_matches_simple_english_caption(self):
