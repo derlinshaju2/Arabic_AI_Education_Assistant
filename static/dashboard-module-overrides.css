@@ -2860,3 +2860,496 @@ html body #contentArea
         max-width: 100% !important;
     }
 }
+
+/* ==========================================================
+   MOBILE VISUAL PARITY WITH DESKTOP MODULES
+
+   Keep the responsive one-column mobile layout, but preserve
+   the same light desktop palette, card surfaces, gradients,
+   borders, shadows, spacing, and typography for Captioning
+   and Evaluation.
+   ========================================================== */
+
+@media (max-width: 768px) {
+    html body,
+    html body .main-content,
+    html body #contentArea,
+    html body .content-area {
+        background: var(--background) !important;
+        color: var(--foreground) !important;
+    }
+
+    html body .topbar {
+        border-bottom: 1px solid var(--border) !important;
+        background: rgba(255, 255, 255, 0.96) !important;
+        color: var(--foreground) !important;
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+    }
+
+    html body .page-title {
+        color: #020617 !important;
+    }
+
+    html body .sidebar,
+    html body .sidebar-footer {
+        border-color: var(--ia-sidebar-border) !important;
+        background: var(--ia-sidebar-bg) !important;
+        color: var(--ia-sidebar-text) !important;
+    }
+
+    html body .sidebar-brand .brand-mark,
+    html body .sidebar-collapse-toggle,
+    html body .sidebar-profile-trigger,
+    html body .sidebar-profile-menu {
+        border-color: rgba(226, 232, 240, 0.95) !important;
+        background: #ffffff !important;
+        color: var(--foreground) !important;
+    }
+
+    html body .sidebar-brand .brand-text,
+    html body .sidebar-profile-name {
+        color: #111827 !important;
+    }
+
+    html body .sidebar-profile-email,
+    html body .nav-section-title {
+        color: #718096 !important;
+    }
+
+    html body .nav-item,
+    html body.sidebar-collapsed .nav-item {
+        border-color: #e5eaf2 !important;
+        background: #ffffff !important;
+        color: #64748b !important;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.035) !important;
+    }
+
+    html body .nav-item svg,
+    html body.sidebar-collapsed .nav-item svg {
+        border-color: rgba(37, 99, 235, 0.16) !important;
+        background: #eff6ff !important;
+        color: #2563eb !important;
+    }
+
+    html body .nav-item.active,
+    html body.sidebar-collapsed .nav-item.active {
+        border-color: transparent !important;
+        background: var(--ia-active-gradient) !important;
+        color: #ffffff !important;
+        box-shadow: 0 12px 26px rgba(37, 99, 235, 0.24) !important;
+    }
+
+    html body .nav-item.active svg,
+    html body.sidebar-collapsed .nav-item.active svg {
+        border-color: rgba(255, 255, 255, 0.24) !important;
+        background: rgba(255, 255, 255, 0.16) !important;
+        color: #ffffff !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    ) {
+        background: transparent !important;
+        color: var(--foreground) !important;
+        gap: 16px !important;
+        padding: 16px 12px 36px !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .workspace-heading {
+        gap: 12px !important;
+        margin: 0 0 12px !important;
+        padding: 0 2px !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .workspace-heading-icon {
+        width: 48px !important;
+        height: 48px !important;
+        border: 1px solid rgba(37, 99, 235, 0.18) !important;
+        border-radius: 16px !important;
+        background:
+            linear-gradient(135deg, #eff6ff, #dff4ff) !important;
+        color: #2563eb !important;
+        box-shadow:
+            0 12px 26px rgba(37, 99, 235, 0.12) !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .workspace-heading-icon svg {
+        width: 24px !important;
+        height: 24px !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .workspace-kicker {
+        color: #64748b !important;
+        font-size: 10px !important;
+        font-weight: 820 !important;
+        letter-spacing: 0.1em !important;
+        line-height: 1.25 !important;
+        text-transform: uppercase !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .workspace-heading h2 {
+        color: #0f172a !important;
+        font-size: clamp(23px, 2vw, 31px) !important;
+        font-weight: 850 !important;
+        letter-spacing: 0 !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .workspace-heading .subtitle {
+        color: #64748b !important;
+        font-size: 14px !important;
+        line-height: 1.55 !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .split-workspace {
+        gap: 16px !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    :is(.workspace-panel, .module-card, .module-card-full) {
+        gap: 16px !important;
+        padding: 16px !important;
+        border: 1px solid var(--ia-panel-border) !important;
+        border-radius: 20px !important;
+        background: var(--ia-glass-bg) !important;
+        color: var(--foreground) !important;
+        box-shadow: var(--ia-soft-shadow) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .workspace-panel.input-panel {
+        background: rgba(255, 255, 255, 0.96) !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .workspace-panel.output-panel {
+        background:
+            radial-gradient(
+                circle at 92% 0%,
+                rgba(37, 99, 235, 0.08),
+                transparent 32%
+            ),
+            rgba(255, 255, 255, 0.92) !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .panel-header {
+        gap: 12px !important;
+        margin-bottom: 0 !important;
+        padding-bottom: 12px !important;
+        border-bottom: 1px solid rgba(220, 230, 243, 0.86) !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .panel-label {
+        color: #64748b !important;
+        font-size: 11px !important;
+        font-weight: 820 !important;
+        letter-spacing: 0.12em !important;
+        text-transform: uppercase !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .panel-header h3 {
+        color: #0f172a !important;
+        font-size: 17px !important;
+        font-weight: 800 !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .file-drop {
+        min-height: 168px !important;
+        padding: 20px !important;
+        border: 1px solid rgba(37, 99, 235, 0.16) !important;
+        border-radius: 18px !important;
+        background:
+            linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.7),
+                rgba(239, 246, 255, 0.78)
+            ),
+            radial-gradient(
+                circle at 50% 0%,
+                rgba(37, 99, 235, 0.12),
+                transparent 38%
+            ) !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .file-drop.has-file {
+        border-color: rgba(37, 99, 235, 0.48) !important;
+        background:
+            linear-gradient(180deg, #f8fbff, #edf6ff) !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .drop-icon {
+        width: 46px !important;
+        height: 46px !important;
+        border-radius: 14px !important;
+        background:
+            linear-gradient(135deg, #eff6ff, #e0f2fe) !important;
+        color: #2563eb !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    :is(.file-title, .file-drop h3, .file-drop strong) {
+        color: #0f172a !important;
+        font-size: 15px !important;
+        font-weight: 800 !important;
+        line-height: 1.3 !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    :is(.file-formats, .file-drop p) {
+        color: #64748b !important;
+        font-size: 12px !important;
+        line-height: 1.45 !important;
+    }
+
+    html body #contentArea
+    :is(#captionForm, #evaluationForm)
+    .module-action-button,
+    html body #contentArea
+    :is(#captionSubmit, #evaluationSubmit) {
+        height: 48px !important;
+        min-height: 48px !important;
+        max-height: 48px !important;
+        padding: 0 20px !important;
+        border: 0 !important;
+        border-radius: 12px !important;
+        background:
+            linear-gradient(
+                90deg,
+                #7c3aed 0%,
+                #2563eb 100%
+            ) !important;
+        background-color: #7c3aed !important;
+        background-image:
+            linear-gradient(
+                90deg,
+                #7c3aed 0%,
+                #2563eb 100%
+            ) !important;
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+        font-size: 14px !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.01em !important;
+        box-shadow:
+            0 10px 22px rgba(79, 70, 229, 0.28) !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    :is(.icon-btn, .mini-action) {
+        min-height: 36px !important;
+        padding: 7px 10px !important;
+        border: 1px solid rgba(226, 232, 240, 0.95) !important;
+        border-radius: 10px !important;
+        background: #ffffff !important;
+        color: #475569 !important;
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04) !important;
+        font-size: 12px !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .output-empty-state {
+        min-height: 96px !important;
+        padding: 16px !important;
+        gap: 10px !important;
+        color: #64748b !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .output-empty-icon {
+        width: 58px !important;
+        height: 58px !important;
+        border: 1px solid rgba(37, 99, 235, 0.18) !important;
+        border-radius: 18px !important;
+        background:
+            linear-gradient(135deg, #eff6ff, #e0f2fe) !important;
+        color: #2563eb !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .output-empty-state h4 {
+        color: #0f172a !important;
+        font-size: 16px !important;
+        font-weight: 820 !important;
+    }
+
+    html body #contentArea
+    :is(
+        .sider-workspace[data-module-view="captioning"],
+        .sider-workspace[data-module-view="evaluation"]
+    )
+    .output-empty-state p {
+        color: #64748b !important;
+        font-size: 13px !important;
+        line-height: 1.55 !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    :is(.image-preview-card, .result-item),
+    html body #contentArea
+    .sider-workspace[data-module-view="evaluation"]
+    :is(.evaluation-summary-card, .analytics-card, .metric-card, .feedback-section) {
+        border: 1px solid var(--ia-card-border) !important;
+        background: rgba(255, 255, 255, 0.86) !important;
+        color: var(--foreground) !important;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05) !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .result-tag,
+    html body #contentArea
+    .sider-workspace[data-module-view="evaluation"]
+    :is(.insight-tag, .summary-scoreline span) {
+        border-color: rgba(37, 99, 235, 0.15) !important;
+        background: #eff6ff !important;
+        color: #1d4ed8 !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    :is(.result-item p, .arabic-text),
+    html body #contentArea
+    .sider-workspace[data-module-view="evaluation"]
+    :is(.evaluation-summary-card h4, .detail-label, .metric-card p) {
+        color: #0f172a !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .preview-image {
+        border: 1px solid rgba(220, 230, 243, 0.92) !important;
+        border-radius: 14px !important;
+        background: #f8fafc !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="evaluation"]
+    .premium-evaluation-report
+    .metric-card {
+        background:
+            linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.92),
+                rgba(239, 246, 255, 0.78)
+            ),
+            rgba(255, 255, 255, 0.9) !important;
+        box-shadow: 0 6px 18px rgba(37, 99, 235, 0.05) !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="evaluation"]
+    .premium-evaluation-report
+    .metric-circle {
+        background: #ffffff !important;
+        box-shadow:
+            inset 0 0 0 1px rgba(226, 232, 240, 0.95),
+            0 10px 24px rgba(37, 99, 235, 0.08) !important;
+    }
+}
