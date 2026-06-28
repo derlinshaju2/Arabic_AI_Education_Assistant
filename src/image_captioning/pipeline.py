@@ -58,6 +58,52 @@ ACTION_WORDS = {
     "wearing",
 }
 SCENE_WORDS = {"at", "beside", "in", "inside", "near", "next", "on", "outside", "under", "with"}
+SPECULATIVE_PHRASES = (
+    "appears to be",
+    "appears like",
+    "looks like it is",
+    "looks like",
+    "might be",
+    "possibly",
+    "probably",
+    "seems to be",
+    "seems like",
+)
+UNSUPPORTED_RELATIONSHIP_TERMS = {
+    "boyfriend",
+    "brother",
+    "couple",
+    "daughter",
+    "family",
+    "father",
+    "friend",
+    "friends",
+    "girlfriend",
+    "mother",
+    "owner",
+    "parents",
+    "sister",
+    "son",
+}
+SUBJECTIVE_MODIFIERS = {
+    "adorable",
+    "angry",
+    "beautiful",
+    "cute",
+    "happy",
+    "old",
+    "sad",
+    "scared",
+    "young",
+}
+EVENT_GUESSES = {
+    "birthday",
+    "ceremony",
+    "concert",
+    "festival",
+    "party",
+    "wedding",
+}
 STRONG_CAPTION_SCORE = 8.0
 
 _torch = None
@@ -227,6 +273,19 @@ def _caption_words(caption):
     return re.findall(r"[a-zA-Z]+", (caption or "").lower())
 
 
+def _word_counts(candidates):
+    counts = {}
+    for candidate in candidates:
+        for word in set(_caption_words(candidate)):
+            counts[word] = counts.get(word, 0) + 1
+    return counts
+
+
+def _action_counts(candidates):
+    counts = _word_counts(candidates)
+    return {word: counts.get(word, 0) for word in ACTION_WORDS}
+
+
 def _caption_mentions_label(caption, primary_label):
     if not primary_label:
         return False
@@ -252,12 +311,13 @@ def _label_position(caption, primary_label):
         return None
 
 
-def _caption_score(caption, primary_label=""):
+def _caption_score(caption, primary_label="", action_counts=None):
     if _is_generic_caption(caption):
         return -100.0
 
     normalized = _normalized_caption(caption).lower()
     words = _caption_words(normalized)
+    word_set = set(words)
     score = min(len(words), 18) * 0.18
 
     if len(words) < 5:
@@ -276,11 +336,24 @@ def _caption_score(caption, primary_label=""):
         elif position is not None and position > 8:
             score -= 1.5
 
-    if any(word in ACTION_WORDS for word in words):
-        score += 1.5
+    for word in word_set & ACTION_WORDS:
+        if action_counts and action_counts.get(word, 0) >= 2:
+            score += 1.5
+        else:
+            score -= 0.6
 
     if any(word in SCENE_WORDS for word in words):
         score += 1.0
+
+    unsupported_terms = (
+        (word_set & UNSUPPORTED_RELATIONSHIP_TERMS)
+        | (word_set & SUBJECTIVE_MODIFIERS)
+        | (word_set & EVENT_GUESSES)
+    )
+    score -= len(unsupported_terms) * 1.4
+
+    if any(phrase in normalized for phrase in SPECULATIVE_PHRASES):
+        score -= 2.0
 
     if normalized.startswith(BACKGROUND_FIRST_TERMS):
         score -= 2.5
@@ -299,8 +372,52 @@ def _strip_prompt_lead(caption):
     return _normalized_caption(caption)
 
 
-def _finalize_caption(caption, primary_label=""):
+def _remove_speculative_language(caption):
+    caption = _normalized_caption(caption)
+    for phrase in SPECULATIVE_PHRASES:
+        caption = re.sub(rf"\b{re.escape(phrase)}\b", "", caption, flags=re.IGNORECASE)
+    return _normalized_caption(caption)
+
+
+def _replace_relationship_claims(caption):
+    replacements = {
+        r"\b(?:his|her|their|the)\s+owner\b": "a person",
+        r"\b(?:his|her|their|the)\s+(?:mother|father|parent|parents)\b": "an adult",
+        r"\b(?:his|her|their|the)\s+(?:friend|friends)\b": "another person",
+        r"\ba couple\b": "two people",
+        r"\bfamily\b": "people",
+    }
+    for pattern, replacement in replacements.items():
+        caption = re.sub(pattern, replacement, caption, flags=re.IGNORECASE)
+    return caption
+
+
+def _remove_unsupported_modifiers(caption):
+    for word in SUBJECTIVE_MODIFIERS | EVENT_GUESSES:
+        caption = re.sub(rf"\b{re.escape(word)}\b", "", caption, flags=re.IGNORECASE)
+    return _normalized_caption(caption)
+
+
+def _clean_caption_grammar(caption):
+    caption = _normalized_caption(caption)
+    caption = re.sub(r"\s+([,.;:])", r"\1", caption)
+    caption = re.sub(r"\b(a|an|the)\s+([,.;:])", r"\2", caption, flags=re.IGNORECASE)
+    caption = re.sub(r"\b(with|near|beside|next to)\s*\.", ".", caption, flags=re.IGNORECASE)
+    caption = re.sub(r"\b(in|on|at|under|inside|outside)\s*\.", ".", caption, flags=re.IGNORECASE)
+    caption = re.sub(r"\s+", " ", caption).strip(" ,")
+    return caption
+
+
+def _sanitize_caption_claims(caption):
     caption = _strip_prompt_lead(caption)
+    caption = _remove_speculative_language(caption)
+    caption = _replace_relationship_claims(caption)
+    caption = _remove_unsupported_modifiers(caption)
+    return _clean_caption_grammar(caption)
+
+
+def _finalize_caption(caption, primary_label=""):
+    caption = _sanitize_caption_claims(caption)
 
     if _is_generic_caption(caption) or len(_caption_words(caption)) < 4:
         caption = _caption_from_label(primary_label)
@@ -313,8 +430,9 @@ def _finalize_caption(caption, primary_label=""):
 
 
 def _best_caption(candidates, primary_label=""):
+    action_support = _action_counts(candidates)
     usable_candidates = [
-        _strip_prompt_lead(candidate)
+        _sanitize_caption_claims(candidate)
         for candidate in candidates
         if not _is_generic_caption(candidate)
     ]
@@ -324,7 +442,7 @@ def _best_caption(candidates, primary_label=""):
 
     return max(
         usable_candidates,
-        key=lambda candidate: _caption_score(candidate, primary_label),
+        key=lambda candidate: _caption_score(candidate, primary_label, action_support),
     )
 
 
@@ -335,7 +453,7 @@ def generate_caption(image_path):
     primary_label = _classifier_label(image)
     generation_attempts = (
         {
-            "max_new_tokens": 30,
+            "max_new_tokens": 24,
             "min_length": 8,
             "num_beams": 3,
             "repetition_penalty": 1.1,
@@ -343,7 +461,7 @@ def generate_caption(image_path):
             "early_stopping": True,
         },
         {
-            "max_new_tokens": 40,
+            "max_new_tokens": 32,
             "min_length": 10,
             "num_beams": 5,
             "repetition_penalty": 1.2,
@@ -360,7 +478,7 @@ def generate_caption(image_path):
                 candidates.append(caption)
 
         best_caption = _best_caption(candidates, primary_label)
-        if best_caption and _caption_score(best_caption, primary_label) >= STRONG_CAPTION_SCORE:
+        if best_caption and _caption_score(best_caption, primary_label, _action_counts(candidates)) >= STRONG_CAPTION_SCORE:
             return _finalize_caption(best_caption, primary_label)
 
     best_caption = _best_caption(candidates, primary_label)
