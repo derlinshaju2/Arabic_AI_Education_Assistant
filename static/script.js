@@ -606,28 +606,11 @@ window.clearClientAuthToken = clearClientAuthToken;
             }, 100);
         }
 
-        // Feedback lists
-        var feedback = data.feedback || {};
-        populateFeedbackList('correctList', feedback.correct_concepts || []);
-        populateFeedbackList('missingList', feedback.missing_concepts || []);
-        populateFeedbackList('suggestionsList', feedback.suggestions || []);
-
         panel.style.display = 'grid';
         panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
         // Refresh stats
         loadStats();
-    }
-
-    function populateFeedbackList(listId, items) {
-        var list = document.getElementById(listId);
-        if (!list) return;
-        list.innerHTML = '';
-        items.forEach(function(item) {
-            var li = document.createElement('li');
-            li.textContent = item;
-            list.appendChild(li);
-        });
     }
 
     // ---- HISTORY MODAL ----
@@ -1277,16 +1260,9 @@ function displayEvaluationResult(result) {
     setText('summaryFinalScore', formatScore(score));
     updateMetricCircle('finalScoreCircle', finalPct);
     updateMetricCircle('similarityCircle', similarityPct);
-    renderEvaluationFeedback(result.feedback || {});
 
     resultsPanel.style.display = 'grid';
     window._lastEvaluation = result;
-}
-
-function renderEvaluationFeedback(feedback) {
-    renderList('correctList', feedback.correct_concepts, 'The response was evaluated against the reference answer.');
-    renderList('missingList', feedback.missing_concepts, 'No major missing concepts were detected.');
-    renderList('suggestionsList', feedback.suggestions, 'Keep refining the answer with precise details.');
 }
 
 function showEvaluationError(message) {
@@ -1545,7 +1521,6 @@ function buildEvaluationText() {
     var result = window._lastEvaluation;
     if (!result) return '';
 
-    var feedback = result.feedback || {};
     return [
         'Answer Evaluation Result',
         '',
@@ -1554,24 +1529,8 @@ function buildEvaluationText() {
         'Similarity Score: ' + Math.round(normalizePercent(result.similarity)) + '%',
         'Question Relevance: ' + Math.round(normalizePercent(
             result.question_relevance !== undefined ? result.question_relevance : result.coverage
-        )) + '%',
-        '',
-        'Strengths:',
-        listToText(feedback.correct_concepts),
-        '',
-        'Areas for Improvement:',
-        listToText(feedback.missing_concepts),
-        '',
-        'Suggestions:',
-        listToText(feedback.suggestions)
+        )) + '%'
     ].join('\n');
-}
-
-function listToText(items) {
-    if (!Array.isArray(items) || !items.length) return '- None';
-    return items.map(function(item) {
-        return '- ' + item;
-    }).join('\n');
 }
 
 function downloadTextFile(filename, content) {

@@ -143,43 +143,6 @@
                         </div>
                     </div>
 
-                    {% if evaluation_result.feedback %}
-                    <div class="feedback-section" id="feedbackCorrect">
-                        <h4 class="feedback-title correct">
-                            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M22 4L12 14.01l-3-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Correct Concepts
-                        </h4>
-                        <ul class="feedback-list" id="correctList">
-                            {% for item in evaluation_result.feedback.correct_concepts %}
-                            <li>{{ item }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-
-                    <div class="feedback-section" id="feedbackMissing">
-                        <h4 class="feedback-title missing">
-                            <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 9l-6 6M9 9l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                            Missing Concepts
-                        </h4>
-                        <ul class="feedback-list" id="missingList">
-                            {% for item in evaluation_result.feedback.missing_concepts %}
-                            <li>{{ item }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-
-                    <div class="feedback-section" id="feedbackSuggestions">
-                        <h4 class="feedback-title suggestions">
-                            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 21h6M10 17v4M14 17v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                            Improvement Suggestions
-                        </h4>
-                        <ul class="feedback-list" id="suggestionsList">
-                            {% for item in evaluation_result.feedback.suggestions %}
-                            <li>{{ item }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    {% endif %}
                 </div>
                 {% else %}
                 <div class="eval-results" id="evalResults" style="display:none;">
@@ -204,29 +167,6 @@
                         </div>
                     </div>
 
-                    <div class="feedback-section" id="feedbackCorrect">
-                        <h4 class="feedback-title correct">
-                            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M22 4L12 14.01l-3-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Correct Concepts
-                        </h4>
-                        <ul class="feedback-list" id="correctList"></ul>
-                    </div>
-
-                    <div class="feedback-section" id="feedbackMissing">
-                        <h4 class="feedback-title missing">
-                            <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 9l-6 6M9 9l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                            Missing Concepts
-                        </h4>
-                        <ul class="feedback-list" id="missingList"></ul>
-                    </div>
-
-                    <div class="feedback-section" id="feedbackSuggestions">
-                        <h4 class="feedback-title suggestions">
-                            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 21h6M10 17v4M14 17v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                            Improvement Suggestions
-                        </h4>
-                        <ul class="feedback-list" id="suggestionsList"></ul>
-                    </div>
                 </div>
                 {% endif %}
             </article>
