@@ -2509,6 +2509,18 @@ html body #contentArea
 
 html body #contentArea
 .sider-workspace[data-module-view="evaluation"]
+.output-panel
+#evaluationOutputEmpty[hidden],
+
+html body #contentArea
+.sider-workspace[data-module-view="evaluation"]
+.output-panel
+#evaluationResults[hidden] {
+    display: none !important;
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="evaluation"]
 .premium-evaluation-report {
     display: grid !important;
 

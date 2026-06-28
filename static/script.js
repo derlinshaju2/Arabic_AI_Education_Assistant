@@ -1031,6 +1031,8 @@ window.initializeEvaluationModule = function() {
     var evaluationForm = document.getElementById('evaluationForm');
     if (!evaluationForm) return;
 
+    resetEvaluationOutputState();
+
     var referenceTextarea = document.getElementById('reference');
     var studentTextarea = document.getElementById('student');
     var questionInput = document.getElementById('subject');
@@ -1039,11 +1041,23 @@ window.initializeEvaluationModule = function() {
     var questionCounter = document.getElementById('questionCounter');
     var refWordCounter = document.getElementById('refWordCounter');
     var stuWordCounter = document.getElementById('stuWordCounter');
+    var requiredInputs = [questionInput, referenceTextarea, studentTextarea].filter(Boolean);
+
+    function resetIfEvaluationFormCleared() {
+        var hasEmptyRequiredInput = requiredInputs.some(function(input) {
+            return !(input.value || '').trim();
+        });
+
+        if (hasEmptyRequiredInput) {
+            resetEvaluationOutputState();
+        }
+    }
 
     if (referenceTextarea) {
         updateEvaluationTextStats(referenceTextarea, refCounter, refWordCounter);
         referenceTextarea.addEventListener('input', function() {
             updateEvaluationTextStats(this, refCounter, refWordCounter);
+            resetIfEvaluationFormCleared();
         });
     }
 
@@ -1052,6 +1066,7 @@ window.initializeEvaluationModule = function() {
         studentTextarea.addEventListener('input', function() {
             updateEvaluationTextStats(this, stuCounter, stuWordCounter);
             autoExpandTextarea(this);
+            resetIfEvaluationFormCleared();
         });
         autoExpandTextarea(studentTextarea);
     }
@@ -1060,8 +1075,21 @@ window.initializeEvaluationModule = function() {
         questionCounter.textContent = (questionInput.value || '').length;
         questionInput.addEventListener('input', function() {
             questionCounter.textContent = this.value.length;
+            resetIfEvaluationFormCleared();
         });
     }
+
+    evaluationForm.addEventListener('reset', function() {
+        setTimeout(function() {
+            ['questionCounter', 'refCounter', 'stuCounter', 'refWordCounter', 'stuWordCounter'].forEach(function(id) {
+                setText(id, '0');
+            });
+            document.querySelectorAll('#evaluationForm textarea').forEach(function(textarea) {
+                textarea.style.height = '';
+            });
+            resetEvaluationOutputState();
+        }, 0);
+    });
 
     evaluationForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -1077,6 +1105,8 @@ window.initializeEvaluationModule = function() {
         }
 
         hideEvaluationError();
+        var evaluationRequestId = (window._evaluationRequestId || 0) + 1;
+        window._evaluationRequestId = evaluationRequestId;
         setEvaluationLoading(true);
 
         fetch('/evaluate', {
@@ -1102,6 +1132,7 @@ window.initializeEvaluationModule = function() {
                 return res.json();
             })
             .then(function(result) {
+                if (window._evaluationRequestId !== evaluationRequestId) return;
                 console.log('[Evaluation] Result:', result);
                 result.subject = subject;
                 result.reference_answer = result.reference_answer || reference;
@@ -1109,10 +1140,13 @@ window.initializeEvaluationModule = function() {
                 displayEvaluationResult(result);
             })
             .catch(function(err) {
+                if (window._evaluationRequestId !== evaluationRequestId) return;
                 console.error('[Evaluation] Error:', err);
+                resetEvaluationOutputState();
                 showEvaluationError(err.message || 'Failed to evaluate answers. Please try again.');
             })
             .finally(function() {
+                if (window._evaluationRequestId !== evaluationRequestId) return;
                 setEvaluationLoading(false);
             });
     });
@@ -1234,12 +1268,22 @@ function setEvaluationLoading(loading) {
     if (btn) btn.disabled = loading;
     if (text) text.style.display = loading ? 'none' : '';
     if (loader) loader.style.display = loading ? 'inline-flex' : 'none';
-    if (skeleton) skeleton.hidden = true;
     if (loading) {
-        if (emptyState) emptyState.style.display = 'none';
+        window._lastEvaluation = null;
+        if (emptyState) {
+            emptyState.hidden = true;
+            emptyState.setAttribute('aria-hidden', 'true');
+            emptyState.style.display = 'none';
+        }
         if (resultsPanel) {
             resultsPanel.classList.add('is-loading');
-            resultsPanel.style.display = 'grid';
+            resultsPanel.hidden = true;
+            resultsPanel.setAttribute('aria-hidden', 'true');
+            resultsPanel.style.display = 'none';
+        }
+        if (skeleton) {
+            skeleton.hidden = false;
+            skeleton.setAttribute('aria-hidden', 'false');
         }
         setText('finalScoreValue', '0');
         setText('similarityValue', '0%');
@@ -1249,7 +1293,57 @@ function setEvaluationLoading(loading) {
         updateMetricCircle('similarityCircle', 0);
     } else if (resultsPanel) {
         resultsPanel.classList.remove('is-loading');
+        if (!window._lastEvaluation) {
+            if (skeleton) {
+                skeleton.hidden = true;
+                skeleton.setAttribute('aria-hidden', 'true');
+            }
+            if (emptyState) {
+                emptyState.hidden = false;
+                emptyState.setAttribute('aria-hidden', 'false');
+                emptyState.style.display = 'grid';
+            }
+        }
     }
+}
+
+function resetEvaluationOutputState() {
+    var emptyState = document.getElementById('evaluationOutputEmpty');
+    var resultsPanel = document.getElementById('evaluationResults');
+    var skeleton = document.getElementById('evaluationSkeleton');
+    var btn = document.getElementById('evaluationSubmit');
+    var text = btn ? btn.querySelector('.btn-text') : null;
+    var loader = btn ? btn.querySelector('.btn-loader') : null;
+
+    if (btn) btn.disabled = false;
+    if (text) text.style.display = '';
+    if (loader) loader.style.display = 'none';
+
+    if (resultsPanel) {
+        resultsPanel.classList.remove('is-loading');
+        resultsPanel.hidden = true;
+        resultsPanel.setAttribute('aria-hidden', 'true');
+        resultsPanel.style.display = 'none';
+    }
+    if (emptyState) {
+        emptyState.hidden = false;
+        emptyState.setAttribute('aria-hidden', 'false');
+        emptyState.style.display = 'grid';
+    }
+    if (skeleton) {
+        skeleton.hidden = true;
+        skeleton.setAttribute('aria-hidden', 'true');
+    }
+
+    setText('finalScoreValue', '0');
+    setText('similarityValue', '0%');
+    setText('summarySimilarity', '0%');
+    setText('summaryFinalScore', '0');
+    updateMetricCircle('finalScoreCircle', 0);
+    updateMetricCircle('similarityCircle', 0);
+
+    window._lastEvaluation = null;
+    window._evaluationRequestId = (window._evaluationRequestId || 0) + 1;
 }
 
 function displayEvaluationResult(result) {
@@ -1262,8 +1356,15 @@ function displayEvaluationResult(result) {
     var finalPct = Math.max(0, Math.min(100, score * 10));
     var similarityPct = normalizePercent(result.similarity);
 
-    if (emptyState) emptyState.style.display = 'none';
-    if (skeleton) skeleton.hidden = true;
+    if (emptyState) {
+        emptyState.hidden = true;
+        emptyState.setAttribute('aria-hidden', 'true');
+        emptyState.style.display = 'none';
+    }
+    if (skeleton) {
+        skeleton.hidden = true;
+        skeleton.setAttribute('aria-hidden', 'true');
+    }
     resultsPanel.classList.remove('is-loading');
 
     setText('finalScoreValue', formatScore(score));
@@ -1273,6 +1374,8 @@ function displayEvaluationResult(result) {
     updateMetricCircle('finalScoreCircle', finalPct);
     updateMetricCircle('similarityCircle', similarityPct);
 
+    resultsPanel.hidden = false;
+    resultsPanel.setAttribute('aria-hidden', 'false');
     resultsPanel.style.display = 'grid';
     window._lastEvaluation = result;
 }
@@ -1511,9 +1614,6 @@ window.reevaluateAnswer = function() {
 
 window.clearEvaluationModule = function() {
     var form = document.getElementById('evaluationForm');
-    var resultsPanel = document.getElementById('evaluationResults');
-    var emptyState = document.getElementById('evaluationOutputEmpty');
-    var skeleton = document.getElementById('evaluationSkeleton');
 
     if (form) form.reset();
     ['questionCounter', 'refCounter', 'stuCounter', 'refWordCounter', 'stuWordCounter'].forEach(function(id) {
@@ -1522,10 +1622,7 @@ window.clearEvaluationModule = function() {
     document.querySelectorAll('#evaluationForm textarea').forEach(function(textarea) {
         textarea.style.height = '';
     });
-    if (resultsPanel) resultsPanel.style.display = 'none';
-    if (emptyState) emptyState.style.display = 'grid';
-    if (skeleton) skeleton.hidden = true;
-    window._lastEvaluation = null;
+    resetEvaluationOutputState();
     showToast('Evaluation form cleared.', 'success');
 };
 
