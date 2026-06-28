@@ -23,6 +23,7 @@ GENERIC_PROMPT_ECHOES = {
 GENERIC_CAPTION_FRAGMENTS = (
     "description of the image",
     "clear and realistic",
+    "image contains",
     "image shown",
     "uploaded image",
 )
@@ -406,11 +407,19 @@ def _caption_score(caption, primary_label="", evidence=None):
 def _strip_prompt_lead(caption):
     caption = _normalized_caption(caption)
     caption = re.sub(
-        r"^(?:the main subject(?: of the image)? is|this image shows|the image shows)\s+",
+        r"^(?:the main subject(?: of the image)? is|this image shows|the image shows|the photo shows|this photo shows|there is|there are)\s+",
         "",
         caption,
         flags=re.IGNORECASE,
     )
+    return _normalized_caption(caption)
+
+
+def _one_sentence(caption):
+    caption = _normalized_caption(caption)
+    match = re.match(r"^(.+?)(?:[.!?]+(?:\s|$)|$)", caption)
+    if match:
+        caption = match.group(1)
     return _normalized_caption(caption)
 
 
@@ -485,6 +494,8 @@ def _remove_unsupported_scene_labels(caption, evidence=None):
 
 def _clean_caption_grammar(caption):
     caption = _normalized_caption(caption)
+    caption = re.sub(r"\b(?:in|inside|within)\s+(?:the\s+)?(?:image|photo|picture)\b", "", caption, flags=re.IGNORECASE)
+    caption = re.sub(r"\b(?:shown|visible)\s+(?:in|inside|within)\s+(?:the\s+)?(?:image|photo|picture)\b", "", caption, flags=re.IGNORECASE)
     caption = re.sub(r"\s+([,.;:])", r"\1", caption)
     caption = re.sub(r"\b(a|an|the)\s+([,.;:])", r"\2", caption, flags=re.IGNORECASE)
     caption = re.sub(r"\b(with|near|beside|next to)\s*\.", ".", caption, flags=re.IGNORECASE)
@@ -525,6 +536,7 @@ def _make_caption_natural(caption):
 
 
 def _sanitize_caption_claims(caption, evidence=None):
+    caption = _one_sentence(caption)
     caption = _strip_prompt_lead(caption)
     caption = _remove_speculative_language(caption)
     caption = _replace_relationship_claims(caption)
@@ -540,10 +552,11 @@ def _finalize_caption(caption, primary_label="", evidence=None):
 
     if _is_generic_caption(caption) or len(_caption_words(caption)) < 4:
         caption = _caption_from_label(primary_label)
+        caption = _sanitize_caption_claims(caption, evidence)
 
     caption = _normalized_caption(caption).strip(" .")
     if not caption:
-        caption = "a photo with a visible main subject and surrounding scene"
+        caption = "a photo with visible objects"
 
     return caption[:1].upper() + caption[1:] + "."
 
@@ -609,4 +622,4 @@ def generate_caption(image_path):
     if fallback_caption:
         return _finalize_caption(fallback_caption, primary_label)
 
-    return "A photo with a visible main subject and surrounding scene."
+    return "A photo with visible objects."

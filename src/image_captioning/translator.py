@@ -74,6 +74,24 @@ ACTIONS = {
     "wearing": "يرتدي",
 }
 
+PLURAL_ACTIONS = {
+    "carrying": "يحملون",
+    "eating": "يأكلون",
+    "flying": "يطيرون",
+    "holding": "يمسكون",
+    "jumping": "يقفزون",
+    "laying": "مستلقيون",
+    "lying": "مستلقيون",
+    "looking": "ينظرون",
+    "playing": "يلعبون",
+    "riding": "يركبون",
+    "running": "يركضون",
+    "sitting": "جالسون",
+    "standing": "واقفون",
+    "walking": "يمشون",
+    "wearing": "يرتدون",
+}
+
 PHRASES = {
     "in the grass": "على العشب",
     "on the grass": "على العشب",
@@ -85,6 +103,10 @@ PHRASES = {
     "in a room": "في غرفة",
     "on a street": "في شارع",
     "outdoors": "في الخارج",
+}
+
+FALLBACK_CAPTIONS = {
+    "a photo with visible objects": "صورة تحتوي على أشياء مرئية.",
 }
 
 PREPOSITIONS = {
@@ -181,11 +203,29 @@ def _template_translate(text):
     sentence = source.rstrip(".")
     lower = sentence.lower()
 
+    fallback = FALLBACK_CAPTIONS.get(lower)
+    if fallback:
+        return fallback
+
     match = re.match(r"^a photo of (?:a|an|the)?\s*(?P<noun>[a-z ]+)$", lower)
     if match:
         noun = _noun_to_arabic(match.group("noun"))
         if noun:
             return _photo_of(noun)
+
+    match = re.match(
+        r"^(?P<noun>people)\s+"
+        r"(?:(?:are)\s+)?"
+        r"(?P<action>carrying|eating|flying|holding|jumping|laying|lying|looking|playing|riding|running|sitting|standing|walking|wearing)"
+        r"(?P<rest>\s+.+)?$",
+        lower,
+    )
+    if match:
+        noun = _noun_to_arabic(match.group("noun"))
+        action = PLURAL_ACTIONS.get(match.group("action"))
+        rest = _translate_rest(match.group("rest") or "")
+        if noun and action and (not match.group("rest") or rest):
+            return f"{noun} {action}{rest}."
 
     match = re.match(
         r"^(?:a|an|the)\s+(?P<noun>[a-z ]+?)\s+"

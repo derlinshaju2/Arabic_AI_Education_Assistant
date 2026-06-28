@@ -99,16 +99,40 @@ class CaptionPipelineTests(unittest.TestCase):
             "People are standing near a car.",
         )
 
+    def test_caption_finalizer_returns_one_sentence(self):
+        self.assertEqual(
+            pipeline._finalize_caption("a dog sitting on grass. a restaurant is nearby"),
+            "A dog is sitting on grass.",
+        )
+
+    def test_caption_finalizer_removes_image_filler(self):
+        self.assertEqual(
+            pipeline._finalize_caption("a dog sitting in the image"),
+            "A dog is sitting.",
+        )
+
     def test_template_arabic_caption_matches_simple_english_caption(self):
         self.assertEqual(
             translator.translate_to_arabic("A dog is playing in the grass."),
             "كلب يلعب على العشب.",
         )
 
+    def test_template_arabic_caption_matches_plural_english_caption(self):
+        self.assertEqual(
+            translator.translate_to_arabic("People are standing near a car."),
+            "أشخاص واقفون بالقرب من سيارة.",
+        )
+
     def test_template_arabic_caption_translates_simple_visible_place(self):
         self.assertEqual(
             translator.translate_to_arabic("A black dog is sitting on a couch."),
             "كلب أسود جالس على أريكة.",
+        )
+
+    def test_template_arabic_caption_matches_fallback_english_caption(self):
+        self.assertEqual(
+            translator.translate_to_arabic("A photo with visible objects."),
+            "صورة تحتوي على أشياء مرئية.",
         )
 
     def test_template_arabic_photo_caption_matches_simple_english_caption(self):
