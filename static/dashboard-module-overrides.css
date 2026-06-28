@@ -2569,7 +2569,9 @@ html body #contentArea
     min-height: 260px !important;
     height: auto !important;
 
-    grid-template-columns: minmax(128px, 0.45fr) minmax(0, 0.55fr) !important;
+    grid-template-columns:
+        minmax(128px, 0.42fr)
+        minmax(180px, 0.58fr) !important;
     align-items: center !important;
 
     gap: 22px !important;
@@ -2617,6 +2619,21 @@ html body #contentArea
 
     font-size: 13px !important;
     line-height: 1.45 !important;
+
+    max-width: 24ch !important;
+
+    white-space: normal !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="evaluation"]
+.premium-evaluation-report
+.metric-card > div:last-child {
+    min-width: 180px !important;
+    max-width: 28ch !important;
 }
 
 @media (max-width: 768px) {
@@ -2654,7 +2671,7 @@ html body #contentArea
     .metric-card {
         min-height: 190px !important;
 
-        grid-template-columns: 112px minmax(0, 1fr) !important;
+        grid-template-columns: 112px minmax(180px, 1fr) !important;
         gap: 16px !important;
         padding: 20px !important;
     }
@@ -2683,5 +2700,14 @@ html body #contentArea
     .premium-evaluation-report
     .metric-card > div:last-child {
         justify-items: center !important;
+        min-width: 0 !important;
+        max-width: 28ch !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="evaluation"]
+    .premium-evaluation-report
+    .metric-card p {
+        max-width: 28ch !important;
     }
 }
