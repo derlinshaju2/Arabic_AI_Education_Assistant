@@ -2639,7 +2639,7 @@ html body #contentArea
     min-height: 0 !important;
 
     grid-template-columns:
-        repeat(auto-fit, minmax(min(100%, 260px), 1fr)) !important;
+        repeat(auto-fit, minmax(min(100%, 300px), 1fr)) !important;
     align-items: stretch !important;
 
     gap: 16px !important;
@@ -2660,11 +2660,11 @@ html body #contentArea
     height: auto !important;
 
     grid-template-columns:
-        minmax(92px, auto)
-        minmax(0, 1fr) !important;
+        minmax(96px, max-content)
+        minmax(160px, 1fr) !important;
     align-items: center !important;
 
-    gap: clamp(14px, 2.4vw, 22px) !important;
+    gap: clamp(18px, 2.4vw, 24px) !important;
     padding: clamp(18px, 2.8vw, 28px) !important;
 
     border-radius: 18px !important;
@@ -2714,10 +2714,17 @@ html body #contentArea
 .sider-workspace[data-module-view="evaluation"]
 .premium-evaluation-report
 .detail-label {
+    display: block !important;
+    width: max-content !important;
+    max-width: 100% !important;
     font-size: 13px !important;
     line-height: 1.25 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
     white-space: normal !important;
-    overflow-wrap: anywhere !important;
+    overflow-wrap: normal !important;
+    word-break: keep-all !important;
+    hyphens: none !important;
 }
 
 html body #contentArea
@@ -2732,7 +2739,7 @@ html body #contentArea
     max-width: 100% !important;
 
     white-space: normal !important;
-    overflow-wrap: anywhere !important;
+    overflow-wrap: break-word !important;
     word-break: normal !important;
     hyphens: none !important;
 }
@@ -2740,10 +2747,16 @@ html body #contentArea
 html body #contentArea
 .sider-workspace[data-module-view="evaluation"]
 .premium-evaluation-report
+.metric-copy,
+
+html body #contentArea
+.sider-workspace[data-module-view="evaluation"]
+.premium-evaluation-report
 .metric-card > div:last-child {
     display: grid !important;
     align-content: center !important;
-    min-width: 0 !important;
+    justify-items: start !important;
+    min-width: min(100%, 160px) !important;
     max-width: 100% !important;
     overflow: visible !important;
 }
@@ -2807,7 +2820,7 @@ html body #contentArea
     .metric-card {
         min-height: 0 !important;
 
-        grid-template-columns: minmax(84px, auto) minmax(0, 1fr) !important;
+        grid-template-columns: minmax(88px, max-content) minmax(150px, 1fr) !important;
         gap: 16px !important;
         padding: 20px !important;
     }
