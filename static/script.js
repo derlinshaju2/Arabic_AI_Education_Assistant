@@ -1001,7 +1001,6 @@ window.initializeCaptioningModule = function() {
             .then(function(result) {
                 console.log('[Captioning] Result:', result);
                 displayCaptionResult(result);
-                showToast('Caption generated successfully.', 'success');
             })
             .catch(function(err) {
                 console.error('[Captioning] Error:', err);
