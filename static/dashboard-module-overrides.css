@@ -2480,6 +2480,7 @@ html body #contentArea
 .sider-workspace[data-module-view="evaluation"]
 .workspace-panel.output-panel {
     min-height: clamp(520px, calc(100dvh - 170px), 720px) !important;
+    overflow: visible !important;
 }
 
 html body #contentArea
@@ -2497,7 +2498,9 @@ html body #contentArea
 .output-panel
 #evaluationResults {
     flex: 1 1 auto !important;
-    min-height: 420px !important;
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
 }
 
 html body #contentArea
@@ -2526,12 +2529,16 @@ html body #contentArea
 
     width: 100% !important;
     min-width: 0 !important;
+    max-width: 100% !important;
     min-height: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
 
     grid-template-columns: minmax(0, 1fr) !important;
-    grid-template-rows: auto minmax(0, 1fr) !important;
-    align-content: stretch !important;
-    align-items: stretch !important;
+    grid-template-rows: none !important;
+    grid-auto-rows: max-content !important;
+    align-content: start !important;
+    align-items: start !important;
 
     gap: 16px !important;
 
@@ -2544,8 +2551,12 @@ html body #contentArea
     box-sizing: border-box !important;
 
     width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
 
-    padding: 18px 20px !important;
+    padding: clamp(16px, 2.4vw, 22px) !important;
 
     border-radius: 16px !important;
 }
@@ -2554,10 +2565,29 @@ html body #contentArea
 .sider-workspace[data-module-view="evaluation"]
 .evaluation-summary-content {
     display: flex !important;
-    align-items: center !important;
+    flex-wrap: wrap !important;
+    align-items: flex-start !important;
     justify-content: space-between !important;
 
     gap: 16px !important;
+    min-width: 0 !important;
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="evaluation"]
+.evaluation-summary-heading {
+    min-width: min(100%, 220px) !important;
+    max-width: 100% !important;
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="evaluation"]
+.premium-evaluation-report
+.insight-tag {
+    width: fit-content !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
 }
 
 html body #contentArea
@@ -2565,22 +2595,36 @@ html body #contentArea
 .evaluation-summary-card h4 {
     font-size: 16px !important;
     line-height: 1.25 !important;
+    max-width: 100% !important;
+    overflow-wrap: anywhere !important;
+    white-space: normal !important;
 }
 
 html body #contentArea
 .sider-workspace[data-module-view="evaluation"]
 .summary-scoreline {
+    display: flex !important;
+    flex: 1 1 260px !important;
+    flex-wrap: wrap !important;
     justify-content: flex-end !important;
     gap: 8px !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
 }
 
 html body #contentArea
 .sider-workspace[data-module-view="evaluation"]
 .summary-scoreline span {
+    box-sizing: border-box !important;
+    flex: 0 1 auto !important;
+    max-width: 100% !important;
     min-height: 34px !important;
     padding: 7px 12px !important;
 
     font-size: 12px !important;
+    line-height: 1.25 !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
 }
 
 html body #contentArea
@@ -2591,13 +2635,15 @@ html body #contentArea
 
     width: 100% !important;
     min-width: 0 !important;
+    max-width: 100% !important;
     min-height: 0 !important;
 
     grid-template-columns:
-        repeat(2, minmax(0, 1fr)) !important;
+        repeat(auto-fit, minmax(min(100%, 260px), 1fr)) !important;
     align-items: stretch !important;
 
     gap: 16px !important;
+    overflow: visible !important;
 }
 
 html body #contentArea
@@ -2609,42 +2655,52 @@ html body #contentArea
     display: grid !important;
 
     min-width: 0 !important;
-    min-height: 260px !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
     height: auto !important;
 
     grid-template-columns:
-        minmax(128px, 0.42fr)
-        minmax(180px, 0.58fr) !important;
+        minmax(92px, auto)
+        minmax(0, 1fr) !important;
     align-items: center !important;
 
-    gap: 22px !important;
-    padding: 28px !important;
+    gap: clamp(14px, 2.4vw, 22px) !important;
+    padding: clamp(18px, 2.8vw, 28px) !important;
 
     border-radius: 18px !important;
+    overflow: visible !important;
 }
 
 html body #contentArea
 .sider-workspace[data-module-view="evaluation"]
 .premium-evaluation-report
 .metric-circle {
-    width: clamp(118px, 15vw, 156px) !important;
-    height: clamp(118px, 15vw, 156px) !important;
+    width: clamp(92px, 10vw, 128px) !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
 
     justify-self: center !important;
+    flex: 0 0 auto !important;
+    max-width: 100% !important;
 }
 
 html body #contentArea
 .sider-workspace[data-module-view="evaluation"]
 .premium-evaluation-report
 .metric-circle::before {
-    inset: 12px !important;
+    inset: clamp(8px, 1vw, 12px) !important;
 }
 
 html body #contentArea
 .sider-workspace[data-module-view="evaluation"]
 .premium-evaluation-report
 .metric-number {
-    font-size: clamp(18px, 2.1vw, 24px) !important;
+    max-width: calc(100% - 20px) !important;
+    font-size: clamp(16px, 1.8vw, 22px) !important;
+    line-height: 1.1 !important;
+    text-align: center !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
 }
 
 html body #contentArea
@@ -2659,6 +2715,9 @@ html body #contentArea
 .premium-evaluation-report
 .detail-label {
     font-size: 13px !important;
+    line-height: 1.25 !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
 }
 
 html body #contentArea
@@ -2670,10 +2729,10 @@ html body #contentArea
     font-size: 13px !important;
     line-height: 1.45 !important;
 
-    max-width: 24ch !important;
+    max-width: 100% !important;
 
     white-space: normal !important;
-    overflow-wrap: normal !important;
+    overflow-wrap: anywhere !important;
     word-break: normal !important;
     hyphens: none !important;
 }
@@ -2682,15 +2741,18 @@ html body #contentArea
 .sider-workspace[data-module-view="evaluation"]
 .premium-evaluation-report
 .metric-card > div:last-child {
-    min-width: 180px !important;
-    max-width: 28ch !important;
+    display: grid !important;
+    align-content: center !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: visible !important;
 }
 
 @media (max-width: 768px) {
     html body #contentArea
     .sider-workspace[data-module-view="evaluation"]
     .workspace-panel.output-panel {
-        min-height: 500px !important;
+        min-height: 0 !important;
     }
 
     html body #contentArea
@@ -2707,7 +2769,7 @@ html body #contentArea
     .sider-workspace[data-module-view="evaluation"]
     .output-panel
     #evaluationResults {
-        min-height: 390px !important;
+        min-height: 0 !important;
     }
 
     html body #contentArea
@@ -2728,6 +2790,7 @@ html body #contentArea
     .sider-workspace[data-module-view="evaluation"]
     .summary-scoreline {
         justify-content: flex-start !important;
+        flex: 1 1 100% !important;
     }
 
     html body #contentArea
@@ -2742,9 +2805,9 @@ html body #contentArea
     .sider-workspace[data-module-view="evaluation"]
     .premium-evaluation-report
     .metric-card {
-        min-height: 190px !important;
+        min-height: 0 !important;
 
-        grid-template-columns: 112px minmax(180px, 1fr) !important;
+        grid-template-columns: minmax(84px, auto) minmax(0, 1fr) !important;
         gap: 16px !important;
         padding: 20px !important;
     }
@@ -2753,8 +2816,8 @@ html body #contentArea
     .sider-workspace[data-module-view="evaluation"]
     .premium-evaluation-report
     .metric-circle {
-        width: 104px !important;
-        height: 104px !important;
+        width: 96px !important;
+        height: auto !important;
     }
 }
 
@@ -2774,13 +2837,13 @@ html body #contentArea
     .metric-card > div:last-child {
         justify-items: center !important;
         min-width: 0 !important;
-        max-width: 28ch !important;
+        max-width: 100% !important;
     }
 
     html body #contentArea
     .sider-workspace[data-module-view="evaluation"]
     .premium-evaluation-report
     .metric-card p {
-        max-width: 28ch !important;
+        max-width: 100% !important;
     }
 }
