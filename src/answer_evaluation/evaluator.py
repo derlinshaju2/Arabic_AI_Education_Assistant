@@ -27,10 +27,36 @@ ARABIC_STOPWORDS = {
     "\u0647\u0630\u0627", "\u0647\u0630\u0647", "\u0647\u0648", "\u0647\u064a", "\u0648",
 }
 MIN_CONTENT_TOKENS = 2
+MAX_FEEDBACK_CONCEPTS = 5
 
 
 def _clamp(value):
     return max(0.0, min(1.0, float(value or 0.0)))
+
+
+def _is_arabic_text(text):
+    return any("\u0600" <= char <= "\u06ff" for char in str(text or ""))
+
+
+def _feedback_language(language, *texts):
+    language = (language or "").strip().lower()
+    if language.startswith("ar"):
+        return "ar"
+    if language.startswith("en"):
+        return "en"
+    return "ar" if any(_is_arabic_text(text) for text in texts) else "en"
+
+
+def _format_concept(token):
+    return str(token or "").replace("_", " ").strip()
+
+
+def _limited_concepts(concepts):
+    return [_format_concept(token) for token in sorted(concepts)[:MAX_FEEDBACK_CONCEPTS]]
+
+
+def _more_count(concepts):
+    return max(0, len(concepts) - MAX_FEEDBACK_CONCEPTS)
 
 
 def _content_tokens(text):
@@ -136,8 +162,8 @@ def combine_similarity_metrics(reference_similarity, concept_match):
 
 def combine_evaluation_score(answer_similarity, concept_match, question_relevance):
     combined = (
-        (answer_similarity * 0.75) +
-        (concept_match * 0.15) +
+        (answer_similarity * 0.8) +
+        (concept_match * 0.1) +
         (question_relevance * 0.1)
     )
 
@@ -157,6 +183,111 @@ def combine_evaluation_score(answer_similarity, concept_match, question_relevanc
     return _clamp(combined)
 
 
+def build_feedback(result, language="en"):
+    lang = _feedback_language(
+        language,
+        result.get("reference_answer", ""),
+        result.get("student_answer", ""),
+    )
+    matched = result.get("matched_concepts") or []
+    missing = result.get("missing_reference_concepts") or []
+    relevance = _clamp(result.get("question_relevance", 1.0))
+
+    matched_items = _limited_concepts(matched)
+    missing_items = _limited_concepts(missing)
+    matched_more = _more_count(matched)
+    missing_more = _more_count(missing)
+
+    if lang == "ar":
+        strengths = [
+            "\u0645\u0641\u0647\u0648\u0645 \u0645\u0637\u0627\u0628\u0642: {0}".format(item)
+            for item in matched_items
+        ]
+        if matched_more:
+            strengths.append(
+                "\u062a\u0645\u062a \u0645\u0637\u0627\u0628\u0642\u0629 {0} \u0645\u0641\u0627\u0647\u064a\u0645 \u0623\u062e\u0631\u0649 \u0645\u0646 \u0627\u0644\u0625\u062c\u0627\u0628\u0629 \u0627\u0644\u0645\u0631\u062c\u0639\u064a\u0629.".format(matched_more)
+            )
+        if not strengths:
+            strengths.append(
+                "\u0644\u0645 \u062a\u0638\u0647\u0631 \u0645\u0641\u0627\u0647\u064a\u0645 \u0645\u0637\u0627\u0628\u0642\u0629 \u0648\u0627\u0636\u062d\u0629 \u0645\u0646 \u0627\u0644\u0625\u062c\u0627\u0628\u0629 \u0627\u0644\u0645\u0631\u062c\u0639\u064a\u0629."
+            )
+
+        areas = [
+            "\u0623\u0636\u0641 \u0627\u0644\u0645\u0641\u0647\u0648\u0645 \u0627\u0644\u0646\u0627\u0642\u0635: {0}".format(item)
+            for item in missing_items
+        ]
+        if missing_more:
+            areas.append(
+                "\u062a\u0648\u062c\u062f {0} \u0645\u0641\u0627\u0647\u064a\u0645 \u0645\u0631\u062c\u0639\u064a\u0629 \u0623\u062e\u0631\u0649 \u062a\u062d\u062a\u0627\u062c \u0625\u0644\u0649 \u062a\u063a\u0637\u064a\u0629.".format(missing_more)
+            )
+        if not areas:
+            areas.append(
+                "\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0641\u0627\u0647\u064a\u0645 \u0645\u0631\u062c\u0639\u064a\u0629 \u0631\u0626\u064a\u0633\u064a\u0629 \u0645\u0641\u0642\u0648\u062f\u0629."
+            )
+        if relevance < 0.35:
+            areas.insert(
+                0,
+                "\u0627\u0644\u0625\u062c\u0627\u0628\u0629 \u0644\u0627 \u062a\u0631\u062a\u0628\u0637 \u0628\u0627\u0644\u0633\u0624\u0627\u0644 \u0628\u0634\u0643\u0644 \u0648\u0627\u0636\u062d.",
+            )
+        elif relevance < 0.6:
+            areas.insert(
+                0,
+                "\u0627\u0644\u0625\u062c\u0627\u0628\u0629 \u0645\u0631\u062a\u0628\u0637\u0629 \u062c\u0632\u0626\u064a\u0627 \u0628\u0627\u0644\u0633\u0624\u0627\u0644.",
+            )
+
+        if missing_items:
+            steps = [
+                "\u0623\u0639\u062f \u0643\u062a\u0627\u0628\u0629 \u0627\u0644\u0625\u062c\u0627\u0628\u0629 \u0628\u0625\u0636\u0627\u0641\u0629: {0}.".format(
+                    ", ".join(missing_items[:3])
+                )
+            ]
+        else:
+            steps = [
+                "\u0631\u0627\u062c\u0639 \u0627\u0644\u0635\u064a\u0627\u063a\u0629 \u0648\u0623\u0636\u0641 \u062a\u0641\u0635\u064a\u0644\u0627 \u0648\u0627\u062d\u062f\u0627 \u062f\u0627\u0639\u0645\u0627 \u0625\u0630\u0627 \u0644\u0632\u0645."
+            ]
+        if relevance < 0.6:
+            steps.insert(
+                0,
+                "\u0627\u0631\u0628\u0637 \u0627\u0644\u0625\u062c\u0627\u0628\u0629 \u0628\u0627\u0644\u0633\u0624\u0627\u0644 \u0628\u0634\u0643\u0644 \u0623\u0648\u0636\u062d.",
+            )
+        return {
+            "language": "ar",
+            "correct_concepts": strengths,
+            "missing_concepts": areas,
+            "suggestions": steps,
+        }
+
+    strengths = ["Matched concept: {0}".format(item) for item in matched_items]
+    if matched_more:
+        strengths.append("{0} additional reference concepts were matched.".format(matched_more))
+    if not strengths:
+        strengths.append("No clear reference concepts were matched.")
+
+    areas = ["Add missing concept: {0}".format(item) for item in missing_items]
+    if missing_more:
+        areas.append("{0} additional reference concepts still need coverage.".format(missing_more))
+    if not areas:
+        areas.append("No major reference concepts are missing.")
+    if relevance < 0.35:
+        areas.insert(0, "The answer does not clearly address the question.")
+    elif relevance < 0.6:
+        areas.insert(0, "The answer is only partly connected to the question.")
+
+    if missing_items:
+        steps = ["Revise the answer to include: {0}.".format(", ".join(missing_items[:3]))]
+    else:
+        steps = ["Keep the core answer and add one precise supporting detail if needed."]
+    if relevance < 0.6:
+        steps.insert(0, "Tie the answer more directly to the question prompt.")
+
+    return {
+        "language": "en",
+        "correct_concepts": strengths,
+        "missing_concepts": areas,
+        "suggestions": steps,
+    }
+
+
 def evaluate_answer(*args, **kwargs):
     """
     Run the answer evaluation pipeline and return JSON-compatible values.
@@ -164,6 +295,7 @@ def evaluate_answer(*args, **kwargs):
     (subject, reference_answer, student_answer) positional form.
     """
     subject = kwargs.get("subject")
+    language = kwargs.get("language")
 
     if args:
         if len(args) == 2:
@@ -175,13 +307,28 @@ def evaluate_answer(*args, **kwargs):
     else:
         reference_answer = kwargs.get("reference_answer")
         student_answer = kwargs.get("student_answer")
+        language = kwargs.get("language")
 
     if not reference_answer or not student_answer:
-        return {
+        empty_result = {
             "similarity": 0.0,
+            "semantic_similarity": 0.0,
             "coverage": 0.0,
+            "concept_match": 0.0,
+            "concept_recall": 0.0,
+            "concept_precision": 0.0,
             "question_relevance": 0.0,
+            "is_relevant": False,
             "score": 0,
+            "matched_concepts": [],
+            "missing_reference_concepts": [],
+            "extra_student_concepts": [],
+            "reference_answer": reference_answer or "",
+            "student_answer": student_answer or "",
+        }
+        empty_result["feedback"] = build_feedback(empty_result, language)
+        return {
+            **empty_result,
         }
 
     reference_clean = preprocess_text(reference_answer)
@@ -190,21 +337,24 @@ def evaluate_answer(*args, **kwargs):
     concept_match, overlap = calculate_concept_match(reference_answer, student_answer)
     similarity = combine_similarity_metrics(semantic_similarity, concept_match)
     question_relevance = calculate_question_relevance(subject, student_answer)
-    combined_score = combine_evaluation_score(similarity, concept_match, question_relevance)
+    threshold_similarity = combine_evaluation_score(similarity, concept_match, question_relevance)
 
-    return {
-        "similarity": round(similarity, 3),
+    result = {
+        "similarity": round(threshold_similarity, 3),
         "semantic_similarity": round(semantic_similarity, 3),
+        "answer_similarity": round(similarity, 3),
         "coverage": round(concept_match, 3),
         "concept_match": round(concept_match, 3),
         "concept_recall": round(overlap["recall"], 3),
         "concept_precision": round(overlap["precision"], 3),
         "question_relevance": round(question_relevance, 3),
         "is_relevant": question_relevance >= 0.35,
-        "score": generate_score(combined_score),
+        "score": generate_score(threshold_similarity),
         "matched_concepts": sorted(overlap["shared_tokens"]),
         "missing_reference_concepts": sorted(overlap["source_tokens"] - overlap["shared_tokens"]),
         "extra_student_concepts": sorted(overlap["target_tokens"] - overlap["shared_tokens"]),
         "reference_answer": reference_answer,
         "student_answer": student_answer,
     }
+    result["feedback"] = build_feedback(result, language)
+    return result

@@ -121,6 +121,10 @@ window.clearClientAuthToken = clearClientAuthToken;
     var langLabel = document.getElementById('langLabel');
     var isArabic = false;
 
+    window.getDashboardLanguage = function() {
+        return isArabic ? 'ar' : 'en';
+    };
+
     if (langSwitch) {
         langSwitch.addEventListener('click', function() {
             isArabic = !isArabic;
@@ -502,7 +506,8 @@ window.clearClientAuthToken = clearClientAuthToken;
                 body: JSON.stringify({
                     reference_answer: reference,
                     student_answer: student,
-                    subject: subject
+                    subject: subject,
+                    language: window.getDashboardLanguage ? window.getDashboardLanguage() : document.documentElement.lang || 'en'
                 }),
                 credentials: 'same-origin'
             })
@@ -1098,6 +1103,7 @@ window.initializeEvaluationModule = function() {
                 subject: subject,
                 reference_answer: reference,
                 student_answer: student,
+                language: window.getDashboardLanguage ? window.getDashboardLanguage() : document.documentElement.lang || 'en',
                 auth_token: window.getAuthToken ? window.getAuthToken() : (window.AUTH_TOKEN || '')
             }),
             credentials: 'same-origin'

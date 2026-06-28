@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 from src.answer_evaluation.evaluator import evaluate_answer
 from src.answer_evaluation.preprocess import preprocess_text
+from src.answer_evaluation.scoring import generate_score
 
 
 class ArabicPreprocessTests(unittest.TestCase):
@@ -54,6 +55,31 @@ class AnswerEvaluationTests(unittest.TestCase):
 
         self.assertFalse(result["is_relevant"])
         self.assertLessEqual(result["score"], 2)
+
+    def test_score_follows_displayed_similarity_threshold(self):
+        with patch("src.answer_evaluation.evaluator.calculate_similarity", return_value=0.78):
+            result = evaluate_answer(
+                "General",
+                "Plants need sunlight and water to produce glucose and oxygen.",
+                "Plants use sunlight and water to make glucose.",
+            )
+
+        self.assertEqual(result["score"], generate_score(result["similarity"]))
+
+    def test_feedback_uses_actual_concepts_and_language(self):
+        with patch("src.answer_evaluation.evaluator.calculate_similarity", return_value=0.82):
+            result = evaluate_answer(
+                "General",
+                "Photosynthesis uses sunlight water carbon dioxide glucose oxygen",
+                "Photosynthesis uses sunlight and water",
+                language="ar",
+            )
+
+        feedback = result["feedback"]
+        self.assertEqual(feedback["language"], "ar")
+        self.assertIn("sunlight", " ".join(feedback["correct_concepts"]))
+        self.assertIn("glucose", " ".join(feedback["missing_concepts"]))
+        self.assertNotIn("Core concepts understood", " ".join(feedback["correct_concepts"]))
 
 
 if __name__ == "__main__":
