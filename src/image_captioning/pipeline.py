@@ -58,6 +58,22 @@ ACTION_WORDS = {
     "wearing",
 }
 SCENE_WORDS = {"at", "beside", "in", "inside", "near", "next", "on", "outside", "under", "with"}
+SCENE_LABEL_WORDS = {
+    "airport",
+    "beach",
+    "city",
+    "classroom",
+    "field",
+    "forest",
+    "kitchen",
+    "office",
+    "park",
+    "restaurant",
+    "room",
+    "school",
+    "street",
+    "yard",
+}
 SPECULATIVE_PHRASES = (
     "appears to be",
     "appears like",
@@ -103,6 +119,17 @@ EVENT_GUESSES = {
     "festival",
     "party",
     "wedding",
+}
+VAGUE_WORDS = {
+    "bunch",
+    "group",
+    "many",
+    "several",
+    "something",
+    "stuff",
+    "thing",
+    "things",
+    "various",
 }
 STRONG_CAPTION_SCORE = 8.0
 
@@ -281,9 +308,13 @@ def _word_counts(candidates):
     return counts
 
 
-def _action_counts(candidates):
-    counts = _word_counts(candidates)
-    return {word: counts.get(word, 0) for word in ACTION_WORDS}
+def _caption_evidence(candidates):
+    word_counts = _word_counts(candidates)
+    return {
+        "words": word_counts,
+        "actions": {word: word_counts.get(word, 0) for word in ACTION_WORDS},
+        "scenes": {word: word_counts.get(word, 0) for word in SCENE_LABEL_WORDS},
+    }
 
 
 def _caption_mentions_label(caption, primary_label):
@@ -311,10 +342,13 @@ def _label_position(caption, primary_label):
         return None
 
 
-def _caption_score(caption, primary_label="", action_counts=None):
+def _caption_score(caption, primary_label="", evidence=None):
     if _is_generic_caption(caption):
         return -100.0
 
+    evidence = evidence or {}
+    action_counts = evidence.get("actions") or {}
+    scene_counts = evidence.get("scenes") or {}
     normalized = _normalized_caption(caption).lower()
     words = _caption_words(normalized)
     word_set = set(words)
@@ -349,13 +383,21 @@ def _caption_score(caption, primary_label="", action_counts=None):
         (word_set & UNSUPPORTED_RELATIONSHIP_TERMS)
         | (word_set & SUBJECTIVE_MODIFIERS)
         | (word_set & EVENT_GUESSES)
+        | (word_set & VAGUE_WORDS)
     )
     score -= len(unsupported_terms) * 1.4
+
+    unsupported_scenes = {
+        word
+        for word in word_set & SCENE_LABEL_WORDS
+        if scene_counts and scene_counts.get(word, 0) < 2
+    }
+    score -= len(unsupported_scenes) * 1.2
 
     if any(phrase in normalized for phrase in SPECULATIVE_PHRASES):
         score -= 2.0
 
-    if normalized.startswith(BACKGROUND_FIRST_TERMS):
+    if normalized.startswith(BACKGROUND_FIRST_TERMS) or "background" in word_set:
         score -= 2.5
 
     return score
@@ -392,9 +434,52 @@ def _replace_relationship_claims(caption):
     return caption
 
 
+def _replace_vague_quantities(caption):
+    caption = re.sub(
+        r"\b(?:a\s+)?(?:group|bunch)\s+of\s+people\b",
+        "people",
+        caption,
+        flags=re.IGNORECASE,
+    )
+    caption = re.sub(
+        r"\b(?:many|several|various)\s+people\b",
+        "people",
+        caption,
+        flags=re.IGNORECASE,
+    )
+    caption = re.sub(
+        r"\b(?:a\s+)?(?:group|bunch)\s+of\s+([a-z]+s)\b",
+        r"\1",
+        caption,
+        flags=re.IGNORECASE,
+    )
+    return _normalized_caption(caption)
+
+
 def _remove_unsupported_modifiers(caption):
-    for word in SUBJECTIVE_MODIFIERS | EVENT_GUESSES:
+    for word in SUBJECTIVE_MODIFIERS | EVENT_GUESSES | VAGUE_WORDS:
         caption = re.sub(rf"\b{re.escape(word)}\b", "", caption, flags=re.IGNORECASE)
+    return _normalized_caption(caption)
+
+
+def _remove_unsupported_scene_labels(caption, evidence=None):
+    evidence = evidence or {}
+    scene_counts = evidence.get("scenes") or {}
+
+    def replace_scene(match):
+        scene = match.group("scene").lower()
+        if scene_counts and scene_counts.get(scene, 0) >= 2:
+            return match.group(0)
+        return ""
+
+    scene_pattern = (
+        r"\b(?:in|inside|at|near|outside|on)\s+"
+        r"(?:a|an|the)?\s*(?P<scene>"
+        + "|".join(sorted(SCENE_LABEL_WORDS))
+        + r")\b"
+    )
+    caption = re.sub(scene_pattern, replace_scene, caption, flags=re.IGNORECASE)
+    caption = re.sub(r"\b(?:in|at|near|toward)\s+the\s+background\b", "", caption, flags=re.IGNORECASE)
     return _normalized_caption(caption)
 
 
@@ -408,16 +493,50 @@ def _clean_caption_grammar(caption):
     return caption
 
 
-def _sanitize_caption_claims(caption):
+def _make_caption_natural(caption):
+    caption = _normalized_caption(caption)
+    action_pattern = "|".join(sorted(ACTION_WORDS))
+
+    if re.search(rf"\b(?:is|are|was|were)\s+(?:{action_pattern})\b", caption, flags=re.IGNORECASE):
+        return caption
+
+    caption = re.sub(
+        rf"^((?:a|an|the)\s+.+?)\s+({action_pattern})(\b.*)$",
+        r"\1 is \2\3",
+        caption,
+        count=1,
+        flags=re.IGNORECASE,
+    )
+    caption = re.sub(
+        rf"^((?:two|three|four|people)\s+.+?)\s+({action_pattern})(\b.*)$",
+        r"\1 are \2\3",
+        caption,
+        count=1,
+        flags=re.IGNORECASE,
+    )
+    caption = re.sub(
+        rf"^(people)\s+({action_pattern})(\b.*)$",
+        r"\1 are \2\3",
+        caption,
+        count=1,
+        flags=re.IGNORECASE,
+    )
+    return _normalized_caption(caption)
+
+
+def _sanitize_caption_claims(caption, evidence=None):
     caption = _strip_prompt_lead(caption)
     caption = _remove_speculative_language(caption)
     caption = _replace_relationship_claims(caption)
+    caption = _replace_vague_quantities(caption)
     caption = _remove_unsupported_modifiers(caption)
+    caption = _remove_unsupported_scene_labels(caption, evidence)
+    caption = _make_caption_natural(caption)
     return _clean_caption_grammar(caption)
 
 
-def _finalize_caption(caption, primary_label=""):
-    caption = _sanitize_caption_claims(caption)
+def _finalize_caption(caption, primary_label="", evidence=None):
+    caption = _sanitize_caption_claims(caption, evidence)
 
     if _is_generic_caption(caption) or len(_caption_words(caption)) < 4:
         caption = _caption_from_label(primary_label)
@@ -430,9 +549,9 @@ def _finalize_caption(caption, primary_label=""):
 
 
 def _best_caption(candidates, primary_label=""):
-    action_support = _action_counts(candidates)
+    evidence = _caption_evidence(candidates)
     usable_candidates = [
-        _sanitize_caption_claims(candidate)
+        _sanitize_caption_claims(candidate, evidence)
         for candidate in candidates
         if not _is_generic_caption(candidate)
     ]
@@ -442,7 +561,7 @@ def _best_caption(candidates, primary_label=""):
 
     return max(
         usable_candidates,
-        key=lambda candidate: _caption_score(candidate, primary_label, action_support),
+        key=lambda candidate: _caption_score(candidate, primary_label, evidence),
     )
 
 
@@ -478,12 +597,13 @@ def generate_caption(image_path):
                 candidates.append(caption)
 
         best_caption = _best_caption(candidates, primary_label)
-        if best_caption and _caption_score(best_caption, primary_label, _action_counts(candidates)) >= STRONG_CAPTION_SCORE:
-            return _finalize_caption(best_caption, primary_label)
+        evidence = _caption_evidence(candidates)
+        if best_caption and _caption_score(best_caption, primary_label, evidence) >= STRONG_CAPTION_SCORE:
+            return _finalize_caption(best_caption, primary_label, evidence)
 
     best_caption = _best_caption(candidates, primary_label)
     if best_caption:
-        return _finalize_caption(best_caption, primary_label)
+        return _finalize_caption(best_caption, primary_label, _caption_evidence(candidates))
 
     fallback_caption = _classifier_caption(image)
     if fallback_caption:

@@ -8,20 +8,52 @@ _model = None
 NOUNS = {
     "adult": "بالغ",
     "airplane": "طائرة",
+    "backpack": "حقيبة ظهر",
+    "ball": "كرة",
+    "bicycle": "دراجة",
     "bird": "طائر",
+    "boat": "قارب",
+    "book": "كتاب",
+    "bottle": "زجاجة",
+    "building": "مبنى",
     "bus": "حافلة",
     "car": "سيارة",
     "cat": "قطة",
+    "chair": "كرسي",
     "child": "طفل",
+    "couch": "أريكة",
+    "cup": "كوب",
     "dog": "كلب",
     "food": "طعام",
+    "grass": "عشب",
+    "horse": "حصان",
+    "laptop": "حاسوب محمول",
     "man": "رجل",
+    "motorcycle": "دراجة نارية",
     "person": "شخص",
     "people": "أشخاص",
+    "phone": "هاتف",
+    "road": "طريق",
+    "sky": "سماء",
+    "snow": "ثلج",
     "table": "طاولة",
     "train": "قطار",
     "tree": "شجرة",
+    "truck": "شاحنة",
+    "water": "ماء",
     "woman": "امرأة",
+}
+
+ADJECTIVES = {
+    "black": "أسود",
+    "blue": "أزرق",
+    "brown": "بني",
+    "green": "أخضر",
+    "large": "كبير",
+    "red": "أحمر",
+    "small": "صغير",
+    "white": "أبيض",
+    "yellow": "أصفر",
 }
 
 ACTIONS = {
@@ -55,6 +87,17 @@ PHRASES = {
     "outdoors": "في الخارج",
 }
 
+PREPOSITIONS = {
+    "beside": "بجانب",
+    "in": "في",
+    "inside": "داخل",
+    "near": "بالقرب من",
+    "on": "على",
+    "outside": "خارج",
+    "under": "تحت",
+    "with": "مع",
+}
+
 
 def _load_model():
     global _tokenizer, _model
@@ -83,7 +126,20 @@ def _strip_article(text):
 
 def _noun_to_arabic(noun):
     noun = _strip_article(noun)
-    return NOUNS.get(noun)
+    if noun in NOUNS:
+        return NOUNS[noun]
+
+    words = noun.split()
+    if len(words) > 1 and words[-1] in NOUNS:
+        translated_adjectives = [
+            ADJECTIVES[word]
+            for word in words[:-1]
+            if word in ADJECTIVES
+        ]
+        if len(translated_adjectives) == len(words[:-1]):
+            return " ".join([NOUNS[words[-1]]] + translated_adjectives)
+
+    return ""
 
 
 def _photo_of(noun):
@@ -101,6 +157,19 @@ def _translate_rest(rest):
     translated = PHRASES.get(rest)
     if translated:
         return f" {translated}"
+
+    import re
+
+    match = re.match(
+        r"^(?P<prep>beside|in|inside|near|on|outside|under|with)\s+"
+        r"(?P<noun>(?:a|an|the)?\s*[a-z ]+)$",
+        rest,
+    )
+    if match:
+        preposition = PREPOSITIONS.get(match.group("prep"))
+        noun = _noun_to_arabic(match.group("noun"))
+        if preposition and noun:
+            return f" {preposition} {noun}"
 
     return ""
 
@@ -120,6 +189,7 @@ def _template_translate(text):
 
     match = re.match(
         r"^(?:a|an|the)\s+(?P<noun>[a-z ]+?)\s+"
+        r"(?:(?:is|are)\s+)?"
         r"(?P<action>carrying|eating|flying|holding|jumping|laying|lying|looking|playing|riding|running|sitting|standing|walking|wearing)"
         r"(?P<rest>\s+.+)?$",
         lower,

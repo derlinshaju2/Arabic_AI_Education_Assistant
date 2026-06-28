@@ -48,7 +48,7 @@ class CaptionPipelineTests(unittest.TestCase):
             ):
                 caption = pipeline.generate_caption(image_path)
 
-        self.assertEqual(caption, "A dog playing in the grass.")
+        self.assertEqual(caption, "A dog is playing in the grass.")
 
     def test_classifier_label_becomes_readable_caption(self):
         self.assertEqual(
@@ -70,12 +70,45 @@ class CaptionPipelineTests(unittest.TestCase):
             ):
                 caption = pipeline.generate_caption(image_path)
 
-        self.assertEqual(caption, "A dog playing with a person.")
+        self.assertEqual(caption, "A dog is playing with a person.")
+
+    def test_unsupported_scene_label_is_removed(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            image_path = Path(tmpdir) / "sample.jpg"
+            Image.new("RGB", (24, 24), color="white").save(image_path)
+
+            def fake_generate(_image, _options, prompt=None):
+                if prompt and "dog" in prompt:
+                    return "a dog sitting in a restaurant"
+                return "a dog sitting on grass"
+
+            with patch(
+                "src.image_captioning.pipeline._classifier_label",
+                return_value="dog",
+            ), patch(
+                "src.image_captioning.pipeline._generate_blip_caption",
+                side_effect=fake_generate,
+            ):
+                caption = pipeline.generate_caption(image_path)
+
+        self.assertEqual(caption, "A dog is sitting on grass.")
+
+    def test_vague_people_quantity_becomes_visible_people(self):
+        self.assertEqual(
+            pipeline._finalize_caption("a group of people standing near a car"),
+            "People are standing near a car.",
+        )
 
     def test_template_arabic_caption_matches_simple_english_caption(self):
         self.assertEqual(
-            translator.translate_to_arabic("A dog playing in the grass."),
+            translator.translate_to_arabic("A dog is playing in the grass."),
             "كلب يلعب على العشب.",
+        )
+
+    def test_template_arabic_caption_translates_simple_visible_place(self):
+        self.assertEqual(
+            translator.translate_to_arabic("A black dog is sitting on a couch."),
+            "كلب أسود جالس على أريكة.",
         )
 
     def test_template_arabic_photo_caption_matches_simple_english_caption(self):
