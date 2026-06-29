@@ -6,6 +6,12 @@ _tokenizer = None
 _model = None
 
 NOUNS = {
+    "animal": "\u062d\u064a\u0648\u0627\u0646",
+    "cart": "\u0639\u0631\u0628\u0629",
+    "cow": "\u0628\u0642\u0631\u0629",
+    "sheep": "\u062e\u0631\u0648\u0641",
+    "street": "\u0634\u0627\u0631\u0639",
+    "vehicle": "\u0645\u0631\u0643\u0628\u0629",
     "adult": "بالغ",
     "airplane": "طائرة",
     "backpack": "حقيبة ظهر",
@@ -106,6 +112,7 @@ PHRASES = {
 }
 
 FALLBACK_CAPTIONS = {
+    "visible objects are present": "\u062a\u0648\u062c\u062f \u0623\u0634\u064a\u0627\u0621 \u0645\u0631\u0626\u064a\u0629.",
     "a photo with visible objects": "صورة تحتوي على أشياء مرئية.",
 }
 
@@ -212,6 +219,16 @@ def _template_translate(text):
         noun = _noun_to_arabic(match.group("noun"))
         if noun:
             return _photo_of(noun)
+
+    match = re.match(r"^people\s+are\s+visible$", lower)
+    if match:
+        return "\u064a\u0638\u0647\u0631 \u0623\u0634\u062e\u0627\u0635."
+
+    match = re.match(r"^(?:a|an|the)\s+(?P<noun>[a-z ]+?)\s+is\s+visible$", lower)
+    if match:
+        noun = _noun_to_arabic(match.group("noun"))
+        if noun:
+            return f"\u064a\u0638\u0647\u0631 {noun}."
 
     match = re.match(
         r"^(?P<noun>people)\s+"

@@ -1,7 +1,12 @@
+import hashlib
+import logging
 import os
 import re
 
 from PIL import Image
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 def _float_env(name, default):
@@ -11,14 +16,16 @@ def _float_env(name, default):
         return float(default)
 
 
+def _bool_env(name, default):
+    return os.environ.get(name, default).lower() not in {"0", "false", "no"}
+
+
 CAPTION_MODEL = os.environ.get("CAPTION_MODEL", "Salesforce/blip-image-captioning-base")
 CLASSIFIER_MODEL = os.environ.get("IMAGE_CLASSIFIER_MODEL", "microsoft/resnet-50")
+SIMILARITY_MODEL = os.environ.get("IMAGE_TEXT_SIMILARITY_MODEL", "openai/clip-vit-base-patch32")
 CLASSIFIER_MIN_CONFIDENCE = _float_env("IMAGE_CLASSIFIER_MIN_CONFIDENCE", "0.20")
-ENABLE_CLASSIFIER_FALLBACK = os.environ.get("IMAGE_CLASSIFIER_FALLBACK", "1").lower() not in {
-    "0",
-    "false",
-    "no",
-}
+ENABLE_CLASSIFIER_FALLBACK = _bool_env("IMAGE_CLASSIFIER_FALLBACK", "1")
+ENABLE_SIMILARITY_RANKING = _bool_env("IMAGE_TEXT_SIMILARITY_RANKING", "1")
 
 GENERIC_PROMPT_ECHOES = {
     "a clear and realistic description of the image",
@@ -83,6 +90,39 @@ SCENE_LABEL_WORDS = {
     "street",
     "yard",
 }
+IMPORTANT_VISIBLE_WORDS = {
+    "animal",
+    "animals",
+    "bicycle",
+    "bicycles",
+    "bird",
+    "birds",
+    "boat",
+    "boats",
+    "bus",
+    "buses",
+    "car",
+    "cars",
+    "cart",
+    "carts",
+    "cat",
+    "cats",
+    "cow",
+    "cows",
+    "dog",
+    "dogs",
+    "horse",
+    "horses",
+    "motorcycle",
+    "motorcycles",
+    "road",
+    "street",
+    "truck",
+    "trucks",
+    "vehicle",
+    "vehicles",
+}
+TRAILING_PREPOSITIONS = {"at", "beside", "by", "in", "inside", "near", "of", "on", "outside", "under", "with"}
 SPECULATIVE_PHRASES = (
     "appears to be",
     "appears like",
@@ -155,6 +195,9 @@ _caption_model = None
 _classifier_processor = None
 _classifier_model = None
 _classifier_load_failed = False
+_similarity_processor = None
+_similarity_model = None
+_similarity_load_failed = False
 
 
 def _normalized_caption(text):
@@ -230,6 +273,28 @@ def _load_classifier_model():
     return _classifier_processor, _classifier_model
 
 
+def _load_similarity_model():
+    global _similarity_processor, _similarity_model, _similarity_load_failed
+
+    if not ENABLE_SIMILARITY_RANKING or _similarity_load_failed:
+        return None, None
+
+    if _similarity_processor is None or _similarity_model is None:
+        try:
+            from transformers import CLIPModel, CLIPProcessor
+
+            device = _get_device()
+            _similarity_processor = CLIPProcessor.from_pretrained(SIMILARITY_MODEL)
+            _similarity_model = CLIPModel.from_pretrained(SIMILARITY_MODEL).to(device)
+            _similarity_model.eval()
+        except Exception:
+            _similarity_load_failed = True
+            LOGGER.exception("Unable to load image-text similarity model")
+            return None, None
+
+    return _similarity_processor, _similarity_model
+
+
 def _move_to_device(inputs):
     device = _get_device()
     return {
@@ -269,7 +334,7 @@ def _caption_from_label(label):
     if not label:
         return ""
 
-    return f"a photo of {_article_for(label)} {label}"
+    return f"{_article_for(label)} {label} is visible"
 
 
 def _classifier_label(image):
@@ -307,6 +372,7 @@ def _classifier_caption(image):
 def _caption_prompts(primary_label):
     prompts = [
         "a photo of",
+        "a clear image of",
         None,
     ]
 
@@ -339,6 +405,10 @@ def _caption_evidence(candidates):
     return {
         "words": word_counts,
         "actions": {word: word_counts.get(word, 0) for word in ACTION_WORDS},
+        "important_objects": {
+            word: word_counts.get(word, 0)
+            for word in IMPORTANT_VISIBLE_WORDS
+        },
         "scenes": {word: word_counts.get(word, 0) for word in SCENE_LABEL_WORDS},
     }
 
@@ -386,7 +456,7 @@ def _caption_score(caption, primary_label="", evidence=None):
         score += 1.0
 
     if normalized.startswith(("a photo of", "an image of", "a picture of")):
-        score += 1.2
+        score -= 1.2
 
     if primary_label and _caption_mentions_label(normalized, primary_label):
         score += 3.5
@@ -404,6 +474,8 @@ def _caption_score(caption, primary_label="", evidence=None):
 
     if any(word in SCENE_WORDS for word in words):
         score += 1.0
+
+    score += len(word_set & IMPORTANT_VISIBLE_WORDS) * 0.6
 
     unsupported_terms = (
         (word_set & UNSUPPORTED_RELATIONSHIP_TERMS)
@@ -434,6 +506,12 @@ def _strip_prompt_lead(caption):
     caption = _normalized_caption(caption)
     caption = re.sub(
         r"^(?:the main subject(?: of the image)? is|this image shows|the image shows|the photo shows|this photo shows|there is|there are)\s+",
+        "",
+        caption,
+        flags=re.IGNORECASE,
+    )
+    caption = re.sub(
+        r"^(?:a|an|the)\s+(?:photo|image|picture)\s+of\s+",
         "",
         caption,
         flags=re.IGNORECASE,
@@ -503,7 +581,7 @@ def _remove_unsupported_scene_labels(caption, evidence=None):
 
     def replace_scene(match):
         scene = match.group("scene").lower()
-        if scene_counts and scene_counts.get(scene, 0) >= 2:
+        if scene in IMPORTANT_VISIBLE_WORDS or (scene_counts and scene_counts.get(scene, 0) >= 2):
             return match.group(0)
         return ""
 
@@ -583,32 +661,120 @@ def _finalize_caption(caption, primary_label="", evidence=None):
 
     caption = _normalized_caption(caption).strip(" .")
     if not caption:
-        caption = "a photo with visible objects"
+        caption = "visible objects are present"
 
     return caption[:1].upper() + caption[1:] + "."
 
 
-def _best_caption(candidates, primary_label=""):
+def _invalid_caption_reason(caption):
+    normalized = _normalized_caption(caption).lower().strip(" .")
+    words = _caption_words(normalized)
+
+    if _is_generic_caption(normalized):
+        return "generic"
+    if not words:
+        return "empty"
+    if len(words) < 4:
+        return "too_short"
+    if len(words) > 30:
+        return "too_long"
+    if normalized.startswith(("a photo of", "an image of", "a picture of")):
+        return "generic_media_prefix"
+    if words[-1] in TRAILING_PREPOSITIONS:
+        return "trailing_preposition"
+    if re.search(r"\b([a-z]+)\s+\1\b", normalized):
+        return "repeated_word"
+    if not re.search(
+        r"\b(is|are|with|near|beside|in|inside|on|outside|under|"
+        r"carrying|eating|flying|holding|jumping|laying|lying|looking|"
+        r"playing|riding|running|sitting|standing|walking|wearing|visible|present)\b",
+        normalized,
+    ):
+        return "missing_predicate"
+
+    return ""
+
+
+def _image_text_similarity(image, captions):
+    processor, model = _load_similarity_model()
+    if processor is None or model is None or not captions:
+        return {}
+
+    torch = _load_torch()
+    inputs = processor(
+        text=captions,
+        images=image,
+        return_tensors="pt",
+        padding=True,
+        truncation=True,
+    )
+    inputs = _move_to_device(inputs)
+
+    with torch.no_grad():
+        outputs = model(**inputs)
+
+    scores = outputs.logits_per_image[0].detach().cpu().tolist()
+    return dict(zip(captions, scores))
+
+
+def _candidate_diagnostics(candidates, evidence):
+    records = []
+    seen = set()
+    for raw_candidate in candidates:
+        sanitized = _sanitize_caption_claims(raw_candidate, evidence)
+        reason = _invalid_caption_reason(sanitized)
+        if sanitized in seen and not reason:
+            reason = "duplicate"
+        if sanitized:
+            seen.add(sanitized)
+        records.append(
+            {
+                "raw": raw_candidate,
+                "caption": sanitized,
+                "rejected": bool(reason),
+                "reason": reason,
+            }
+        )
+    return records
+
+
+def _best_caption(image, candidates, primary_label=""):
     evidence = _caption_evidence(candidates)
+    diagnostics = _candidate_diagnostics(candidates, evidence)
     usable_candidates = [
-        _sanitize_caption_claims(candidate, evidence)
-        for candidate in candidates
-        if not _is_generic_caption(candidate)
+        record["caption"]
+        for record in diagnostics
+        if not record["rejected"]
     ]
 
     if not usable_candidates:
-        return ""
+        return "", diagnostics, {}
 
-    return max(
+    similarities = _image_text_similarity(image, usable_candidates)
+
+    best_caption = max(
         usable_candidates,
-        key=lambda candidate: _caption_score(candidate, primary_label, evidence),
+        key=lambda candidate: (
+            similarities.get(candidate, 0.0),
+            _caption_score(candidate, primary_label, evidence),
+        ),
     )
+    return best_caption, diagnostics, similarities
 
 
-def generate_caption(image_path):
+def image_file_hash(image_path):
+    digest = hashlib.sha256()
+    with open(image_path, "rb") as image_file:
+        for chunk in iter(lambda: image_file.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def generate_caption_result(image_path):
     with Image.open(image_path) as uploaded_image:
         image = uploaded_image.convert("RGB")
 
+    image_hash = image_file_hash(image_path)
     primary_label = _classifier_label(image)
     generation_attempts = (
         {
@@ -627,26 +793,57 @@ def generate_caption(image_path):
             "length_penalty": 0.9,
             "early_stopping": True,
         },
+        {
+            "max_new_tokens": 36,
+            "min_length": 10,
+            "num_beams": 7,
+            "repetition_penalty": 1.25,
+            "length_penalty": 1.0,
+            "early_stopping": True,
+        },
     )
 
     candidates = []
+    diagnostics = []
+    similarities = {}
     for options in generation_attempts:
         for prompt in _caption_prompts(primary_label):
             caption = _generate_blip_caption(image, options, prompt=prompt)
             if caption and caption not in candidates:
                 candidates.append(caption)
 
-        best_caption = _best_caption(candidates, primary_label)
+        best_caption, diagnostics, similarities = _best_caption(image, candidates, primary_label)
         evidence = _caption_evidence(candidates)
         if best_caption and _caption_score(best_caption, primary_label, evidence) >= STRONG_CAPTION_SCORE:
-            return _finalize_caption(best_caption, primary_label, evidence)
+            english_caption = _finalize_caption(best_caption, primary_label, evidence)
+            break
+    else:
+        best_caption, diagnostics, similarities = _best_caption(image, candidates, primary_label)
+        if best_caption:
+            english_caption = _finalize_caption(best_caption, primary_label, _caption_evidence(candidates))
+        else:
+            fallback_caption = _classifier_caption(image)
+            if fallback_caption:
+                english_caption = _finalize_caption(fallback_caption, primary_label)
+            else:
+                english_caption = "Visible objects are present."
 
-    best_caption = _best_caption(candidates, primary_label)
-    if best_caption:
-        return _finalize_caption(best_caption, primary_label, _caption_evidence(candidates))
+    result = {
+        "image_hash": image_hash,
+        "generated_candidates": candidates,
+        "candidate_diagnostics": diagnostics,
+        "selected_english_caption": english_caption,
+        "similarity_scores": similarities,
+    }
+    LOGGER.info(
+        "caption image_hash=%s candidates=%r selected_english=%r similarity_scores=%r",
+        image_hash,
+        candidates,
+        english_caption,
+        similarities,
+    )
+    return result
 
-    fallback_caption = _classifier_caption(image)
-    if fallback_caption:
-        return _finalize_caption(fallback_caption, primary_label)
 
-    return "A photo with visible objects."
+def generate_caption(image_path):
+    return generate_caption_result(image_path)["selected_english_caption"]

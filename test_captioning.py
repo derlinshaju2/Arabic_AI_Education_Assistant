@@ -10,6 +10,16 @@ from src.image_captioning import translator
 
 
 class CaptionPipelineTests(unittest.TestCase):
+    def setUp(self):
+        self.similarity_patcher = patch(
+            "src.image_captioning.pipeline._image_text_similarity",
+            return_value={},
+        )
+        self.similarity_patcher.start()
+
+    def tearDown(self):
+        self.similarity_patcher.stop()
+
     def test_prompt_echo_uses_fallback_caption(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             image_path = Path(tmpdir) / "sample.jpg"
@@ -27,7 +37,7 @@ class CaptionPipelineTests(unittest.TestCase):
             ):
                 caption = pipeline.generate_caption(image_path)
 
-        self.assertEqual(caption, "A photo of a dog.")
+        self.assertEqual(caption, "A dog is visible.")
 
     def test_prefers_main_subject_before_background_details(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -53,7 +63,7 @@ class CaptionPipelineTests(unittest.TestCase):
     def test_classifier_label_becomes_readable_caption(self):
         self.assertEqual(
             pipeline._caption_from_label("tabby, tabby cat"),
-            "a photo of a tabby",
+            "a tabby is visible",
         )
 
     def test_low_confidence_classifier_label_is_ignored(self):
@@ -134,8 +144,63 @@ class CaptionPipelineTests(unittest.TestCase):
     def test_caption_finalizer_removes_close_up_filler(self):
         self.assertEqual(
             pipeline._finalize_caption("a close-up of a dog", primary_label="dog"),
-            "A photo of a dog.",
+            "A dog is visible.",
         )
+
+    def test_caption_finalizer_removes_generic_photo_prefix(self):
+        self.assertEqual(
+            pipeline._finalize_caption("a photo of a dog sitting on grass"),
+            "A dog is sitting on grass.",
+        )
+
+    def test_similarity_ranking_selects_best_visible_candidate(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            image_path = Path(tmpdir) / "sample.jpg"
+            Image.new("RGB", (24, 24), color="white").save(image_path)
+
+            def fake_generate(_image, _options, prompt=None):
+                if prompt and "dog" in prompt:
+                    return "a dog sitting indoors"
+                return "a cart standing on a street"
+
+            with patch(
+                "src.image_captioning.pipeline._classifier_label",
+                return_value="dog",
+            ), patch(
+                "src.image_captioning.pipeline._generate_blip_caption",
+                side_effect=fake_generate,
+            ), patch(
+                "src.image_captioning.pipeline._image_text_similarity",
+                return_value={
+                    "a dog is sitting": 0.2,
+                    "a cart is standing on a street": 0.9,
+                },
+            ):
+                caption = pipeline.generate_caption(image_path)
+
+        self.assertEqual(caption, "A cart is standing on a street.")
+
+    def test_caption_result_tracks_each_uploaded_image_hash(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            first_path = Path(tmpdir) / "first.jpg"
+            second_path = Path(tmpdir) / "second.jpg"
+            Image.new("RGB", (24, 24), color="white").save(first_path)
+            Image.new("RGB", (24, 24), color="black").save(second_path)
+
+            with patch(
+                "src.image_captioning.pipeline._classifier_label",
+                return_value="dog",
+            ), patch(
+                "src.image_captioning.pipeline._generate_blip_caption",
+                return_value="a dog sitting on grass",
+            ):
+                first = pipeline.generate_caption_result(first_path)
+                second = pipeline.generate_caption_result(second_path)
+
+        self.assertNotEqual(first["image_hash"], second["image_hash"])
+        self.assertEqual(first["selected_english_caption"], "A dog is sitting on grass.")
+        self.assertEqual(second["selected_english_caption"], "A dog is sitting on grass.")
+        self.assertIn("a dog sitting on grass", first["generated_candidates"])
 
     def test_template_arabic_caption_matches_simple_english_caption(self):
         self.assertEqual(
@@ -157,14 +222,20 @@ class CaptionPipelineTests(unittest.TestCase):
 
     def test_template_arabic_caption_matches_fallback_english_caption(self):
         self.assertEqual(
-            translator.translate_to_arabic("A photo with visible objects."),
-            "صورة تحتوي على أشياء مرئية.",
+            translator.translate_to_arabic("Visible objects are present."),
+            "\u062a\u0648\u062c\u062f \u0623\u0634\u064a\u0627\u0621 \u0645\u0631\u0626\u064a\u0629.",
         )
 
     def test_template_arabic_photo_caption_matches_simple_english_caption(self):
         self.assertEqual(
             translator.translate_to_arabic("A photo of a dog."),
             "صورة لكلب.",
+        )
+
+    def test_template_arabic_visible_caption_matches_simple_english_caption(self):
+        self.assertEqual(
+            translator.translate_to_arabic("A dog is visible."),
+            f"\u064a\u0638\u0647\u0631 {translator.NOUNS['dog']}.",
         )
 
 

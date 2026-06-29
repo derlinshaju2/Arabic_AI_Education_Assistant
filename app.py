@@ -474,22 +474,36 @@ def google_callback_url():
 
 
 def caption_image(file):
-    from src.image_captioning.pipeline import generate_caption
+    from src.image_captioning.pipeline import generate_caption_result
     from src.image_captioning.translator import translate_to_arabic
 
     filename = f"{uuid.uuid4().hex}.jpg"
     path = os.path.join(UPLOAD_FOLDER, filename)
     file.save(path)
 
-    english_caption = generate_caption(path)
+    caption_result = generate_caption_result(path)
+    english_caption = caption_result["selected_english_caption"]
     arabic_caption = translate_to_arabic(english_caption)
+    image_hash = caption_result.get("image_hash", "")
+
+    app.logger.info(
+        "caption_image image_hash=%s candidates=%r selected_english=%r arabic=%r",
+        image_hash,
+        caption_result.get("generated_candidates", []),
+        english_caption,
+        arabic_caption,
+    )
 
     # Generate a confidence score based on caption length and content
     confidence = min(95, max(60, 70 + len(english_caption.split()) * 2))
+    image_url = url_for("static", filename=f"uploads/{filename}")
+    if image_hash:
+        image_url = f"{image_url}?v={image_hash[:12]}"
 
     return {
         "filename": filename,
-        "image_url": url_for("static", filename=f"uploads/{filename}"),
+        "image_hash": image_hash,
+        "image_url": image_url,
         "english_caption": english_caption,
         "arabic_caption": arabic_caption,
         "confidence": confidence,
