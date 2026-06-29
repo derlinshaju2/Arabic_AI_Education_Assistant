@@ -3672,3 +3672,302 @@ html body #contentArea
         min-height: 98px !important;
     }
 }
+
+/* ==========================================================
+   CAPTIONING MOBILE RHYTHM AND MOTION
+   ========================================================== */
+
+@keyframes captionLoadingEnter {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes captionResultEnter {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="captioning"]
+#captionSkeleton:not([hidden]) {
+    animation: captionLoadingEnter 240ms ease-out both;
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="captioning"]
+#captionResults:not([hidden]) {
+    animation: captionResultEnter 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="captioning"]
+#captionResults:not([hidden])
+> .image-preview-card {
+    animation: captionResultEnter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="captioning"]
+#captionResults:not([hidden])
+.result-list > .result-item:first-child {
+    animation: captionResultEnter 360ms 45ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+html body #contentArea
+.sider-workspace[data-module-view="captioning"]
+#captionResults:not([hidden])
+.result-list > .result-item:last-child {
+    animation: captionResultEnter 360ms 90ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (max-width: 768px) {
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"] {
+        box-sizing: border-box !important;
+        gap: 6px !important;
+        padding: 8px 12px 16px !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .workspace-heading {
+        margin: 0 0 2px !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .split-workspace {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        gap: 8px !important;
+        overflow: hidden !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    :is(.workspace-panel.input-panel, .workspace-panel.output-panel) {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        margin-inline: 0 !important;
+        padding: 12px !important;
+        gap: 8px !important;
+        border-radius: 14px !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    #captionForm {
+        flex: 0 0 auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        gap: 8px !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    #captionForm .file-drop {
+        flex: 0 0 108px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 108px !important;
+        min-height: 108px !important;
+        max-height: 108px !important;
+        padding: 10px 14px !important;
+        border-radius: 12px !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    #captionForm .drop-content {
+        gap: 4px !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    #captionForm .drop-icon {
+        width: 34px !important;
+        height: 34px !important;
+        padding: 7px !important;
+        border-radius: 10px !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .panel-header {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-bottom: 4px !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .panel-actions {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .panel-actions .icon-btn {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        padding-inline: 8px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .output-empty-state {
+        flex: 0 0 auto !important;
+        min-height: 150px !important;
+        padding: 14px !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    #captionResults.premium-result-grid {
+        gap: 6px !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    :is(.image-preview-card, .result-list > .result-item) {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 10px !important;
+        border-radius: 12px !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .image-preview-card .result-item-header {
+        min-height: 24px !important;
+        margin-bottom: 6px !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .preview-image {
+        width: 100% !important;
+        height: 190px !important;
+        max-height: 190px !important;
+        padding: 4px !important;
+        object-fit: contain !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .result-list {
+        grid-auto-rows: minmax(100px, auto) !important;
+        gap: 6px !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .result-list > .result-item {
+        min-height: 100px !important;
+        height: auto !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .result-item-header {
+        min-height: 28px !important;
+        margin-bottom: 6px !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .result-item p {
+        font-size: 15px !important;
+        line-height: 1.55 !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .result-item .arabic-text {
+        font-size: 17px !important;
+        line-height: 1.65 !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .result-item-header .mini-action {
+        align-self: center !important;
+        min-height: 28px !important;
+        height: 28px !important;
+        padding: 3px 7px !important;
+        gap: 4px !important;
+        border-radius: 8px !important;
+        font-size: 11px !important;
+        line-height: 1 !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .result-item-header .mini-action svg {
+        width: 13px !important;
+        height: 13px !important;
+    }
+}
+
+@media (max-width: 420px) {
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"] {
+        padding-inline: 10px !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    #captionForm .file-drop {
+        flex-basis: 104px !important;
+        height: 104px !important;
+        min-height: 104px !important;
+        max-height: 104px !important;
+    }
+
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    .output-panel .preview-image {
+        height: 174px !important;
+        max-height: 174px !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html body #contentArea
+    .sider-workspace[data-module-view="captioning"]
+    :is(
+        #captionSkeleton:not([hidden]),
+        #captionResults:not([hidden]),
+        #captionResults:not([hidden]) > .image-preview-card,
+        #captionResults:not([hidden]) .result-list > .result-item
+    ) {
+        animation: none !important;
+    }
+}
