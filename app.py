@@ -487,8 +487,9 @@ def caption_image(file):
     image_hash = caption_result.get("image_hash", "")
 
     app.logger.info(
-        "caption_image image_hash=%s candidates=%r selected_english=%r arabic=%r",
+        "caption_image image_hash=%s visual_evidence=%r candidates=%r selected_english=%r arabic=%r",
         image_hash,
+        caption_result.get("visual_evidence", {}),
         caption_result.get("generated_candidates", []),
         english_caption,
         arabic_caption,

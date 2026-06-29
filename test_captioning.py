@@ -15,9 +15,19 @@ class CaptionPipelineTests(unittest.TestCase):
             "src.image_captioning.pipeline._image_text_similarity",
             return_value={},
         )
+        self.visual_patcher = patch(
+            "src.image_captioning.pipeline._visual_evidence",
+            return_value={
+                "detected_counts": {},
+                "classifier_object": "",
+                "verified_objects": set(),
+            },
+        )
         self.similarity_patcher.start()
+        self.visual_patcher.start()
 
     def tearDown(self):
+        self.visual_patcher.stop()
         self.similarity_patcher.stop()
 
     def test_prompt_echo_uses_fallback_caption(self):
@@ -201,6 +211,60 @@ class CaptionPipelineTests(unittest.TestCase):
         self.assertEqual(first["selected_english_caption"], "A dog is sitting on grass.")
         self.assertEqual(second["selected_english_caption"], "A dog is sitting on grass.")
         self.assertIn("a dog sitting on grass", first["generated_candidates"])
+
+    def test_visual_count_verification_rejects_single_animal_when_two_are_detected(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            image_path = Path(tmpdir) / "sample.jpg"
+            Image.new("RGB", (24, 24), color="white").save(image_path)
+
+            def fake_generate(_image, _options, prompt=None):
+                if prompt and "dog" in prompt:
+                    return "a dog sitting on grass"
+                return "two dogs sitting on grass"
+
+            with patch(
+                "src.image_captioning.pipeline._classifier_label",
+                return_value="dog",
+            ), patch(
+                "src.image_captioning.pipeline._visual_evidence",
+                return_value={
+                    "detected_counts": {"dog": 2},
+                    "classifier_object": "dog",
+                    "verified_objects": {"dog"},
+                },
+            ), patch(
+                "src.image_captioning.pipeline._generate_blip_caption",
+                side_effect=fake_generate,
+            ):
+                result = pipeline.generate_caption_result(image_path)
+
+        self.assertEqual(result["selected_english_caption"], "Two dogs are sitting on grass.")
+        self.assertTrue(
+            any(
+                diagnostic["reason"] == "count_mismatch:dog:1_vs_2"
+                for diagnostic in result["candidate_diagnostics"]
+            )
+        )
+
+    def test_visual_object_verification_rejects_net_as_satellite_dish(self):
+        evidence = {
+            "candidate_objects": {"net": 2, "satellite dish": 1},
+            "candidate_count_claims": {},
+        }
+        visual = {
+            "detected_counts": {"net": 1},
+            "classifier_object": "net",
+            "verified_objects": {"net"},
+        }
+
+        self.assertEqual(
+            pipeline._invalid_caption_reason("a satellite dish is beside a wall", evidence, visual),
+            "unsupported_object:satellite dish",
+        )
+        self.assertEqual(
+            pipeline._invalid_caption_reason("a net is beside a wall", evidence, visual),
+            "",
+        )
 
     def test_template_arabic_caption_matches_simple_english_caption(self):
         self.assertEqual(

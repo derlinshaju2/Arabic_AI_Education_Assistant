@@ -23,9 +23,12 @@ def _bool_env(name, default):
 CAPTION_MODEL = os.environ.get("CAPTION_MODEL", "Salesforce/blip-image-captioning-base")
 CLASSIFIER_MODEL = os.environ.get("IMAGE_CLASSIFIER_MODEL", "microsoft/resnet-50")
 SIMILARITY_MODEL = os.environ.get("IMAGE_TEXT_SIMILARITY_MODEL", "openai/clip-vit-base-patch32")
+OBJECT_DETECTOR_MODEL = os.environ.get("IMAGE_OBJECT_DETECTOR_MODEL", "google/owlvit-base-patch32")
 CLASSIFIER_MIN_CONFIDENCE = _float_env("IMAGE_CLASSIFIER_MIN_CONFIDENCE", "0.20")
+OBJECT_DETECTOR_THRESHOLD = _float_env("IMAGE_OBJECT_DETECTOR_THRESHOLD", "0.18")
 ENABLE_CLASSIFIER_FALLBACK = _bool_env("IMAGE_CLASSIFIER_FALLBACK", "1")
 ENABLE_SIMILARITY_RANKING = _bool_env("IMAGE_TEXT_SIMILARITY_RANKING", "1")
+ENABLE_OBJECT_VERIFICATION = _bool_env("IMAGE_OBJECT_VERIFICATION", "1")
 
 GENERIC_PROMPT_ECHOES = {
     "a clear and realistic description of the image",
@@ -113,14 +116,61 @@ IMPORTANT_VISIBLE_WORDS = {
     "dogs",
     "horse",
     "horses",
+    "net",
+    "nets",
     "motorcycle",
     "motorcycles",
     "road",
+    "satellite",
+    "satellite dish",
+    "satellite dishes",
     "street",
+    "solar dish",
+    "solar dishes",
     "truck",
     "trucks",
     "vehicle",
     "vehicles",
+}
+OBJECT_ALIASES = {
+    "animal": {"animal", "animals"},
+    "bicycle": {"bicycle", "bicycles", "bike", "bikes"},
+    "bird": {"bird", "birds"},
+    "boat": {"boat", "boats"},
+    "bus": {"bus", "buses"},
+    "car": {"car", "cars", "vehicle", "vehicles"},
+    "cart": {"cart", "carts", "shopping cart", "shopping carts"},
+    "cat": {"cat", "cats"},
+    "cow": {"cow", "cows"},
+    "dog": {"dog", "dogs"},
+    "horse": {"horse", "horses"},
+    "motorcycle": {"motorcycle", "motorcycles", "motorbike", "motorbikes"},
+    "net": {"net", "nets", "fishing net", "fishing nets"},
+    "satellite dish": {"satellite dish", "satellite dishes", "solar dish", "solar dishes"},
+    "sheep": {"sheep"},
+    "truck": {"truck", "trucks"},
+    "vehicle": {"vehicle", "vehicles", "car", "cars", "truck", "trucks", "bus", "buses"},
+}
+OBJECT_CANONICAL = {
+    alias: canonical
+    for canonical, aliases in OBJECT_ALIASES.items()
+    for alias in aliases
+}
+OBJECT_CONFLICTS = {
+    "net": {"satellite dish"},
+    "satellite dish": {"net"},
+}
+NUMBER_WORDS = {
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+    "ten": 10,
 }
 TRAILING_PREPOSITIONS = {"at", "beside", "by", "in", "inside", "near", "of", "on", "outside", "under", "with"}
 SPECULATIVE_PHRASES = (
@@ -198,6 +248,9 @@ _classifier_load_failed = False
 _similarity_processor = None
 _similarity_model = None
 _similarity_load_failed = False
+_detector_processor = None
+_detector_model = None
+_detector_load_failed = False
 
 
 def _normalized_caption(text):
@@ -295,6 +348,28 @@ def _load_similarity_model():
     return _similarity_processor, _similarity_model
 
 
+def _load_object_detector():
+    global _detector_processor, _detector_model, _detector_load_failed
+
+    if not ENABLE_OBJECT_VERIFICATION or _detector_load_failed:
+        return None, None
+
+    if _detector_processor is None or _detector_model is None:
+        try:
+            from transformers import OwlViTForObjectDetection, OwlViTProcessor
+
+            device = _get_device()
+            _detector_processor = OwlViTProcessor.from_pretrained(OBJECT_DETECTOR_MODEL)
+            _detector_model = OwlViTForObjectDetection.from_pretrained(OBJECT_DETECTOR_MODEL).to(device)
+            _detector_model.eval()
+        except Exception:
+            _detector_load_failed = True
+            LOGGER.exception("Unable to load object verification model")
+            return None, None
+
+    return _detector_processor, _detector_model
+
+
 def _move_to_device(inputs):
     device = _get_device()
     return {
@@ -365,6 +440,56 @@ def _label_from_classifier_scores(scores, id2label, min_confidence=CLASSIFIER_MI
     return _clean_classifier_label(label)
 
 
+def _canonical_object(text):
+    normalized = _normalized_caption(text).lower().strip(" .")
+    if normalized in OBJECT_CANONICAL:
+        return OBJECT_CANONICAL[normalized]
+
+    singular = normalized[:-1] if normalized.endswith("s") else normalized
+    if singular in OBJECT_CANONICAL:
+        return OBJECT_CANONICAL[singular]
+
+    return singular if singular in OBJECT_ALIASES else ""
+
+
+def _object_detection_queries():
+    queries = []
+    for aliases in OBJECT_ALIASES.values():
+        for alias in sorted(aliases):
+            if alias not in queries:
+                queries.append(alias)
+    return queries
+
+
+def _detected_object_counts(image):
+    processor, model = _load_object_detector()
+    if processor is None or model is None:
+        return {}
+
+    torch = _load_torch()
+    queries = _object_detection_queries()
+    inputs = processor(text=[queries], images=image, return_tensors="pt")
+    inputs = _move_to_device(inputs)
+
+    with torch.no_grad():
+        outputs = model(**inputs)
+
+    target_sizes = torch.tensor([image.size[::-1]], device=_get_device())
+    results = processor.post_process_object_detection(
+        outputs=outputs,
+        target_sizes=target_sizes,
+        threshold=OBJECT_DETECTOR_THRESHOLD,
+    )[0]
+
+    counts = {}
+    for label_index in results.get("labels", []):
+        label = queries[int(label_index)]
+        canonical = _canonical_object(label)
+        if canonical:
+            counts[canonical] = counts.get(canonical, 0) + 1
+    return counts
+
+
 def _classifier_caption(image):
     return _caption_from_label(_classifier_label(image))
 
@@ -392,6 +517,36 @@ def _caption_words(caption):
     return re.findall(r"[a-zA-Z]+", (caption or "").lower())
 
 
+def _caption_object_words(caption):
+    normalized = _normalized_caption(caption).lower()
+    found = set()
+    for alias, canonical in OBJECT_CANONICAL.items():
+        if re.search(rf"\b{re.escape(alias)}\b", normalized):
+            found.add(canonical)
+    return found
+
+
+def _caption_count_claims(caption):
+    normalized = _normalized_caption(caption).lower()
+    claims = {}
+
+    for alias, canonical in sorted(OBJECT_CANONICAL.items(), key=lambda item: len(item[0]), reverse=True):
+        escaped_alias = re.escape(alias)
+        explicit = re.search(
+            rf"\b(?P<count>\d+|{'|'.join(NUMBER_WORDS)})\s+{escaped_alias}\b",
+            normalized,
+        )
+        if explicit:
+            count_text = explicit.group("count")
+            claims[canonical] = int(count_text) if count_text.isdigit() else NUMBER_WORDS[count_text]
+            continue
+
+        if re.search(rf"\b(?:a|an|one)\s+{escaped_alias}\b", normalized):
+            claims.setdefault(canonical, 1)
+
+    return claims
+
+
 def _word_counts(candidates):
     counts = {}
     for candidate in candidates:
@@ -402,6 +557,15 @@ def _word_counts(candidates):
 
 def _caption_evidence(candidates):
     word_counts = _word_counts(candidates)
+    candidate_object_counts = {}
+    candidate_count_claims = {}
+    for candidate in candidates:
+        for object_name in _caption_object_words(candidate):
+            candidate_object_counts[object_name] = candidate_object_counts.get(object_name, 0) + 1
+        for object_name, count in _caption_count_claims(candidate).items():
+            count_counts = candidate_count_claims.setdefault(object_name, {})
+            count_counts[count] = count_counts.get(count, 0) + 1
+
     return {
         "words": word_counts,
         "actions": {word: word_counts.get(word, 0) for word in ACTION_WORDS},
@@ -409,7 +573,23 @@ def _caption_evidence(candidates):
             word: word_counts.get(word, 0)
             for word in IMPORTANT_VISIBLE_WORDS
         },
+        "candidate_objects": candidate_object_counts,
+        "candidate_count_claims": candidate_count_claims,
         "scenes": {word: word_counts.get(word, 0) for word in SCENE_LABEL_WORDS},
+    }
+
+
+def _visual_evidence(image, primary_label=""):
+    detections = _detected_object_counts(image)
+    classifier_object = _canonical_object(primary_label)
+    verified_objects = set(detections)
+    if classifier_object:
+        verified_objects.add(classifier_object)
+
+    return {
+        "detected_counts": detections,
+        "classifier_object": classifier_object,
+        "verified_objects": verified_objects,
     }
 
 
@@ -438,16 +618,20 @@ def _label_position(caption, primary_label):
         return None
 
 
-def _caption_score(caption, primary_label="", evidence=None):
+def _caption_score(caption, primary_label="", evidence=None, visual_evidence=None):
     if _is_generic_caption(caption):
         return -100.0
 
     evidence = evidence or {}
     action_counts = evidence.get("actions") or {}
     scene_counts = evidence.get("scenes") or {}
+    candidate_objects = evidence.get("candidate_objects") or {}
+    detected_counts = (visual_evidence or {}).get("detected_counts") or {}
+    verified_objects = (visual_evidence or {}).get("verified_objects") or set()
     normalized = _normalized_caption(caption).lower()
     words = _caption_words(normalized)
     word_set = set(words)
+    caption_objects = _caption_object_words(normalized)
     score = min(len(words), 18) * 0.18
 
     if len(words) < 5:
@@ -476,6 +660,24 @@ def _caption_score(caption, primary_label="", evidence=None):
         score += 1.0
 
     score += len(word_set & IMPORTANT_VISIBLE_WORDS) * 0.6
+
+    for object_name in caption_objects:
+        if object_name in detected_counts:
+            score += 2.5
+        elif object_name in verified_objects:
+            score += 1.4
+        elif candidate_objects.get(object_name, 0) >= 2:
+            score += 0.8
+        else:
+            score -= 1.8
+
+    for object_name, claimed_count in _caption_count_claims(normalized).items():
+        detected_count = detected_counts.get(object_name)
+        if detected_count:
+            if detected_count == claimed_count:
+                score += 2.0
+            else:
+                score -= 4.0
 
     unsupported_terms = (
         (word_set & UNSUPPORTED_RELATIONSHIP_TERMS)
@@ -666,9 +868,16 @@ def _finalize_caption(caption, primary_label="", evidence=None):
     return caption[:1].upper() + caption[1:] + "."
 
 
-def _invalid_caption_reason(caption):
+def _invalid_caption_reason(caption, evidence=None, visual_evidence=None):
     normalized = _normalized_caption(caption).lower().strip(" .")
     words = _caption_words(normalized)
+    evidence = evidence or {}
+    visual_evidence = visual_evidence or {}
+    candidate_objects = evidence.get("candidate_objects") or {}
+    candidate_count_claims = evidence.get("candidate_count_claims") or {}
+    detected_counts = visual_evidence.get("detected_counts") or {}
+    verified_objects = visual_evidence.get("verified_objects") or set()
+    has_visual_objects = bool(detected_counts or verified_objects)
 
     if _is_generic_caption(normalized):
         return "generic"
@@ -684,6 +893,28 @@ def _invalid_caption_reason(caption):
         return "trailing_preposition"
     if re.search(r"\b([a-z]+)\s+\1\b", normalized):
         return "repeated_word"
+
+    for object_name in _caption_object_words(normalized):
+        if object_name in detected_counts or object_name in verified_objects:
+            continue
+        if has_visual_objects and candidate_objects.get(object_name, 0) < 2:
+            return f"unsupported_object:{object_name}"
+
+        for conflicting_object in OBJECT_CONFLICTS.get(object_name, set()):
+            if conflicting_object in detected_counts or candidate_objects.get(conflicting_object, 0) >= 2:
+                return f"object_conflict:{object_name}_vs_{conflicting_object}"
+
+    for object_name, claimed_count in _caption_count_claims(normalized).items():
+        detected_count = detected_counts.get(object_name)
+        if detected_count and detected_count != claimed_count:
+            return f"count_mismatch:{object_name}:{claimed_count}_vs_{detected_count}"
+
+        consensus_counts = candidate_count_claims.get(object_name) or {}
+        if consensus_counts:
+            consensus_count, agreement = max(consensus_counts.items(), key=lambda item: item[1])
+            if agreement >= 2 and consensus_count != claimed_count:
+                return f"count_conflict:{object_name}:{claimed_count}_vs_{consensus_count}"
+
     if not re.search(
         r"\b(is|are|with|near|beside|in|inside|on|outside|under|"
         r"carrying|eating|flying|holding|jumping|laying|lying|looking|"
@@ -717,12 +948,12 @@ def _image_text_similarity(image, captions):
     return dict(zip(captions, scores))
 
 
-def _candidate_diagnostics(candidates, evidence):
+def _candidate_diagnostics(candidates, evidence, visual_evidence=None):
     records = []
     seen = set()
     for raw_candidate in candidates:
         sanitized = _sanitize_caption_claims(raw_candidate, evidence)
-        reason = _invalid_caption_reason(sanitized)
+        reason = _invalid_caption_reason(sanitized, evidence, visual_evidence)
         if sanitized in seen and not reason:
             reason = "duplicate"
         if sanitized:
@@ -738,9 +969,9 @@ def _candidate_diagnostics(candidates, evidence):
     return records
 
 
-def _best_caption(image, candidates, primary_label=""):
+def _best_caption(image, candidates, primary_label="", visual_evidence=None):
     evidence = _caption_evidence(candidates)
-    diagnostics = _candidate_diagnostics(candidates, evidence)
+    diagnostics = _candidate_diagnostics(candidates, evidence, visual_evidence)
     usable_candidates = [
         record["caption"]
         for record in diagnostics
@@ -756,7 +987,7 @@ def _best_caption(image, candidates, primary_label=""):
         usable_candidates,
         key=lambda candidate: (
             similarities.get(candidate, 0.0),
-            _caption_score(candidate, primary_label, evidence),
+            _caption_score(candidate, primary_label, evidence, visual_evidence),
         ),
     )
     return best_caption, diagnostics, similarities
@@ -776,6 +1007,7 @@ def generate_caption_result(image_path):
 
     image_hash = image_file_hash(image_path)
     primary_label = _classifier_label(image)
+    visual = _visual_evidence(image, primary_label)
     generation_attempts = (
         {
             "max_new_tokens": 24,
@@ -812,13 +1044,13 @@ def generate_caption_result(image_path):
             if caption and caption not in candidates:
                 candidates.append(caption)
 
-        best_caption, diagnostics, similarities = _best_caption(image, candidates, primary_label)
+        best_caption, diagnostics, similarities = _best_caption(image, candidates, primary_label, visual)
         evidence = _caption_evidence(candidates)
-        if best_caption and _caption_score(best_caption, primary_label, evidence) >= STRONG_CAPTION_SCORE:
+        if best_caption and _caption_score(best_caption, primary_label, evidence, visual) >= STRONG_CAPTION_SCORE:
             english_caption = _finalize_caption(best_caption, primary_label, evidence)
             break
     else:
-        best_caption, diagnostics, similarities = _best_caption(image, candidates, primary_label)
+        best_caption, diagnostics, similarities = _best_caption(image, candidates, primary_label, visual)
         if best_caption:
             english_caption = _finalize_caption(best_caption, primary_label, _caption_evidence(candidates))
         else:
@@ -832,12 +1064,14 @@ def generate_caption_result(image_path):
         "image_hash": image_hash,
         "generated_candidates": candidates,
         "candidate_diagnostics": diagnostics,
+        "visual_evidence": visual,
         "selected_english_caption": english_caption,
         "similarity_scores": similarities,
     }
     LOGGER.info(
-        "caption image_hash=%s candidates=%r selected_english=%r similarity_scores=%r",
+        "caption image_hash=%s visual_evidence=%r candidates=%r selected_english=%r similarity_scores=%r",
         image_hash,
+        visual,
         candidates,
         english_caption,
         similarities,
