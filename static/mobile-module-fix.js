@@ -1,5 +1,4 @@
-```javascript
-(function () {
+;(function () {
     'use strict';
 
     if (window.__INTELLIARABIC_MOBILE_FIX__) {
@@ -312,4 +311,3 @@
         }
     );
 })();
-```

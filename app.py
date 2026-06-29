@@ -14,6 +14,7 @@ from urllib.parse import urlencode
 
 import bcrypt
 import jwt
+from PIL import Image, UnidentifiedImageError
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token as google_id_token
@@ -27,6 +28,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 
 UPLOAD_FOLDER = os.path.join("static", "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+ALLOWED_CAPTION_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 
 LEGACY_DATABASE_PATH = os.path.join(os.getcwd(), "users.db")
 
@@ -473,23 +475,59 @@ def google_callback_url():
     return url_for("google_callback", _external=True)
 
 
+class CaptionUploadError(ValueError):
+    pass
+
+
+def validate_caption_upload(file):
+    filename = (file.filename or "").strip()
+    if not filename:
+        raise CaptionUploadError("Choose an image file first.")
+
+    extension = os.path.splitext(filename)[1].lower()
+    if extension not in ALLOWED_CAPTION_IMAGE_EXTENSIONS:
+        raise CaptionUploadError("Upload a JPG, PNG, or WebP image.")
+
+    try:
+        file.stream.seek(0)
+        with Image.open(file.stream) as uploaded_image:
+            uploaded_image.verify()
+    except (OSError, UnidentifiedImageError) as error:
+        raise CaptionUploadError("The uploaded file is not a valid image.") from error
+    finally:
+        file.stream.seek(0)
+
+    return extension
+
+
 def caption_image(file):
-    from src.image_captioning.pipeline import generate_caption_result
+    from src.image_captioning.pipeline import InvalidImageError, generate_caption_result
     from src.image_captioning.translator import translate_to_arabic
 
-    filename = f"{uuid.uuid4().hex}.jpg"
+    extension = validate_caption_upload(file)
+    filename = f"{uuid.uuid4().hex}{extension}"
     path = os.path.join(UPLOAD_FOLDER, filename)
     file.save(path)
 
-    caption_result = generate_caption_result(path)
+    try:
+        caption_result = generate_caption_result(path)
+    except InvalidImageError as error:
+        raise CaptionUploadError(str(error)) from error
+
     english_caption = caption_result["selected_english_caption"]
+    if not isinstance(english_caption, str) or not english_caption.strip():
+        raise RuntimeError("Caption generation returned an empty English caption.")
+
     arabic_caption = translate_to_arabic(english_caption)
+    if not isinstance(arabic_caption, str) or not arabic_caption.strip():
+        raise RuntimeError("Arabic translation returned an empty caption.")
+
     image_hash = caption_result.get("image_hash", "")
 
     app.logger.info(
-        "caption_image image_hash=%s visual_evidence=%r candidates=%r selected_english=%r arabic=%r",
+        "caption_image image_hash=%s evidence=%r candidates=%r selected_english=%r arabic=%r",
         image_hash,
-        caption_result.get("visual_evidence", {}),
+        caption_result.get("caption_evidence", {}),
         caption_result.get("generated_candidates", []),
         english_caption,
         arabic_caption,
@@ -797,7 +835,24 @@ def upload(user):
             caption_error="Choose an image first.",
         ), 400
 
-    result = caption_image(file)
+    try:
+        result = caption_image(file)
+    except CaptionUploadError as error:
+        return render_template(
+            "captioning.html",
+            user=user,
+            auth_token=page_auth_token(user),
+            caption_error=str(error),
+        ), 400
+    except Exception:
+        app.logger.exception("Caption generation failed during /upload")
+        return render_template(
+            "captioning.html",
+            user=user,
+            auth_token=page_auth_token(user),
+            caption_error="Failed to generate caption. Please try again.",
+        ), 500
+
     log_activity(user["id"], "caption", details=result.get("english_caption", ""))
     return render_template("captioning.html", user=user, auth_token=page_auth_token(user), caption_result=result)
 
@@ -811,8 +866,20 @@ def caption(user):
 
     try:
         result = caption_image(file)
-    except Exception:
-        return jsonify({"status": "error", "message": "Failed to generate caption. Please try again."}), 500
+    except CaptionUploadError as error:
+        return jsonify({
+            "status": "error",
+            "error": "invalid_image",
+            "message": str(error),
+        }), 400
+    except Exception as error:
+        app.logger.exception("Caption generation failed during /caption")
+        return jsonify({
+            "status": "error",
+            "error": error.__class__.__name__,
+            "message": "Failed to generate caption. Please try again.",
+            "detail": str(error),
+        }), 500
 
     log_activity(user["id"], "caption", details=result.get("english_caption", ""))
     return jsonify(result)

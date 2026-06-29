@@ -3,32 +3,12 @@ import logging
 import os
 import re
 
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 
 LOGGER = logging.getLogger(__name__)
 
-
-def _float_env(name, default):
-    try:
-        return float(os.environ.get(name, default))
-    except (TypeError, ValueError):
-        return float(default)
-
-
-def _bool_env(name, default):
-    return os.environ.get(name, default).lower() not in {"0", "false", "no"}
-
-
 CAPTION_MODEL = os.environ.get("CAPTION_MODEL", "Salesforce/blip-image-captioning-base")
-CLASSIFIER_MODEL = os.environ.get("IMAGE_CLASSIFIER_MODEL", "microsoft/resnet-50")
-SIMILARITY_MODEL = os.environ.get("IMAGE_TEXT_SIMILARITY_MODEL", "openai/clip-vit-base-patch32")
-OBJECT_DETECTOR_MODEL = os.environ.get("IMAGE_OBJECT_DETECTOR_MODEL", "google/owlvit-base-patch32")
-CLASSIFIER_MIN_CONFIDENCE = _float_env("IMAGE_CLASSIFIER_MIN_CONFIDENCE", "0.20")
-OBJECT_DETECTOR_THRESHOLD = _float_env("IMAGE_OBJECT_DETECTOR_THRESHOLD", "0.18")
-ENABLE_CLASSIFIER_FALLBACK = _bool_env("IMAGE_CLASSIFIER_FALLBACK", "1")
-ENABLE_SIMILARITY_RANKING = _bool_env("IMAGE_TEXT_SIMILARITY_RANKING", "1")
-ENABLE_OBJECT_VERIFICATION = _bool_env("IMAGE_OBJECT_VERIFICATION", "1")
 
 GENERIC_PROMPT_ECHOES = {
     "a clear and realistic description of the image",
@@ -44,20 +24,6 @@ GENERIC_CAPTION_FRAGMENTS = (
     "image contains",
     "image shown",
     "uploaded image",
-)
-BACKGROUND_FIRST_TERMS = (
-    "a background",
-    "a field",
-    "a grassy field",
-    "a room",
-    "a street",
-    "a table",
-    "a wall",
-    "an outdoor",
-    "the background",
-    "the grass",
-    "the room",
-    "the street",
 )
 ACTION_WORDS = {
     "carrying",
@@ -77,23 +43,7 @@ ACTION_WORDS = {
     "wearing",
 }
 SCENE_WORDS = {"at", "beside", "in", "inside", "near", "next", "on", "outside", "under", "with"}
-SCENE_LABEL_WORDS = {
-    "airport",
-    "beach",
-    "city",
-    "classroom",
-    "field",
-    "forest",
-    "kitchen",
-    "office",
-    "park",
-    "restaurant",
-    "room",
-    "school",
-    "street",
-    "yard",
-}
-IMPORTANT_VISIBLE_WORDS = {
+VISIBLE_OBJECT_WORDS = {
     "animal",
     "animals",
     "bicycle",
@@ -116,21 +66,25 @@ IMPORTANT_VISIBLE_WORDS = {
     "dogs",
     "horse",
     "horses",
-    "net",
-    "nets",
+    "man",
+    "men",
     "motorcycle",
     "motorcycles",
+    "net",
+    "nets",
+    "person",
+    "people",
     "road",
-    "satellite",
-    "satellite dish",
-    "satellite dishes",
+    "sheep",
     "street",
-    "solar dish",
-    "solar dishes",
+    "table",
+    "train",
     "truck",
     "trucks",
     "vehicle",
     "vehicles",
+    "woman",
+    "women",
 }
 OBJECT_ALIASES = {
     "animal": {"animal", "animals"},
@@ -146,19 +100,15 @@ OBJECT_ALIASES = {
     "horse": {"horse", "horses"},
     "motorcycle": {"motorcycle", "motorcycles", "motorbike", "motorbikes"},
     "net": {"net", "nets", "fishing net", "fishing nets"},
-    "satellite dish": {"satellite dish", "satellite dishes", "solar dish", "solar dishes"},
+    "person": {"person", "people", "man", "men", "woman", "women"},
     "sheep": {"sheep"},
     "truck": {"truck", "trucks"},
-    "vehicle": {"vehicle", "vehicles", "car", "cars", "truck", "trucks", "bus", "buses"},
+    "vehicle": {"vehicle", "vehicles"},
 }
 OBJECT_CANONICAL = {
     alias: canonical
     for canonical, aliases in OBJECT_ALIASES.items()
     for alias in aliases
-}
-OBJECT_CONFLICTS = {
-    "net": {"satellite dish"},
-    "satellite dish": {"net"},
 }
 NUMBER_WORDS = {
     "one": 1,
@@ -172,7 +122,6 @@ NUMBER_WORDS = {
     "nine": 9,
     "ten": 10,
 }
-TRAILING_PREPOSITIONS = {"at", "beside", "by", "in", "inside", "near", "of", "on", "outside", "under", "with"}
 SPECULATIVE_PHRASES = (
     "appears to be",
     "appears like",
@@ -200,61 +149,32 @@ UNSUPPORTED_RELATIONSHIP_TERMS = {
     "sister",
     "son",
 }
-SUBJECTIVE_MODIFIERS = {
-    "adorable",
-    "angry",
-    "beautiful",
-    "cute",
-    "happy",
-    "old",
-    "sad",
-    "scared",
-    "young",
-}
-EVENT_GUESSES = {
-    "birthday",
-    "ceremony",
-    "concert",
-    "festival",
-    "party",
-    "wedding",
-}
-VAGUE_WORDS = {
-    "bunch",
-    "group",
-    "many",
-    "several",
-    "something",
-    "stuff",
-    "thing",
-    "things",
-    "various",
-}
-IMAGE_QUALITY_WORDS = {
-    "blurry",
-    "detailed",
-    "quality",
-    "realistic",
-}
-STRONG_CAPTION_SCORE = 8.0
+SUBJECTIVE_MODIFIERS = {"adorable", "angry", "beautiful", "cute", "happy", "old", "sad", "scared", "young"}
+EVENT_GUESSES = {"birthday", "ceremony", "concert", "festival", "party", "wedding"}
+VAGUE_WORDS = {"bunch", "group", "many", "several", "something", "stuff", "thing", "things", "various"}
+IMAGE_QUALITY_WORDS = {"blurry", "detailed", "quality", "realistic"}
+TRAILING_PREPOSITIONS = {"at", "beside", "by", "in", "inside", "near", "of", "on", "outside", "under", "with"}
 
 _torch = None
 _device = None
 _caption_processor = None
 _caption_model = None
-_classifier_processor = None
-_classifier_model = None
-_classifier_load_failed = False
-_similarity_processor = None
-_similarity_model = None
-_similarity_load_failed = False
-_detector_processor = None
-_detector_model = None
-_detector_load_failed = False
+
+
+class ImageCaptioningError(RuntimeError):
+    pass
+
+
+class InvalidImageError(ValueError):
+    pass
 
 
 def _normalized_caption(text):
     return re.sub(r"\s+", " ", (text or "").strip())
+
+
+def _caption_words(caption):
+    return re.findall(r"[a-zA-Z]+", (caption or "").lower())
 
 
 def _is_generic_caption(caption):
@@ -264,10 +184,6 @@ def _is_generic_caption(caption):
         or normalized in GENERIC_PROMPT_ECHOES
         or any(fragment in normalized for fragment in GENERIC_CAPTION_FRAGMENTS)
     )
-
-
-def _article_for(text):
-    return "an" if (text or "")[:1].lower() in "aeiou" else "a"
 
 
 def _load_torch():
@@ -305,71 +221,6 @@ def _load_caption_model():
     return _caption_processor, _caption_model
 
 
-def _load_classifier_model():
-    global _classifier_processor, _classifier_model, _classifier_load_failed
-
-    if not ENABLE_CLASSIFIER_FALLBACK or _classifier_load_failed:
-        return None, None
-
-    if _classifier_processor is None or _classifier_model is None:
-        try:
-            from transformers import AutoImageProcessor, AutoModelForImageClassification
-
-            device = _get_device()
-            _classifier_processor = AutoImageProcessor.from_pretrained(CLASSIFIER_MODEL)
-            _classifier_model = AutoModelForImageClassification.from_pretrained(CLASSIFIER_MODEL).to(device)
-            _classifier_model.eval()
-        except Exception:
-            _classifier_load_failed = True
-            return None, None
-
-    return _classifier_processor, _classifier_model
-
-
-def _load_similarity_model():
-    global _similarity_processor, _similarity_model, _similarity_load_failed
-
-    if not ENABLE_SIMILARITY_RANKING or _similarity_load_failed:
-        return None, None
-
-    if _similarity_processor is None or _similarity_model is None:
-        try:
-            from transformers import CLIPModel, CLIPProcessor
-
-            device = _get_device()
-            _similarity_processor = CLIPProcessor.from_pretrained(SIMILARITY_MODEL)
-            _similarity_model = CLIPModel.from_pretrained(SIMILARITY_MODEL).to(device)
-            _similarity_model.eval()
-        except Exception:
-            _similarity_load_failed = True
-            LOGGER.exception("Unable to load image-text similarity model")
-            return None, None
-
-    return _similarity_processor, _similarity_model
-
-
-def _load_object_detector():
-    global _detector_processor, _detector_model, _detector_load_failed
-
-    if not ENABLE_OBJECT_VERIFICATION or _detector_load_failed:
-        return None, None
-
-    if _detector_processor is None or _detector_model is None:
-        try:
-            from transformers import OwlViTForObjectDetection, OwlViTProcessor
-
-            device = _get_device()
-            _detector_processor = OwlViTProcessor.from_pretrained(OBJECT_DETECTOR_MODEL)
-            _detector_model = OwlViTForObjectDetection.from_pretrained(OBJECT_DETECTOR_MODEL).to(device)
-            _detector_model.eval()
-        except Exception:
-            _detector_load_failed = True
-            LOGGER.exception("Unable to load object verification model")
-            return None, None
-
-    return _detector_processor, _detector_model
-
-
 def _move_to_device(inputs):
     device = _get_device()
     return {
@@ -378,11 +229,37 @@ def _move_to_device(inputs):
     }
 
 
-def _decode_caption(processor, output):
-    return _normalized_caption(processor.decode(output[0], skip_special_tokens=True))
+def image_file_hash(image_path):
+    digest = hashlib.sha256()
+    with open(image_path, "rb") as image_file:
+        for chunk in iter(lambda: image_file.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
-def _generate_blip_caption(image, generation_options, prompt=None):
+def load_valid_image(image_path):
+    try:
+        with Image.open(image_path) as uploaded_image:
+            uploaded_image.verify()
+    except (OSError, UnidentifiedImageError) as error:
+        raise InvalidImageError("The uploaded file is not a valid image.") from error
+
+    with Image.open(image_path) as uploaded_image:
+        return uploaded_image.convert("RGB")
+
+
+def _decode_outputs(processor, outputs):
+    sequences = getattr(outputs, "sequences", outputs)
+    decoded = processor.batch_decode(sequences, skip_special_tokens=True)
+    captions = []
+    for caption in decoded:
+        normalized = _normalized_caption(caption)
+        if normalized and normalized not in captions:
+            captions.append(normalized)
+    return captions
+
+
+def _generate_blip_candidates(image, generation_options, prompt=None):
     torch = _load_torch()
     processor, model = _load_caption_model()
     if prompt:
@@ -392,316 +269,23 @@ def _generate_blip_caption(image, generation_options, prompt=None):
     inputs = _move_to_device(inputs)
 
     with torch.no_grad():
-        output = model.generate(**inputs, **generation_options)
-
-    return _decode_caption(processor, output)
-
-
-def _clean_classifier_label(label):
-    label = (label or "").split(",")[0].replace("_", " ").strip().lower()
-    label = re.sub(r"\b[a-z]?\d+\b", "", label)
-    label = re.sub(r"\s+", " ", label).strip()
-    return label
-
-
-def _caption_from_label(label):
-    label = _clean_classifier_label(label)
-    if not label:
-        return ""
-
-    return f"{_article_for(label)} {label} is visible"
-
-
-def _classifier_label(image):
-    processor, model = _load_classifier_model()
-    if processor is None or model is None:
-        return ""
-
-    torch = _load_torch()
-    inputs = processor(images=image, return_tensors="pt")
-    inputs = _move_to_device(inputs)
-
-    with torch.no_grad():
-        logits = model(**inputs).logits
-
-    probabilities = torch.nn.functional.softmax(logits, dim=-1)[0].detach().cpu().tolist()
-    return _label_from_classifier_scores(probabilities, model.config.id2label)
-
-
-def _label_from_classifier_scores(scores, id2label, min_confidence=CLASSIFIER_MIN_CONFIDENCE):
-    if not scores:
-        return ""
-
-    predicted_id, confidence = max(enumerate(scores), key=lambda item: item[1])
-    if confidence < min_confidence:
-        return ""
-
-    label = id2label.get(predicted_id, "")
-    return _clean_classifier_label(label)
-
-
-def _canonical_object(text):
-    normalized = _normalized_caption(text).lower().strip(" .")
-    if normalized in OBJECT_CANONICAL:
-        return OBJECT_CANONICAL[normalized]
-
-    singular = normalized[:-1] if normalized.endswith("s") else normalized
-    if singular in OBJECT_CANONICAL:
-        return OBJECT_CANONICAL[singular]
-
-    return singular if singular in OBJECT_ALIASES else ""
-
-
-def _object_detection_queries():
-    queries = []
-    for aliases in OBJECT_ALIASES.values():
-        for alias in sorted(aliases):
-            if alias not in queries:
-                queries.append(alias)
-    return queries
-
-
-def _detected_object_counts(image):
-    processor, model = _load_object_detector()
-    if processor is None or model is None:
-        return {}
-
-    torch = _load_torch()
-    queries = _object_detection_queries()
-    inputs = processor(text=[queries], images=image, return_tensors="pt")
-    inputs = _move_to_device(inputs)
-
-    with torch.no_grad():
-        outputs = model(**inputs)
-
-    target_sizes = torch.tensor([image.size[::-1]], device=_get_device())
-    results = processor.post_process_object_detection(
-        outputs=outputs,
-        target_sizes=target_sizes,
-        threshold=OBJECT_DETECTOR_THRESHOLD,
-    )[0]
-
-    counts = {}
-    for label_index in results.get("labels", []):
-        label = queries[int(label_index)]
-        canonical = _canonical_object(label)
-        if canonical:
-            counts[canonical] = counts.get(canonical, 0) + 1
-    return counts
-
-
-def _classifier_caption(image):
-    return _caption_from_label(_classifier_label(image))
-
-
-def _caption_prompts(primary_label):
-    prompts = [
-        "a photo of",
-        "a clear image of",
-        None,
-    ]
-
-    if primary_label:
-        article = _article_for(primary_label)
-        prompts.insert(0, f"a photo of {article} {primary_label}")
-
-    unique_prompts = []
-    for prompt in prompts:
-        if prompt not in unique_prompts:
-            unique_prompts.append(prompt)
-
-    return unique_prompts
-
-
-def _caption_words(caption):
-    return re.findall(r"[a-zA-Z]+", (caption or "").lower())
-
-
-def _caption_object_words(caption):
-    normalized = _normalized_caption(caption).lower()
-    found = set()
-    for alias, canonical in OBJECT_CANONICAL.items():
-        if re.search(rf"\b{re.escape(alias)}\b", normalized):
-            found.add(canonical)
-    return found
-
-
-def _caption_count_claims(caption):
-    normalized = _normalized_caption(caption).lower()
-    claims = {}
-
-    for alias, canonical in sorted(OBJECT_CANONICAL.items(), key=lambda item: len(item[0]), reverse=True):
-        escaped_alias = re.escape(alias)
-        explicit = re.search(
-            rf"\b(?P<count>\d+|{'|'.join(NUMBER_WORDS)})\s+{escaped_alias}\b",
-            normalized,
+        outputs = model.generate(
+            **inputs,
+            return_dict_in_generate=True,
+            output_scores=True,
+            **generation_options,
         )
-        if explicit:
-            count_text = explicit.group("count")
-            claims[canonical] = int(count_text) if count_text.isdigit() else NUMBER_WORDS[count_text]
-            continue
 
-        if re.search(rf"\b(?:a|an|one)\s+{escaped_alias}\b", normalized):
-            claims.setdefault(canonical, 1)
+    captions = _decode_outputs(processor, outputs)
+    sequence_scores = getattr(outputs, "sequences_scores", None)
+    if sequence_scores is None:
+        return [(caption, 0.0) for caption in captions]
 
-    return claims
-
-
-def _word_counts(candidates):
-    counts = {}
-    for candidate in candidates:
-        for word in set(_caption_words(candidate)):
-            counts[word] = counts.get(word, 0) + 1
-    return counts
-
-
-def _caption_evidence(candidates):
-    word_counts = _word_counts(candidates)
-    candidate_object_counts = {}
-    candidate_count_claims = {}
-    for candidate in candidates:
-        for object_name in _caption_object_words(candidate):
-            candidate_object_counts[object_name] = candidate_object_counts.get(object_name, 0) + 1
-        for object_name, count in _caption_count_claims(candidate).items():
-            count_counts = candidate_count_claims.setdefault(object_name, {})
-            count_counts[count] = count_counts.get(count, 0) + 1
-
-    return {
-        "words": word_counts,
-        "actions": {word: word_counts.get(word, 0) for word in ACTION_WORDS},
-        "important_objects": {
-            word: word_counts.get(word, 0)
-            for word in IMPORTANT_VISIBLE_WORDS
-        },
-        "candidate_objects": candidate_object_counts,
-        "candidate_count_claims": candidate_count_claims,
-        "scenes": {word: word_counts.get(word, 0) for word in SCENE_LABEL_WORDS},
-    }
-
-
-def _visual_evidence(image, primary_label=""):
-    detections = _detected_object_counts(image)
-    classifier_object = _canonical_object(primary_label)
-    verified_objects = set(detections)
-    if classifier_object:
-        verified_objects.add(classifier_object)
-
-    return {
-        "detected_counts": detections,
-        "classifier_object": classifier_object,
-        "verified_objects": verified_objects,
-    }
-
-
-def _caption_mentions_label(caption, primary_label):
-    if not primary_label:
-        return False
-
-    caption_words = set(_caption_words(caption))
-    label_words = set(_caption_words(primary_label))
-    return bool(label_words and label_words <= caption_words)
-
-
-def _label_position(caption, primary_label):
-    if not primary_label:
-        return None
-
-    words = _caption_words(caption)
-    label_words = _caption_words(primary_label)
-    if not words or not label_words:
-        return None
-
-    first_label_word = label_words[0]
-    try:
-        return words.index(first_label_word)
-    except ValueError:
-        return None
-
-
-def _caption_score(caption, primary_label="", evidence=None, visual_evidence=None):
-    if _is_generic_caption(caption):
-        return -100.0
-
-    evidence = evidence or {}
-    action_counts = evidence.get("actions") or {}
-    scene_counts = evidence.get("scenes") or {}
-    candidate_objects = evidence.get("candidate_objects") or {}
-    detected_counts = (visual_evidence or {}).get("detected_counts") or {}
-    verified_objects = (visual_evidence or {}).get("verified_objects") or set()
-    normalized = _normalized_caption(caption).lower()
-    words = _caption_words(normalized)
-    word_set = set(words)
-    caption_objects = _caption_object_words(normalized)
-    score = min(len(words), 18) * 0.18
-
-    if len(words) < 5:
-        score -= 2.0
-    if len(words) >= 8:
-        score += 1.0
-
-    if normalized.startswith(("a photo of", "an image of", "a picture of")):
-        score -= 1.2
-
-    if primary_label and _caption_mentions_label(normalized, primary_label):
-        score += 3.5
-        position = _label_position(normalized, primary_label)
-        if position is not None and position <= 5:
-            score += 2.0
-        elif position is not None and position > 8:
-            score -= 1.5
-
-    for word in word_set & ACTION_WORDS:
-        if action_counts and action_counts.get(word, 0) >= 2:
-            score += 1.5
-        else:
-            score -= 0.6
-
-    if any(word in SCENE_WORDS for word in words):
-        score += 1.0
-
-    score += len(word_set & IMPORTANT_VISIBLE_WORDS) * 0.6
-
-    for object_name in caption_objects:
-        if object_name in detected_counts:
-            score += 2.5
-        elif object_name in verified_objects:
-            score += 1.4
-        elif candidate_objects.get(object_name, 0) >= 2:
-            score += 0.8
-        else:
-            score -= 1.8
-
-    for object_name, claimed_count in _caption_count_claims(normalized).items():
-        detected_count = detected_counts.get(object_name)
-        if detected_count:
-            if detected_count == claimed_count:
-                score += 2.0
-            else:
-                score -= 4.0
-
-    unsupported_terms = (
-        (word_set & UNSUPPORTED_RELATIONSHIP_TERMS)
-        | (word_set & SUBJECTIVE_MODIFIERS)
-        | (word_set & EVENT_GUESSES)
-        | (word_set & VAGUE_WORDS)
-        | (word_set & IMAGE_QUALITY_WORDS)
-    )
-    score -= len(unsupported_terms) * 1.4
-
-    unsupported_scenes = {
-        word
-        for word in word_set & SCENE_LABEL_WORDS
-        if scene_counts and scene_counts.get(word, 0) < 2
-    }
-    score -= len(unsupported_scenes) * 1.2
-
-    if any(phrase in normalized for phrase in SPECULATIVE_PHRASES):
-        score -= 2.0
-
-    if normalized.startswith(BACKGROUND_FIRST_TERMS) or "background" in word_set:
-        score -= 2.5
-
-    return score
+    scores = sequence_scores.detach().cpu().tolist()
+    return [
+        (caption, float(scores[index]) if index < len(scores) else 0.0)
+        for index, caption in enumerate(captions)
+    ]
 
 
 def _strip_prompt_lead(caption):
@@ -750,51 +334,15 @@ def _replace_relationship_claims(caption):
 
 
 def _replace_vague_quantities(caption):
-    caption = re.sub(
-        r"\b(?:a\s+)?(?:group|bunch)\s+of\s+people\b",
-        "people",
-        caption,
-        flags=re.IGNORECASE,
-    )
-    caption = re.sub(
-        r"\b(?:many|several|various)\s+people\b",
-        "people",
-        caption,
-        flags=re.IGNORECASE,
-    )
-    caption = re.sub(
-        r"\b(?:a\s+)?(?:group|bunch)\s+of\s+([a-z]+s)\b",
-        r"\1",
-        caption,
-        flags=re.IGNORECASE,
-    )
+    caption = re.sub(r"\b(?:a\s+)?(?:group|bunch)\s+of\s+people\b", "people", caption, flags=re.IGNORECASE)
+    caption = re.sub(r"\b(?:many|several|various)\s+people\b", "people", caption, flags=re.IGNORECASE)
+    caption = re.sub(r"\b(?:a\s+)?(?:group|bunch)\s+of\s+([a-z]+s)\b", r"\1", caption, flags=re.IGNORECASE)
     return _normalized_caption(caption)
 
 
 def _remove_unsupported_modifiers(caption):
     for word in SUBJECTIVE_MODIFIERS | EVENT_GUESSES | VAGUE_WORDS | IMAGE_QUALITY_WORDS:
         caption = re.sub(rf"\b{re.escape(word)}\b", "", caption, flags=re.IGNORECASE)
-    return _normalized_caption(caption)
-
-
-def _remove_unsupported_scene_labels(caption, evidence=None):
-    evidence = evidence or {}
-    scene_counts = evidence.get("scenes") or {}
-
-    def replace_scene(match):
-        scene = match.group("scene").lower()
-        if scene in IMPORTANT_VISIBLE_WORDS or (scene_counts and scene_counts.get(scene, 0) >= 2):
-            return match.group(0)
-        return ""
-
-    scene_pattern = (
-        r"\b(?:in|inside|at|near|outside|on)\s+"
-        r"(?:a|an|the)?\s*(?P<scene>"
-        + "|".join(sorted(SCENE_LABEL_WORDS))
-        + r")\b"
-    )
-    caption = re.sub(scene_pattern, replace_scene, caption, flags=re.IGNORECASE)
-    caption = re.sub(r"\b(?:in|at|near|toward)\s+the\s+background\b", "", caption, flags=re.IGNORECASE)
     return _normalized_caption(caption)
 
 
@@ -805,8 +353,7 @@ def _clean_caption_grammar(caption):
     caption = re.sub(r"\b(?:shown|visible)\s+(?:in|inside|within)\s+(?:the\s+)?(?:image|photo|picture)\b", "", caption, flags=re.IGNORECASE)
     caption = re.sub(r"\s+([,.;:])", r"\1", caption)
     caption = re.sub(r"\b(a|an|the)\s+([,.;:])", r"\2", caption, flags=re.IGNORECASE)
-    caption = re.sub(r"\b(with|near|beside|next to)\s*\.", ".", caption, flags=re.IGNORECASE)
-    caption = re.sub(r"\b(in|on|at|under|inside|outside)\s*\.", ".", caption, flags=re.IGNORECASE)
+    caption = re.sub(r"\b(with|near|beside|next to|in|on|at|under|inside|outside)\s*$", "", caption, flags=re.IGNORECASE)
     caption = re.sub(r"\s+", " ", caption).strip(" ,")
     return caption
 
@@ -842,42 +389,68 @@ def _make_caption_natural(caption):
     return _normalized_caption(caption)
 
 
-def _sanitize_caption_claims(caption, evidence=None):
+def _sanitize_caption_claims(caption):
     caption = _one_sentence(caption)
     caption = _strip_prompt_lead(caption)
     caption = _remove_speculative_language(caption)
     caption = _replace_relationship_claims(caption)
     caption = _replace_vague_quantities(caption)
     caption = _remove_unsupported_modifiers(caption)
-    caption = _remove_unsupported_scene_labels(caption, evidence)
     caption = _make_caption_natural(caption)
     return _clean_caption_grammar(caption)
 
 
-def _finalize_caption(caption, primary_label="", evidence=None):
-    caption = _sanitize_caption_claims(caption, evidence)
-
-    if _is_generic_caption(caption) or len(_caption_words(caption)) < 4:
-        caption = _caption_from_label(primary_label)
-        caption = _sanitize_caption_claims(caption, evidence)
-
-    caption = _normalized_caption(caption).strip(" .")
-    if not caption:
-        caption = "visible objects are present"
-
-    return caption[:1].upper() + caption[1:] + "."
+def _caption_object_words(caption):
+    normalized = _normalized_caption(caption).lower()
+    found = set()
+    for alias, canonical in OBJECT_CANONICAL.items():
+        if re.search(rf"\b{re.escape(alias)}\b", normalized):
+            found.add(canonical)
+    return found
 
 
-def _invalid_caption_reason(caption, evidence=None, visual_evidence=None):
+def _caption_count_claims(caption):
+    normalized = _normalized_caption(caption).lower()
+    claims = {}
+    number_pattern = "|".join(NUMBER_WORDS)
+
+    for alias, canonical in sorted(OBJECT_CANONICAL.items(), key=lambda item: len(item[0]), reverse=True):
+        explicit = re.search(rf"\b(?P<count>\d+|{number_pattern})\s+{re.escape(alias)}\b", normalized)
+        if explicit:
+            count_text = explicit.group("count")
+            claims[canonical] = int(count_text) if count_text.isdigit() else NUMBER_WORDS[count_text]
+            continue
+
+        if re.search(rf"\b(?:a|an|one)\s+{re.escape(alias)}\b", normalized):
+            claims.setdefault(canonical, 1)
+
+    return claims
+
+
+def _candidate_evidence(candidates):
+    object_counts = {}
+    count_claims = {}
+    action_counts = {}
+
+    for candidate in candidates:
+        for object_name in _caption_object_words(candidate):
+            object_counts[object_name] = object_counts.get(object_name, 0) + 1
+        for action in set(_caption_words(candidate)) & ACTION_WORDS:
+            action_counts[action] = action_counts.get(action, 0) + 1
+        for object_name, count in _caption_count_claims(candidate).items():
+            count_counts = count_claims.setdefault(object_name, {})
+            count_counts[count] = count_counts.get(count, 0) + 1
+
+    return {
+        "objects": object_counts,
+        "actions": action_counts,
+        "count_claims": count_claims,
+    }
+
+
+def _invalid_caption_reason(caption, evidence):
     normalized = _normalized_caption(caption).lower().strip(" .")
     words = _caption_words(normalized)
-    evidence = evidence or {}
-    visual_evidence = visual_evidence or {}
-    candidate_objects = evidence.get("candidate_objects") or {}
-    candidate_count_claims = evidence.get("candidate_count_claims") or {}
-    detected_counts = visual_evidence.get("detected_counts") or {}
-    verified_objects = visual_evidence.get("verified_objects") or set()
-    has_visual_objects = bool(detected_counts or verified_objects)
 
     if _is_generic_caption(normalized):
         return "generic"
@@ -894,26 +467,14 @@ def _invalid_caption_reason(caption, evidence=None, visual_evidence=None):
     if re.search(r"\b([a-z]+)\s+\1\b", normalized):
         return "repeated_word"
 
-    for object_name in _caption_object_words(normalized):
-        if object_name in detected_counts or object_name in verified_objects:
-            continue
-        if has_visual_objects and candidate_objects.get(object_name, 0) < 2:
-            return f"unsupported_object:{object_name}"
-
-        for conflicting_object in OBJECT_CONFLICTS.get(object_name, set()):
-            if conflicting_object in detected_counts or candidate_objects.get(conflicting_object, 0) >= 2:
-                return f"object_conflict:{object_name}_vs_{conflicting_object}"
-
+    count_claims = evidence.get("count_claims") or {}
     for object_name, claimed_count in _caption_count_claims(normalized).items():
-        detected_count = detected_counts.get(object_name)
-        if detected_count and detected_count != claimed_count:
-            return f"count_mismatch:{object_name}:{claimed_count}_vs_{detected_count}"
-
-        consensus_counts = candidate_count_claims.get(object_name) or {}
-        if consensus_counts:
-            consensus_count, agreement = max(consensus_counts.items(), key=lambda item: item[1])
-            if agreement >= 2 and consensus_count != claimed_count:
-                return f"count_conflict:{object_name}:{claimed_count}_vs_{consensus_count}"
+        consensus_counts = count_claims.get(object_name) or {}
+        if not consensus_counts:
+            continue
+        consensus_count, agreement = max(consensus_counts.items(), key=lambda item: item[1])
+        if agreement >= 2 and consensus_count != claimed_count:
+            return f"count_conflict:{object_name}:{claimed_count}_vs_{consensus_count}"
 
     if not re.search(
         r"\b(is|are|with|near|beside|in|inside|on|outside|under|"
@@ -926,155 +487,138 @@ def _invalid_caption_reason(caption, evidence=None, visual_evidence=None):
     return ""
 
 
-def _image_text_similarity(image, captions):
-    processor, model = _load_similarity_model()
-    if processor is None or model is None or not captions:
-        return {}
+def _caption_score(caption, evidence, model_score=0.0):
+    normalized = _normalized_caption(caption).lower()
+    words = _caption_words(normalized)
+    word_set = set(words)
+    score = float(model_score) + min(len(words), 18) * 0.18
 
-    torch = _load_torch()
-    inputs = processor(
-        text=captions,
-        images=image,
-        return_tensors="pt",
-        padding=True,
-        truncation=True,
+    if len(words) < 5:
+        score -= 2.0
+    if len(words) >= 8:
+        score += 1.0
+
+    score += len(word_set & VISIBLE_OBJECT_WORDS) * 0.7
+
+    action_counts = evidence.get("actions") or {}
+    for word in word_set & ACTION_WORDS:
+        score += 1.2 if action_counts.get(word, 0) >= 2 else 0.2
+
+    if any(word in SCENE_WORDS for word in words):
+        score += 0.8
+
+    unsupported_terms = (
+        (word_set & UNSUPPORTED_RELATIONSHIP_TERMS)
+        | (word_set & SUBJECTIVE_MODIFIERS)
+        | (word_set & EVENT_GUESSES)
+        | (word_set & VAGUE_WORDS)
+        | (word_set & IMAGE_QUALITY_WORDS)
     )
-    inputs = _move_to_device(inputs)
+    score -= len(unsupported_terms) * 1.4
+    if "background" in word_set:
+        score -= 3.0
 
-    with torch.no_grad():
-        outputs = model(**inputs)
-
-    scores = outputs.logits_per_image[0].detach().cpu().tolist()
-    return dict(zip(captions, scores))
+    return score
 
 
-def _candidate_diagnostics(candidates, evidence, visual_evidence=None):
-    records = []
+def _finalize_caption(caption):
+    caption = _sanitize_caption_claims(caption)
+    caption = _normalized_caption(caption).strip(" .")
+    if not caption:
+        raise ImageCaptioningError("BLIP returned an empty caption.")
+
+    return caption[:1].upper() + caption[1:] + "."
+
+
+def _candidate_diagnostics(raw_candidates):
+    sanitized_candidates = [
+        _sanitize_caption_claims(candidate["caption"])
+        for candidate in raw_candidates
+    ]
+    evidence = _candidate_evidence(sanitized_candidates)
+    diagnostics = []
     seen = set()
-    for raw_candidate in candidates:
-        sanitized = _sanitize_caption_claims(raw_candidate, evidence)
-        reason = _invalid_caption_reason(sanitized, evidence, visual_evidence)
+
+    for candidate in raw_candidates:
+        sanitized = _sanitize_caption_claims(candidate["caption"])
+        reason = _invalid_caption_reason(sanitized, evidence)
         if sanitized in seen and not reason:
             reason = "duplicate"
         if sanitized:
             seen.add(sanitized)
-        records.append(
+        diagnostics.append(
             {
-                "raw": raw_candidate,
+                "raw": candidate["caption"],
                 "caption": sanitized,
+                "model_score": candidate["model_score"],
+                "score": _caption_score(sanitized, evidence, candidate["model_score"]),
                 "rejected": bool(reason),
                 "reason": reason,
             }
         )
-    return records
+
+    return diagnostics, evidence
 
 
-def _best_caption(image, candidates, primary_label="", visual_evidence=None):
-    evidence = _caption_evidence(candidates)
-    diagnostics = _candidate_diagnostics(candidates, evidence, visual_evidence)
-    usable_candidates = [
-        record["caption"]
-        for record in diagnostics
-        if not record["rejected"]
-    ]
+def _select_best_caption(raw_candidates):
+    diagnostics, evidence = _candidate_diagnostics(raw_candidates)
+    usable = [candidate for candidate in diagnostics if not candidate["rejected"]]
+    if not usable:
+        raise ImageCaptioningError("BLIP did not produce a usable caption.")
 
-    if not usable_candidates:
-        return "", diagnostics, {}
-
-    similarities = _image_text_similarity(image, usable_candidates)
-
-    best_caption = max(
-        usable_candidates,
-        key=lambda candidate: (
-            similarities.get(candidate, 0.0),
-            _caption_score(candidate, primary_label, evidence, visual_evidence),
-        ),
-    )
-    return best_caption, diagnostics, similarities
-
-
-def image_file_hash(image_path):
-    digest = hashlib.sha256()
-    with open(image_path, "rb") as image_file:
-        for chunk in iter(lambda: image_file.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+    return max(usable, key=lambda candidate: candidate["score"]), diagnostics, evidence
 
 
 def generate_caption_result(image_path):
-    with Image.open(image_path) as uploaded_image:
-        image = uploaded_image.convert("RGB")
-
+    image = load_valid_image(image_path)
     image_hash = image_file_hash(image_path)
-    primary_label = _classifier_label(image)
-    visual = _visual_evidence(image, primary_label)
     generation_attempts = (
         {
-            "max_new_tokens": 24,
-            "min_length": 8,
-            "num_beams": 3,
+            "max_new_tokens": 30,
+            "num_beams": 5,
+            "num_return_sequences": 3,
             "repetition_penalty": 1.1,
             "length_penalty": 1.0,
             "early_stopping": True,
         },
         {
-            "max_new_tokens": 32,
-            "min_length": 10,
-            "num_beams": 5,
-            "repetition_penalty": 1.2,
-            "length_penalty": 0.9,
-            "early_stopping": True,
-        },
-        {
             "max_new_tokens": 36,
-            "min_length": 10,
             "num_beams": 7,
-            "repetition_penalty": 1.25,
-            "length_penalty": 1.0,
+            "num_return_sequences": 4,
+            "repetition_penalty": 1.15,
+            "length_penalty": 0.95,
             "early_stopping": True,
         },
     )
+    prompts = (None, "a clear caption of")
 
-    candidates = []
-    diagnostics = []
-    similarities = {}
+    raw_candidates = []
+    seen = set()
     for options in generation_attempts:
-        for prompt in _caption_prompts(primary_label):
-            caption = _generate_blip_caption(image, options, prompt=prompt)
-            if caption and caption not in candidates:
-                candidates.append(caption)
+        for prompt in prompts:
+            for caption, model_score in _generate_blip_candidates(image, options, prompt=prompt):
+                if caption and caption not in seen:
+                    seen.add(caption)
+                    raw_candidates.append({"caption": caption, "model_score": model_score})
 
-        best_caption, diagnostics, similarities = _best_caption(image, candidates, primary_label, visual)
-        evidence = _caption_evidence(candidates)
-        if best_caption and _caption_score(best_caption, primary_label, evidence, visual) >= STRONG_CAPTION_SCORE:
-            english_caption = _finalize_caption(best_caption, primary_label, evidence)
-            break
-    else:
-        best_caption, diagnostics, similarities = _best_caption(image, candidates, primary_label, visual)
-        if best_caption:
-            english_caption = _finalize_caption(best_caption, primary_label, _caption_evidence(candidates))
-        else:
-            fallback_caption = _classifier_caption(image)
-            if fallback_caption:
-                english_caption = _finalize_caption(fallback_caption, primary_label)
-            else:
-                english_caption = "Visible objects are present."
+    selected, diagnostics, evidence = _select_best_caption(raw_candidates)
+    english_caption = _finalize_caption(selected["caption"])
+    if not english_caption.strip(". "):
+        raise ImageCaptioningError("BLIP returned an empty caption.")
 
     result = {
         "image_hash": image_hash,
-        "generated_candidates": candidates,
+        "generated_candidates": [candidate["caption"] for candidate in raw_candidates],
         "candidate_diagnostics": diagnostics,
-        "visual_evidence": visual,
+        "caption_evidence": evidence,
         "selected_english_caption": english_caption,
-        "similarity_scores": similarities,
     }
     LOGGER.info(
-        "caption image_hash=%s visual_evidence=%r candidates=%r selected_english=%r similarity_scores=%r",
+        "caption image_hash=%s candidates=%r selected_english=%r evidence=%r",
         image_hash,
-        visual,
-        candidates,
+        result["generated_candidates"],
         english_caption,
-        similarities,
+        evidence,
     )
     return result
 
