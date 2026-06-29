@@ -98,7 +98,35 @@ PLURAL_ACTIONS = {
     "wearing": "يرتدون",
 }
 
+DUAL_NOUNS = {
+    "cat": "\u0642\u0637\u062a\u0627\u0646",
+    "cart": "\u0639\u0631\u0628\u062a\u0627\u0646",
+    "dog": "\u0643\u0644\u0628\u0627\u0646",
+    "horse": "\u062d\u0635\u0627\u0646\u0627\u0646",
+    "person": "\u0634\u062e\u0635\u0627\u0646",
+}
+
+DUAL_ACTIONS = {
+    "carrying": "\u064a\u062d\u0645\u0644\u0627\u0646",
+    "eating": "\u064a\u0623\u0643\u0644\u0627\u0646",
+    "flying": "\u064a\u0637\u064a\u0631\u0627\u0646",
+    "holding": "\u064a\u0645\u0633\u0643\u0627\u0646",
+    "jumping": "\u064a\u0642\u0641\u0632\u0627\u0646",
+    "laying": "\u0645\u0633\u062a\u0644\u0642\u064a\u0627\u0646",
+    "lying": "\u0645\u0633\u062a\u0644\u0642\u064a\u0627\u0646",
+    "looking": "\u064a\u0646\u0638\u0631\u0627\u0646",
+    "playing": "\u064a\u0644\u0639\u0628\u0627\u0646",
+    "riding": "\u064a\u0631\u0643\u0628\u0627\u0646",
+    "running": "\u064a\u0631\u0643\u0636\u0627\u0646",
+    "sitting": "\u062c\u0627\u0644\u0633\u0627\u0646",
+    "standing": "\u0648\u0627\u0642\u0641\u0627\u0646",
+    "walking": "\u064a\u0645\u0634\u064a\u0627\u0646",
+    "wearing": "\u064a\u0631\u062a\u062f\u064a\u0627\u0646",
+}
+
 PHRASES = {
+    "on grass": "\u0639\u0644\u0649 \u0627\u0644\u0639\u0634\u0628",
+    "near a road": "\u0628\u0627\u0644\u0642\u0631\u0628 \u0645\u0646 \u0637\u0631\u064a\u0642",
     "in the grass": "على العشب",
     "on the grass": "على العشب",
     "with a person": "مع شخص",
@@ -203,6 +231,19 @@ def _translate_rest(rest):
     return ""
 
 
+def _singularize_english_noun(noun):
+    noun = _strip_article(noun)
+    if noun in {"people", "men", "women"}:
+        return "person"
+    if noun.endswith("ies"):
+        return noun[:-3] + "y"
+    if noun.endswith("es") and noun[:-2] in NOUNS:
+        return noun[:-2]
+    if noun.endswith("s") and noun[:-1] in NOUNS:
+        return noun[:-1]
+    return noun
+
+
 def _template_translate(text):
     import re
 
@@ -220,6 +261,20 @@ def _template_translate(text):
         if noun:
             return _photo_of(noun)
 
+    match = re.match(
+        r"^(?P<count>two)\s+(?P<noun>[a-z ]+?)\s+"
+        r"(?:(?:are)\s+)?"
+        r"(?P<action>carrying|eating|flying|holding|jumping|laying|lying|looking|playing|riding|running|sitting|standing|walking|wearing)"
+        r"(?P<rest>\s+.+)?$",
+        lower,
+    )
+    if match:
+        noun = DUAL_NOUNS.get(_singularize_english_noun(match.group("noun")))
+        action = DUAL_ACTIONS.get(match.group("action"))
+        rest = _translate_rest(match.group("rest") or "")
+        if noun and action and (not match.group("rest") or rest):
+            return f"{noun} {action}{rest}."
+
     match = re.match(r"^people\s+are\s+visible$", lower)
     if match:
         return "\u064a\u0638\u0647\u0631 \u0623\u0634\u062e\u0627\u0635."
@@ -229,6 +284,42 @@ def _template_translate(text):
         noun = _noun_to_arabic(match.group("noun"))
         if noun:
             return f"\u064a\u0638\u0647\u0631 {noun}."
+
+    match = re.match(
+        r"^(?P<count>two)\s+(?P<noun>[a-z ]+?)\s+"
+        r"(?:(?:are)\s+)?"
+        r"(?P<rest>(?:beside|in|inside|near|on|outside|under|with)\s+.+)$",
+        lower,
+    )
+    if match:
+        noun = DUAL_NOUNS.get(_singularize_english_noun(match.group("noun")))
+        rest = _translate_rest(match.group("rest") or "")
+        if noun and rest:
+            return f"{noun}{rest}."
+
+    match = re.match(
+        r"^(?P<noun>people)\s+"
+        r"(?:(?:are)\s+)?"
+        r"(?P<rest>(?:beside|in|inside|near|on|outside|under|with)\s+.+)$",
+        lower,
+    )
+    if match:
+        noun = _noun_to_arabic(match.group("noun"))
+        rest = _translate_rest(match.group("rest") or "")
+        if noun and rest:
+            return f"{noun}{rest}."
+
+    match = re.match(
+        r"^(?:a|an|the)\s+(?P<noun>[a-z ]+?)\s+"
+        r"(?:(?:is|are)\s+)?"
+        r"(?P<rest>(?:beside|in|inside|near|on|outside|under|with)\s+.+)$",
+        lower,
+    )
+    if match:
+        noun = _noun_to_arabic(match.group("noun"))
+        rest = _translate_rest(match.group("rest") or "")
+        if noun and rest:
+            return f"{noun}{rest}."
 
     match = re.match(
         r"^(?P<noun>people)\s+"

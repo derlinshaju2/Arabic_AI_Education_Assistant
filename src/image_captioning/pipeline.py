@@ -122,17 +122,6 @@ NUMBER_WORDS = {
     "nine": 9,
     "ten": 10,
 }
-SPECULATIVE_PHRASES = (
-    "appears to be",
-    "appears like",
-    "looks like it is",
-    "looks like",
-    "might be",
-    "possibly",
-    "probably",
-    "seems to be",
-    "seems like",
-)
 UNSUPPORTED_RELATIONSHIP_TERMS = {
     "boyfriend",
     "brother",
@@ -259,13 +248,10 @@ def _decode_outputs(processor, outputs):
     return captions
 
 
-def _generate_blip_candidates(image, generation_options, prompt=None):
+def _generate_blip_candidates(image, generation_options):
     torch = _load_torch()
     processor, model = _load_caption_model()
-    if prompt:
-        inputs = processor(images=image, text=prompt, return_tensors="pt")
-    else:
-        inputs = processor(images=image, return_tensors="pt")
+    inputs = processor(images=image, return_tensors="pt")
     inputs = _move_to_device(inputs)
 
     with torch.no_grad():
@@ -297,7 +283,13 @@ def _strip_prompt_lead(caption):
         flags=re.IGNORECASE,
     )
     caption = re.sub(
-        r"^(?:a|an|the)\s+(?:photo|image|picture)\s+of\s+",
+        r"^(?:(?:a|an|the)\s+)?(?:clear\s+)?caption\s+of\s+",
+        "",
+        caption,
+        flags=re.IGNORECASE,
+    )
+    caption = re.sub(
+        r"^(?:(?:a|an|the)\s+)?(?:photo|image|picture)\s+of\s+",
         "",
         caption,
         flags=re.IGNORECASE,
@@ -310,39 +302,6 @@ def _one_sentence(caption):
     match = re.match(r"^(.+?)(?:[.!?]+(?:\s|$)|$)", caption)
     if match:
         caption = match.group(1)
-    return _normalized_caption(caption)
-
-
-def _remove_speculative_language(caption):
-    caption = _normalized_caption(caption)
-    for phrase in SPECULATIVE_PHRASES:
-        caption = re.sub(rf"\b{re.escape(phrase)}\b", "", caption, flags=re.IGNORECASE)
-    return _normalized_caption(caption)
-
-
-def _replace_relationship_claims(caption):
-    replacements = {
-        r"\b(?:his|her|their|the)\s+owner\b": "a person",
-        r"\b(?:his|her|their|the)\s+(?:mother|father|parent|parents)\b": "an adult",
-        r"\b(?:his|her|their|the)\s+(?:friend|friends)\b": "another person",
-        r"\ba couple\b": "two people",
-        r"\bfamily\b": "people",
-    }
-    for pattern, replacement in replacements.items():
-        caption = re.sub(pattern, replacement, caption, flags=re.IGNORECASE)
-    return caption
-
-
-def _replace_vague_quantities(caption):
-    caption = re.sub(r"\b(?:a\s+)?(?:group|bunch)\s+of\s+people\b", "people", caption, flags=re.IGNORECASE)
-    caption = re.sub(r"\b(?:many|several|various)\s+people\b", "people", caption, flags=re.IGNORECASE)
-    caption = re.sub(r"\b(?:a\s+)?(?:group|bunch)\s+of\s+([a-z]+s)\b", r"\1", caption, flags=re.IGNORECASE)
-    return _normalized_caption(caption)
-
-
-def _remove_unsupported_modifiers(caption):
-    for word in SUBJECTIVE_MODIFIERS | EVENT_GUESSES | VAGUE_WORDS | IMAGE_QUALITY_WORDS:
-        caption = re.sub(rf"\b{re.escape(word)}\b", "", caption, flags=re.IGNORECASE)
     return _normalized_caption(caption)
 
 
@@ -361,41 +320,125 @@ def _clean_caption_grammar(caption):
 def _make_caption_natural(caption):
     caption = _normalized_caption(caption)
     action_pattern = "|".join(sorted(ACTION_WORDS))
-
-    if re.search(rf"\b(?:is|are|was|were)\s+(?:{action_pattern})\b", caption, flags=re.IGNORECASE):
+    predicate_pattern = rf"{action_pattern}|visible|present|beside|in|inside|near|next to|on|outside|under|with"
+    match = re.match(
+        rf"^(?P<subject>.+?)(?:\s+(?P<auxiliary>is|are|was|were))?\s+"
+        rf"(?P<predicate>{predicate_pattern})(?P<rest>\b.*)$",
+        caption,
+        flags=re.IGNORECASE,
+    )
+    if not match:
         return caption
 
-    caption = re.sub(
-        rf"^((?:a|an|the)\s+.+?)\s+({action_pattern})(\b.*)$",
-        r"\1 is \2\3",
-        caption,
-        count=1,
-        flags=re.IGNORECASE,
+    subject = match.group("subject")
+    if re.search(r"\b(?:appear|appears|be|been|being|seem|seems|to)\b", subject, flags=re.IGNORECASE):
+        return caption
+
+    subject, number = _normalize_subject_number(subject)
+    auxiliary = match.group("auxiliary")
+    if number:
+        if auxiliary and auxiliary.lower() in {"was", "were"}:
+            auxiliary = "were" if number == "plural" else "was"
+        else:
+            auxiliary = "are" if number == "plural" else "is"
+
+    if not auxiliary:
+        return caption
+
+    return _normalized_caption(
+        f"{subject} {auxiliary} {match.group('predicate')}{match.group('rest')}"
     )
-    caption = re.sub(
-        rf"^((?:two|three|four|people)\s+.+?)\s+({action_pattern})(\b.*)$",
-        r"\1 are \2\3",
-        caption,
-        count=1,
-        flags=re.IGNORECASE,
-    )
-    caption = re.sub(
-        rf"^(people)\s+({action_pattern})(\b.*)$",
-        r"\1 are \2\3",
-        caption,
-        count=1,
-        flags=re.IGNORECASE,
-    )
-    return _normalized_caption(caption)
+
+
+def _pluralize_noun(noun):
+    lower = noun.lower()
+    irregular = {
+        "person": "people",
+        "man": "men",
+        "woman": "women",
+        "child": "children",
+        "sheep": "sheep",
+    }
+    if lower in irregular.values():
+        return noun
+    if lower in irregular:
+        return irregular[lower]
+    if lower not in OBJECT_ALIASES and lower.endswith("s"):
+        return noun
+    if lower.endswith("y") and lower[-2:-1] not in "aeiou":
+        return noun[:-1] + "ies"
+    if lower.endswith(("ch", "sh", "s", "x", "z")):
+        return noun + "es"
+    return noun + "s"
+
+
+def _singularize_noun(noun):
+    lower = noun.lower()
+    irregular = {
+        "people": "person",
+        "men": "man",
+        "women": "woman",
+        "children": "child",
+        "sheep": "sheep",
+    }
+    if lower in irregular:
+        return irregular[lower]
+
+    for singular in OBJECT_ALIASES:
+        if _pluralize_noun(singular).lower() == lower:
+            return singular
+    return noun
+
+
+def _normalize_subject_number(subject):
+    subject = _normalized_caption(subject)
+    words = re.findall(r"[a-zA-Z]+|\d+", subject.lower())
+    if not words:
+        return subject, ""
+
+    first = words[0]
+    number = ""
+    if first in {"a", "an", "one"} or first == "1":
+        number = "singular"
+    elif first in NUMBER_WORDS and NUMBER_WORDS[first] > 1:
+        number = "plural"
+    elif first.isdigit() and int(first) > 1:
+        number = "plural"
+    elif " and " in subject.lower():
+        number = "plural"
+    elif first in {"children", "men", "people", "women"}:
+        number = "plural"
+    else:
+        last = words[-1]
+        if last in OBJECT_ALIASES:
+            number = "singular"
+        elif any(_pluralize_noun(noun).lower() == last for noun in OBJECT_ALIASES):
+            number = "plural"
+
+    simple_subject = not re.search(r"\b(?:and|of|with)\b", subject, flags=re.IGNORECASE)
+    if number and simple_subject:
+        subject = re.sub(
+            r"([a-zA-Z]+)(\s*)$",
+            lambda match: (
+                _pluralize_noun(match.group(1))
+                if number == "plural"
+                else _singularize_noun(match.group(1))
+            )
+            + match.group(2),
+            subject,
+        )
+
+    article_match = re.match(r"^(a|an)\s+([a-zA-Z]+)", subject, flags=re.IGNORECASE)
+    if article_match:
+        article = "an" if article_match.group(2).lower().startswith(tuple("aeiou")) else "a"
+        subject = article + subject[article_match.end(1) :]
+
+    return _normalized_caption(subject), number
 
 
 def _sanitize_caption_claims(caption):
     caption = _one_sentence(caption)
     caption = _strip_prompt_lead(caption)
-    caption = _remove_speculative_language(caption)
-    caption = _replace_relationship_claims(caption)
-    caption = _replace_vague_quantities(caption)
-    caption = _remove_unsupported_modifiers(caption)
     caption = _make_caption_natural(caption)
     return _clean_caption_grammar(caption)
 
@@ -590,16 +633,13 @@ def generate_caption_result(image_path):
             "early_stopping": True,
         },
     )
-    prompts = (None, "a clear caption of")
-
     raw_candidates = []
     seen = set()
     for options in generation_attempts:
-        for prompt in prompts:
-            for caption, model_score in _generate_blip_candidates(image, options, prompt=prompt):
-                if caption and caption not in seen:
-                    seen.add(caption)
-                    raw_candidates.append({"caption": caption, "model_score": model_score})
+        for caption, model_score in _generate_blip_candidates(image, options):
+            if caption and caption not in seen:
+                seen.add(caption)
+                raw_candidates.append({"caption": caption, "model_score": model_score})
 
     selected, diagnostics, evidence = _select_best_caption(raw_candidates)
     english_caption = _finalize_caption(selected["caption"])
