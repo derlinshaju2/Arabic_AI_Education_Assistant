@@ -202,8 +202,23 @@ def row_to_user(row):
 
 
 def find_user_by_email(email):
+    email = normalize_email(email)
+    if not email:
+        return None
+
     with get_db() as db:
-        row = db.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+        row = db.execute(
+            """
+            SELECT *
+            FROM users
+            WHERE lower(trim(email)) = ?
+            ORDER BY
+                CASE WHEN email = ? THEN 0 ELSE 1 END,
+                id DESC
+            LIMIT 1
+            """,
+            (email, email),
+        ).fetchone()
     return row
 
 
@@ -214,6 +229,7 @@ def find_user_by_id(user_id):
 
 
 def create_user(name, email, password_hash=None, google_id=None, profile_image=None):
+    email = normalize_email(email)
     created_at = datetime.now(timezone.utc).isoformat()
 
     with get_db() as db:
@@ -299,14 +315,49 @@ def hash_password(password):
 
 
 def is_bcrypt_password_hash(password_hash):
-    return (password_hash or "").startswith(BCRYPT_PREFIXES)
+    return normalize_stored_password_hash(password_hash).startswith(BCRYPT_PREFIXES)
 
 
 def password_needs_rehash(password_hash):
-    return bool(password_hash) and not is_bcrypt_password_hash(password_hash)
+    normalized_hash = normalize_stored_password_hash(password_hash)
+    return bool(normalized_hash) and (
+        normalized_hash != password_hash or not is_bcrypt_password_hash(normalized_hash)
+    )
+
+
+def normalize_stored_password_hash(password_hash):
+    if password_hash is None:
+        return ""
+
+    if isinstance(password_hash, bytes):
+        password_hash = password_hash.decode("utf-8", errors="ignore")
+
+    raw_hash = str(password_hash)
+    normalized_hash = raw_hash.strip()
+
+    if (
+        len(normalized_hash) >= 3
+        and normalized_hash[0] in {"'", '"'}
+        and normalized_hash[-1] == normalized_hash[0]
+    ):
+        normalized_hash = normalized_hash[1:-1]
+
+    if (
+        len(normalized_hash) >= 4
+        and normalized_hash[0] == "b"
+        and normalized_hash[1] in {"'", '"'}
+        and normalized_hash[-1] == normalized_hash[1]
+    ):
+        normalized_hash = normalized_hash[2:-1]
+
+    if normalized_hash.startswith(BCRYPT_PREFIXES + WERKZEUG_PASSWORD_PREFIXES):
+        return normalized_hash
+
+    return raw_hash
 
 
 def verify_password(password, password_hash):
+    password_hash = normalize_stored_password_hash(password_hash)
     if not password_hash:
         return False
 

@@ -36,6 +36,12 @@ class PasswordVerificationTests(unittest.TestCase):
     def test_malformed_bcrypt_hash_is_rejected(self):
         self.assertFalse(verify_password("TestPass123!", "$2b$not-a-real-hash"))
 
+    def test_byte_literal_bcrypt_password_verifies(self):
+        password = "ByteLiteral123!"
+        stored_hash = str(hash_password(password).encode("utf-8"))
+
+        self.assertTrue(verify_password(password, stored_hash))
+
 
 class LoginMigrationTests(unittest.TestCase):
     def setUp(self):
@@ -69,6 +75,118 @@ class LoginMigrationTests(unittest.TestCase):
 
         self.assertTrue(is_bcrypt_password_hash(row["password"]))
         self.assertTrue(verify_password("LegacyPass123!", row["password"]))
+
+    def test_byte_literal_bcrypt_login_upgrades_to_clean_bcrypt(self):
+        password = "ByteLiteral123!"
+        created_at = datetime.now(timezone.utc).isoformat()
+        with get_db() as db:
+            db.execute(
+                """
+                INSERT INTO users (name, email, password, googleId, profileImage, createdAt)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    "Byte Literal User",
+                    "byte@example.com",
+                    str(hash_password(password).encode("utf-8")),
+                    None,
+                    None,
+                    created_at,
+                ),
+            )
+
+        response = app.test_client().post(
+            "/login",
+            json={"email": "byte@example.com", "password": password},
+            headers={"Accept": "application/json"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        with get_db() as db:
+            row = db.execute(
+                "SELECT password FROM users WHERE email = ?",
+                ("byte@example.com",),
+            ).fetchone()
+
+        self.assertTrue(is_bcrypt_password_hash(row["password"]))
+        self.assertFalse(row["password"].startswith("b'"))
+
+    def test_login_finds_existing_user_email_case_insensitively(self):
+        created_at = datetime.now(timezone.utc).isoformat()
+        with get_db() as db:
+            db.execute(
+                """
+                INSERT INTO users (name, email, password, googleId, profileImage, createdAt)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    "Case User",
+                    "Case.User@Example.COM",
+                    hash_password("CasePass123!"),
+                    None,
+                    None,
+                    created_at,
+                ),
+            )
+
+        response = app.test_client().post(
+            "/login",
+            json={"email": " case.user@example.com ", "password": "CasePass123!"},
+            headers={"Accept": "application/json"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["status"], "success")
+
+
+class SignupLoginFlowTests(unittest.TestCase):
+    def setUp(self):
+        with get_db() as db:
+            db.execute("DELETE FROM activity_history")
+            db.execute("DELETE FROM users")
+
+    def test_signup_created_user_can_login_with_same_credentials(self):
+        signup_response = app.test_client().post(
+            "/signup",
+            json={
+                "name": "Registered User",
+                "email": "Registered.User@Example.COM",
+                "password": "Registered123!",
+                "confirm_password": "Registered123!",
+            },
+            headers={"Accept": "application/json"},
+        )
+
+        self.assertEqual(signup_response.status_code, 200)
+        self.assertEqual(signup_response.get_json()["status"], "success")
+
+        login_client = app.test_client()
+        login_response = login_client.post(
+            "/login",
+            json={"email": "registered.user@example.com", "password": "Registered123!"},
+            headers={"Accept": "application/json"},
+        )
+
+        self.assertEqual(login_response.status_code, 200)
+        data = login_response.get_json()
+        self.assertEqual(data["status"], "success")
+        self.assertIn("token", data)
+        self.assertTrue(
+            any(cookie.startswith("auth_token=") for cookie in login_response.headers.getlist("Set-Cookie"))
+        )
+
+        with login_client.session_transaction() as session_data:
+            self.assertEqual(session_data["user"], "registered.user@example.com")
+
+        with get_db() as db:
+            row = db.execute(
+                "SELECT email, password FROM users WHERE email = ?",
+                ("registered.user@example.com",),
+            ).fetchone()
+
+        self.assertIsNotNone(row)
+        self.assertEqual(row["email"], "registered.user@example.com")
+        self.assertTrue(is_bcrypt_password_hash(row["password"]))
 
 
 class LogoutTests(unittest.TestCase):
