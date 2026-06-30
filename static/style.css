@@ -7579,3 +7579,43 @@ canvas {
         font-size: 13px !important;
     }
 }
+
+
+/* ==========================================================
+   STANDALONE FIXED HEADER
+
+   Applies to /captioning and /evaluation pages where the
+   topbar is a direct child of body.
+   ========================================================== */
+
+:root {
+    --ia-standalone-topbar-height: 92px;
+}
+
+html body > .topbar {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    z-index: 1500 !important;
+
+    width: 100% !important;
+    min-height: var(--ia-standalone-topbar-height) !important;
+    box-sizing: border-box !important;
+
+    transform: none !important;
+}
+
+html body > .page-shell {
+    padding-top: calc(var(--ia-standalone-topbar-height) + 24px) !important;
+}
+
+@media (max-width: 768px) {
+    :root {
+        --ia-standalone-topbar-height: 62px;
+    }
+
+    html body > .page-shell {
+        padding-top: calc(var(--ia-standalone-topbar-height) + 12px) !important;
+    }
+}
