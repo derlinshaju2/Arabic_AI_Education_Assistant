@@ -1038,8 +1038,6 @@ window.initializeEvaluationModule = function() {
     var refCounter = document.getElementById('refCounter');
     var stuCounter = document.getElementById('stuCounter');
     var questionCounter = document.getElementById('questionCounter');
-    var refWordCounter = document.getElementById('refWordCounter');
-    var stuWordCounter = document.getElementById('stuWordCounter');
     var requiredInputs = [questionInput, referenceTextarea, studentTextarea].filter(Boolean);
 
     function resetIfEvaluationFormCleared() {
@@ -1053,17 +1051,17 @@ window.initializeEvaluationModule = function() {
     }
 
     if (referenceTextarea) {
-        updateEvaluationTextStats(referenceTextarea, refCounter, refWordCounter);
+        updateEvaluationTextStats(referenceTextarea, refCounter);
         referenceTextarea.addEventListener('input', function() {
-            updateEvaluationTextStats(this, refCounter, refWordCounter);
+            updateEvaluationTextStats(this, refCounter);
             resetIfEvaluationFormCleared();
         });
     }
 
     if (studentTextarea) {
-        updateEvaluationTextStats(studentTextarea, stuCounter, stuWordCounter);
+        updateEvaluationTextStats(studentTextarea, stuCounter);
         studentTextarea.addEventListener('input', function() {
-            updateEvaluationTextStats(this, stuCounter, stuWordCounter);
+            updateEvaluationTextStats(this, stuCounter);
             autoExpandTextarea(this);
             resetIfEvaluationFormCleared();
         });
@@ -1080,7 +1078,7 @@ window.initializeEvaluationModule = function() {
 
     evaluationForm.addEventListener('reset', function() {
         setTimeout(function() {
-            ['questionCounter', 'refCounter', 'stuCounter', 'refWordCounter', 'stuWordCounter'].forEach(function(id) {
+            ['questionCounter', 'refCounter', 'stuCounter'].forEach(function(id) {
                 setText(id, '0');
             });
             document.querySelectorAll('#evaluationForm textarea').forEach(function(textarea) {
@@ -1412,14 +1410,9 @@ function updateProgressBar(id, value) {
     if (bar) bar.style.width = Math.max(0, Math.min(100, Math.round(value))) + '%';
 }
 
-function updateEvaluationTextStats(textarea, charEl, wordEl) {
+function updateEvaluationTextStats(textarea, charEl) {
     var value = textarea ? textarea.value || '' : '';
     if (charEl) charEl.textContent = value.length;
-    if (wordEl) wordEl.textContent = countWords(value);
-}
-
-function countWords(value) {
-    return (value || '').trim().split(/\s+/).filter(Boolean).length;
 }
 
 function autoExpandTextarea(textarea) {
@@ -1615,7 +1608,7 @@ window.clearEvaluationModule = function() {
     var form = document.getElementById('evaluationForm');
 
     if (form) form.reset();
-    ['questionCounter', 'refCounter', 'stuCounter', 'refWordCounter', 'stuWordCounter'].forEach(function(id) {
+    ['questionCounter', 'refCounter', 'stuCounter'].forEach(function(id) {
         setText(id, '0');
     });
     document.querySelectorAll('#evaluationForm textarea').forEach(function(textarea) {
