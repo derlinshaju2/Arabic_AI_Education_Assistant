@@ -116,24 +116,10 @@ window.clearClientAuthToken = clearClientAuthToken;
         console.log('[Dashboard] Profile dropdown initialized');
     }
 
-    // ---- LANGUAGE SWITCH ----
-    var langSwitch = document.getElementById('langSwitch');
-    var langLabel = document.getElementById('langLabel');
-    var isArabic = false;
-
+    // ---- LANGUAGE ----
     window.getDashboardLanguage = function() {
-        return isArabic ? 'ar' : 'en';
+        return document.documentElement.lang || 'en';
     };
-
-    if (langSwitch) {
-        langSwitch.addEventListener('click', function() {
-            isArabic = !isArabic;
-            langLabel.textContent = isArabic ? 'EN' : '\u0639\u0631\u0628\u064A';
-            document.documentElement.dir = isArabic ? 'rtl' : 'ltr';
-            document.documentElement.lang = isArabic ? 'ar' : 'en';
-        });
-        console.log('[Dashboard] Language switch initialized');
-    }
 
     // ---- STATISTICS ----
     function loadStats() {
