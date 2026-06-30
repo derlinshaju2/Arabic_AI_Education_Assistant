@@ -4034,3 +4034,56 @@ html body #contentArea
         animation: none !important;
     }
 }
+
+
+/* ==========================================================
+   FIXED DASHBOARD HEADER
+
+   Keep the dashboard navigation visible while content scrolls
+   and reserve matching space so modules never sit underneath it.
+   ========================================================== */
+
+:root {
+    --ia-fixed-topbar-height: 64px;
+}
+
+html body .main-content {
+    box-sizing: border-box !important;
+    padding-top: var(--ia-fixed-topbar-height) !important;
+}
+
+html body .topbar {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    left: var(--ia-sidebar-expanded) !important;
+    z-index: 900 !important;
+
+    min-height: var(--ia-fixed-topbar-height) !important;
+    box-sizing: border-box !important;
+
+    transform: none !important;
+}
+
+html body.sidebar-collapsed .topbar {
+    left: var(--ia-sidebar-collapsed) !important;
+}
+
+html body .content-area {
+    scroll-padding-top: var(--ia-fixed-topbar-height) !important;
+}
+
+@media (max-width: 980px) {
+    :root {
+        --ia-fixed-topbar-height: 62px;
+    }
+
+    html body .topbar {
+        left: 0 !important;
+        width: auto !important;
+    }
+
+    html body.sidebar-collapsed .topbar {
+        left: 0 !important;
+    }
+}
