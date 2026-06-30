@@ -10,6 +10,7 @@
   --green: #059669;
   --rose: #e11d48;
   --shadow: 0 24px 70px rgba(15, 23, 42, 0.12);
+  --site-header-height: 76px;
 }
 
 * {
@@ -45,15 +46,20 @@ svg {
 
 .site-shell {
   min-height: 100vh;
+  padding-top: var(--site-header-height);
 }
 
 .site-header {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 20;
+  left: 0;
+  right: 0;
+  z-index: 1200;
+  width: 100%;
   border-bottom: 1px solid rgba(226, 232, 240, 0.76);
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .nav-inner,
@@ -69,7 +75,7 @@ svg {
 
 .nav-inner {
   display: flex;
-  min-height: 76px;
+  min-height: var(--site-header-height);
   align-items: center;
   justify-content: space-between;
   gap: 24px;
@@ -1445,8 +1451,16 @@ canvas {
 }
 
 @media (max-width: 720px) {
+  .site-shell {
+    padding-top: 0;
+  }
+
   .site-header {
     position: sticky;
+    left: auto;
+    right: auto;
+    width: auto;
+    z-index: 20;
   }
 
   .mobile-nav.is-open {
