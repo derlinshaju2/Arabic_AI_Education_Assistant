@@ -1037,7 +1037,6 @@ window.initializeEvaluationModule = function() {
     var questionInput = document.getElementById('subject');
     var refCounter = document.getElementById('refCounter');
     var stuCounter = document.getElementById('stuCounter');
-    var questionCounter = document.getElementById('questionCounter');
     var requiredInputs = [questionInput, referenceTextarea, studentTextarea].filter(Boolean);
 
     function resetIfEvaluationFormCleared() {
@@ -1068,17 +1067,15 @@ window.initializeEvaluationModule = function() {
         autoExpandTextarea(studentTextarea);
     }
 
-    if (questionInput && questionCounter) {
-        questionCounter.textContent = (questionInput.value || '').length;
+    if (questionInput) {
         questionInput.addEventListener('input', function() {
-            questionCounter.textContent = this.value.length;
             resetIfEvaluationFormCleared();
         });
     }
 
     evaluationForm.addEventListener('reset', function() {
         setTimeout(function() {
-            ['questionCounter', 'refCounter', 'stuCounter'].forEach(function(id) {
+            ['refCounter', 'stuCounter'].forEach(function(id) {
                 setText(id, '0');
             });
             document.querySelectorAll('#evaluationForm textarea').forEach(function(textarea) {
@@ -1608,7 +1605,7 @@ window.clearEvaluationModule = function() {
     var form = document.getElementById('evaluationForm');
 
     if (form) form.reset();
-    ['questionCounter', 'refCounter', 'stuCounter'].forEach(function(id) {
+    ['refCounter', 'stuCounter'].forEach(function(id) {
         setText(id, '0');
     });
     document.querySelectorAll('#evaluationForm textarea').forEach(function(textarea) {
