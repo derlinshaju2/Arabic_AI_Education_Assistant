@@ -1,3 +1,13 @@
+---
+title: IntelliArabic
+emoji: 🧠
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # IntelliArabic – Arabic AI Education Assistant
 
 An AI-powered educational web application that combines **Computer Vision** and **Natural Language Processing** to support Arabic language learning.
