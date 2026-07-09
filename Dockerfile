@@ -11,4 +11,4 @@ ENV PORT=7860
 
 EXPOSE 7860
 
-CMD ["python", "app.py"]
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:7860", "--timeout", "300", "--workers", "1"]

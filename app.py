@@ -659,6 +659,11 @@ def get_user_history(user_id, limit=20):
 
 
 # ---------------- PAGES ----------------
+@app.route("/healthz")
+def healthz():
+    return jsonify({"status": "ok"})
+
+
 @app.route("/")
 def home():
     if current_user():
