@@ -6,6 +6,18 @@ colorTo: purple
 sdk: docker
 app_port: 7860
 pinned: false
+short_description: Arabic AI captions and answer scoring.
+models:
+  - Salesforce/blip-image-captioning-base
+  - Helsinki-NLP/opus-mt-en-ar
+  - sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+tags:
+  - flask
+  - docker
+  - arabic
+  - education
+  - image-captioning
+  - answer-evaluation
 ---
 
 # IntelliArabic – Arabic AI Education Assistant
